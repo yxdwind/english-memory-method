@@ -23,11 +23,29 @@ Isolated hooks = broken points: you must memorize the hooks, their order, AND th
 v2 welds hooks into chains: each link is *inferred* from the previous one — **whatever can be logically derived doesn't need to be memorized**.
 See [SKILL.md](SKILL.md), sections 「核心理念」 and 「链式复述五级阶梯」 (Chinese).
 
-## 📦 Install
+## 📥 Install
 
-- **Claude Code**: clone this repo, put `SKILL.md` in `~/.claude/skills/english-memory-method/`
-- **OpenClaw / AutoClaw**: put it in `~/.openclaw-autoclaw/skills/english-memory-method/`
-- Trigger: paste an English article + "出背诵方案"
+**One-liner (recommended)** — auto-detects your skills dir (AutoClaw → OpenClaw → Claude Code) and installs `SKILL.md` + `assets/`:
+
+Windows (PowerShell):
+```powershell
+irm https://raw.githubusercontent.com/yxdwind/english-memory-method/main/install.ps1 | iex
+```
+
+macOS / Linux:
+```bash
+curl -fsSL https://raw.githubusercontent.com/yxdwind/english-memory-method/main/install.sh | bash
+```
+
+Custom dir: `install.ps1 -Target <skills-dir>` or `install.sh <skills-dir>`.
+If raw.githubusercontent.com is unreachable, fall back to `git clone https://github.com/yxdwind/english-memory-method.git` and copy manually (below).
+
+**Manual (fallback)**: copy `SKILL.md` and `assets/` into your skills dir:
+
+- **Claude Code**: `~/.claude/skills/english-memory-method/`
+- **OpenClaw / AutoClaw**: `~/.openclaw-autoclaw/skills/english-memory-method/`
+
+Restart your agent to load it. Trigger: paste an English article and ask for a memorization plan (出背诵方案).
 
 ## 🎯 Use cases
 

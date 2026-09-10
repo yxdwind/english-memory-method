@@ -23,9 +23,27 @@ v2 把钩子焊成链：每一环由上一环"推"出来，**能被逻辑推出�
 
 ## 📦 安装
 
-- **Claude Code**：克隆本仓库，将 `SKILL.md` 放入 `~/.claude/skills/english-memory-method/`
-- **OpenClaw / AutoClaw**：放入 `~/.openclaw-autoclaw/skills/english-memory-method/`
-- 触发方式：丢一篇英语文章 + 一句"出背诵方案"（或"同上记忆技巧"）
+**一键安装（推荐）**——脚本自动探测技能目录（AutoClaw → OpenClaw → Claude Code），装好 `SKILL.md` + `assets/`：
+
+Windows（PowerShell）：
+```powershell
+irm https://raw.githubusercontent.com/yxdwind/english-memory-method/main/install.ps1 | iex
+```
+
+macOS / Linux：
+```bash
+curl -fsSL https://raw.githubusercontent.com/yxdwind/english-memory-method/main/install.sh | bash
+```
+
+自定义目录：`install.ps1 -Target <skills目录>` 或 `install.sh <skills目录>`。
+若 raw.githubusercontent.com 访问不畅，用备选方案：`git clone https://github.com/yxdwind/english-memory-method.git` 后手动复制（见下）。
+
+**手动安装（备选）**：将 `SKILL.md` 和 `assets/` 复制到对应技能目录：
+
+- **Claude Code**：`~/.claude/skills/english-memory-method/`
+- **OpenClaw / AutoClaw**：`~/.openclaw-autoclaw/skills/english-memory-method/`
+
+装完重启 agent 即生效。触发方式：丢一篇英语文章 + 一句"出背诵方案"（或"同上记忆技巧"）
 
 ## 🎯 适用场景
 
