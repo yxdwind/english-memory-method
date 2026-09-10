@@ -51,5 +51,6 @@ if ($head -notmatch "english-memory-method") {
 
 Write-Host ""
 Write-Host "[DONE] $Skill installed to: $Dest"
-Write-Host "Restart your agent (AutoClaw / OpenClaw / Claude Code) to load it."
-Write-Host "Trigger: paste an English article and ask for a memorization plan."
+Write-Host "No restart needed: the skills watcher (on by default) picks it up on"
+Write-Host "your next message. If not refreshed, start a new conversation, or just"
+Write-Host "ask your agent to read the SKILL.md directly."

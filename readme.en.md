@@ -40,12 +40,14 @@ curl -fsSL https://raw.githubusercontent.com/yxdwind/english-memory-method/main/
 Custom dir: `install.ps1 -Target <skills-dir>` or `install.sh <skills-dir>`.
 If raw.githubusercontent.com is unreachable, fall back to `git clone https://github.com/yxdwind/english-memory-method.git` and copy manually (below).
 
+**No restart needed**: the skills watcher (on by default for OpenClaw / AutoClaw) picks the skill up on your next message. If the current session doesn't refresh, start a new conversation — or simply ask your agent to read the `SKILL.md` directly. (Claude Code has no watcher: a new session picks it up.)
+
 **Manual (fallback)**: copy `SKILL.md` and `assets/` into your skills dir:
 
 - **Claude Code**: `~/.claude/skills/english-memory-method/`
 - **OpenClaw / AutoClaw**: `~/.openclaw-autoclaw/skills/english-memory-method/`
 
-Restart your agent to load it. Trigger: paste an English article and ask for a memorization plan (出背诵方案).
+Trigger: paste an English article and ask for a memorization plan (出背诵方案).
 
 ## 🎯 Use cases
 

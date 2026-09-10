@@ -38,12 +38,14 @@ curl -fsSL https://raw.githubusercontent.com/yxdwind/english-memory-method/main/
 自定义目录：`install.ps1 -Target <skills目录>` 或 `install.sh <skills目录>`。
 若 raw.githubusercontent.com 访问不畅，用备选方案：`git clone https://github.com/yxdwind/english-memory-method.git` 后手动复制（见下）。
 
+**装完即用，无需重启**：技能目录有 watcher 监控（OpenClaw / AutoClaw 默认开启），装完下一条消息即可触发；若当前会话未刷新，开一个新会话，或直接让 agent 读取 `SKILL.md` 文件执行（Claude Code 无 watcher，新开会话生效）。
+
 **手动安装（备选）**：将 `SKILL.md` 和 `assets/` 复制到对应技能目录：
 
 - **Claude Code**：`~/.claude/skills/english-memory-method/`
 - **OpenClaw / AutoClaw**：`~/.openclaw-autoclaw/skills/english-memory-method/`
 
-装完重启 agent 即生效。触发方式：丢一篇英语文章 + 一句"出背诵方案"（或"同上记忆技巧"）
+触发方式：丢一篇英语文章 + 一句"出背诵方案"（或"同上记忆技巧"）
 
 ## 🎯 适用场景
 
