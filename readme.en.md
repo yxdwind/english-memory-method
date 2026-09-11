@@ -17,6 +17,8 @@ Paste any English article, and it produces: a structure diagram (SVG) + a full s
 
 Plus: a memory-hook library (alliteration / rhyme / parallelism / contrast / synonym swap / bookend echo / number anchors / signpost words) + fill-in-the-blank tests.
 
+**New in v2.1**: a sentence-by-sentence close-reading section — ① per-sentence translation (Chinese by default; pass a parameter for any language, e.g. "翻译成日语"); ② full connected-speech marking: linking ⌒ / weak forms / contractions / flap t / h-dropping marked inline with American IPA annotations — see the pronunciation in the text itself.
+
 ## 🧠 Why chains, not hooks
 
 Isolated hooks = broken points: you must memorize the hooks, their order, AND their mapping to sentences — triple burden.

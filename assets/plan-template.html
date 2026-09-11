@@ -40,6 +40,18 @@
   figcaption{font-size:13px;color:var(--muted);margin-top:8px;}
   ul{padding-left:22px;}
   li{margin:5px 0;}
+  /* v2.1 逐句翻译 + 全现象连读标注 */
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);border:1px solid var(--line);background:#fff;padding:8px 14px;border-radius:8px;margin:10px 0 14px;}
+  .sent{margin:16px 0;padding-bottom:14px;border-bottom:1px dashed var(--line);}
+  .sent:last-child{border-bottom:none;padding-bottom:0;}
+  .sent-en{font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.95;}
+  .sent-en .tie{color:#d97706;font-weight:bold;margin:0 1px;}
+  .sent-en .wk{color:#9ca3af;font-style:italic;}
+  .sent-en .ft{color:#b91c1c;font-weight:bold;text-decoration:underline wavy #b91c1c 1px;text-underline-offset:3px;}
+  .sent-en .hk{color:#9ca3af;text-decoration:underline dashed #9ca3af 1px;text-underline-offset:3px;}
+  .sent-zh{color:var(--muted);font-size:14px;border-left:3px solid var(--accent-border);padding-left:10px;margin:6px 0;}
+  .pron{font-size:13.5px;background:#f8f5ec;border-left:3px solid #d97706;padding:7px 12px;color:#4b4030;line-height:2;border-radius:0 6px 6px 0;}
+  .pron .lbl{font-size:11px;letter-spacing:.15em;color:#d97706;display:block;}
   footer{margin-top:44px;color:var(--muted);font-size:13px;text-align:center;}
 </style>
 </head>
@@ -67,6 +79,15 @@
   <img src="assets/{{topic}}-structure.svg" alt="{{TITLE}}结构图">
   <figcaption>{{对结构图的一句话导读}}</figcaption>
 </figure>
+
+<!-- ③b 原文逐句区（v2.1 必需）：每句三层 sent-en（行内语音标记）→ sent-zh（翻译，默认中文，可传参换语种）→ pron（连读注解 ≤6 条） -->
+<h2>1.5 原文逐句精读（翻译 + 连读标注 · v2.1）</h2>
+<div class="legend"><span><b style="color:#d97706">⌒</b> 连读</span><span><i style="color:#9ca3af">灰色斜体</i> 弱读</span><span><b style="color:#b91c1c">t</b> flap t / 失爆</span><span><u style="text-decoration:underline dashed #9ca3af">h</u> h 击穿</span><span>翻译默认中文 · 需要其他语言在对话里说一声</span></div>
+<div class="sent">
+  <div class="sent-en">{{英文原句，行内语音标记：连读词对加 tie⌒，弱读词加 wk，flap t/失爆的 t 加 ft，被击穿的 h 加 hk；不替换原词}}</div>
+  <div class="sent-zh">{{中文翻译，默认中文；用户传参可换语种}}</div>
+  <div class="pron"><span class="lbl">连读 · 弱读 · 读法</span>{{注解：片段 音标 · 现象（读法要点），≤6 条，美式 IPA}}</div>
+</div>
 
 <!-- ④ 关键词表：每段一张表，三列 原句|关键词钩子|中文提示 -->
 <h2>2. 关键词串联表（每句一个钩子）</h2>
