@@ -47,7 +47,7 @@ If raw.githubusercontent.com is unreachable, fall back to `git clone https://git
 - **Claude Code**: `~/.claude/skills/english-memory-method/`
 - **OpenClaw / AutoClaw**: `~/.openclaw-autoclaw/skills/english-memory-method/`
 
-Trigger: paste an English article and ask for a memorization plan (出背诵方案).
+Trigger: paste an English article and ask for a memorization plan (出背诵方案, or 出记忆技巧).
 
 ## 🎯 Use cases
 

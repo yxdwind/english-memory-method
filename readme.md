@@ -45,7 +45,7 @@ curl -fsSL https://raw.githubusercontent.com/yxdwind/english-memory-method/main/
 - **Claude Code**：`~/.claude/skills/english-memory-method/`
 - **OpenClaw / AutoClaw**：`~/.openclaw-autoclaw/skills/english-memory-method/`
 
-触发方式：丢一篇英语文章 + 一句"出背诵方案"（或"同上记忆技巧"）
+触发方式：丢一篇英语文章 + 一句"出背诵方案"（或"出记忆技巧"）
 
 ## 🎯 适用场景
 
