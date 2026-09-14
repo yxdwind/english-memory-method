@@ -60,10 +60,13 @@ curl -fsSL https://raw.githubusercontent.com/yxdwind/english-memory-method/main/
 | Trae | `~/.trae/skills/english-memory-method/` |
 | 通义灵码 Lingma | `~/.lingma/skills/english-memory-method/` |
 | 文心快码 Comate | `~/.comate/skills/english-memory-method/` |
-｜ CodeBuddy / WorkBuddy ｜ `~/.codebuddy/skills/` 、`~/.workbuddy/skills/` ｜
-｜ Kimi Code ｜ `~/.kimi-code/skills/english-memory-method/` ｜
-｜ MiniMax ｜ `~/.minimax/skills/english-memory-method/` ｜
-| Windsurf / Continue / Roo Code | `~/.windsurf|continue|.roo/skills/` |
+| CodeBuddy | `~/.codebuddy/skills/english-memory-method/` |
+| WorkBuddy | `~/.workbuddy/skills/english-memory-method/` |
+| Kimi Code | `~/.kimi-code/skills/english-memory-method/` |
+| MiniMax | `~/.minimax/skills/english-memory-method/` |
+| Windsurf | `~/.windsurf/skills/english-memory-method/` |
+| Continue | `~/.continue/skills/english-memory-method/` |
+| Roo Code | `~/.roo/skills/english-memory-method/` |
 | OpenClaw / AutoClaw | `~/.openclaw-autoclaw/skills/english-memory-method/` |
 
 触发方式:丢一篇英语文章 + 一句"出背诵方案"(或"出记忆技巧")

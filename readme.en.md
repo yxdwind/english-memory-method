@@ -62,10 +62,13 @@ If raw.githubusercontent.com is unreachable, fall back to `git clone https://git
 | Trae | `~/.trae/skills/english-memory-method/` |
 | Lingma (Alibaba) | `~/.lingma/skills/english-memory-method/` |
 | Comate (Baidu) | `~/.comate/skills/english-memory-method/` |
-| CodeBuddy / WorkBuddy (Tencent) | `~/.codebuddy/skills/`, `~/.workbuddy/skills/` |
+| CodeBuddy (Tencent) | `~/.codebuddy/skills/english-memory-method/` |
+| WorkBuddy (Tencent) | `~/.workbuddy/skills/english-memory-method/` |
 | Kimi Code (Moonshot) | `~/.kimi-code/skills/english-memory-method/` |
 | MiniMax | `~/.minimax/skills/english-memory-method/` |
-| Windsurf / Continue / Roo Code | `~/.windsurf|.continue|.roo/skills/` |
+| Windsurf | `~/.windsurf/skills/english-memory-method/` |
+| Continue | `~/.continue/skills/english-memory-method/` |
+| Roo Code | `~/.roo/skills/english-memory-method/` |
 | OpenClaw / AutoClaw | `~/.openclaw-autoclaw/skills/english-memory-method/` |
 
 Trigger: paste an English article and ask for a memorization plan (出背诵方案, or 出记忆技巧).
