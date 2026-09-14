@@ -19,6 +19,8 @@ Plus: a memory-hook library (alliteration / rhyme / parallelism / contrast / syn
 
 **New in v2.1**: a sentence-by-sentence close-reading section — ① per-sentence translation (Chinese by default; pass a parameter for any language, e.g. "翻译成日语"); ② full connected-speech marking: linking ⌒ / weak forms / contractions / flap t / h-dropping marked inline with American IPA annotations — see the pronunciation in the text itself.
 
+**New in v2.1.1**: ① a "7.5 Retelling Toolkit" — 10 universal techniques (stall recovery / fluent delivery / practice tips) appended after the memory hooks; ② multi-platform support — the installer now deploys to 16 agent platforms at once, with rule-adapter files for platforms without a skills mechanism (see [platforms/](platforms/README.md)).
+
 ## 🧠 Why chains, not hooks
 
 Isolated hooks = broken points: you must memorize the hooks, their order, AND their mapping to sentences — triple burden.
@@ -27,7 +29,7 @@ See [SKILL.md](SKILL.md), sections 「核心理念」 and 「链式复述五级�
 
 ## 📥 Install
 
-**One-liner (recommended)** — auto-detects your skills dir (AutoClaw → OpenClaw → Claude Code) and installs `SKILL.md` + `assets/`:
+**One-liner (recommended)** — auto-detects EVERY installed platform (Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi Code / Windsurf / Continue / Roo Code ...) and installs into each one:
 
 Windows (PowerShell):
 ```powershell
@@ -39,17 +41,43 @@ macOS / Linux:
 curl -fsSL https://raw.githubusercontent.com/yxdwind/english-memory-method/main/install.sh | bash
 ```
 
-Custom dir: `install.ps1 -Target <skills-dir>` or `install.sh <skills-dir>`.
+**Target specific platforms** (comma-separated aliases; a custom dir also works):
+```powershell
+./install.ps1 -Target "claude,codex,trae"
+./install.sh claude,codex,trae
+```
+
+Aliases: `autoclaw` `openclaw` `agents` `claude` `codex` `trae` `lingma` `comate` `codebuddy` `windsurf` `continue` `roo` `kimi` `qoder` `qwen` `workbuddy`
+
 If raw.githubusercontent.com is unreachable, fall back to `git clone https://github.com/yxdwind/english-memory-method.git` and copy manually (below).
 
 **No restart needed**: the skills watcher (on by default for OpenClaw / AutoClaw) picks the skill up on your next message. If the current session doesn't refresh, start a new conversation — or simply ask your agent to read the `SKILL.md` directly. (Claude Code has no watcher: a new session picks it up.)
 
-**Manual (fallback)**: copy `SKILL.md` and `assets/` into your skills dir:
+**Manual (fallback)**: copy `SKILL.md` and `assets/` into your skills dir, e.g.:
 
-- **Claude Code**: `~/.claude/skills/english-memory-method/`
-- **OpenClaw / AutoClaw**: `~/.openclaw-autoclaw/skills/english-memory-method/`
+| Platform | Skills dir |
+|---|---|
+| Claude Code | `~/.claude/skills/english-memory-method/` |
+| Codex | `~/.codex/skills/english-memory-method/` |
+| Trae | `~/.trae/skills/english-memory-method/` |
+| Lingma (Alibaba) | `~/.lingma/skills/english-memory-method/` |
+| Comate (Baidu) | `~/.comate/skills/english-memory-method/` |
+| CodeBuddy / WorkBuddy (Tencent) | `~/.codebuddy/skills/`, `~/.workbuddy/skills/` |
+| Kimi Code (Moonshot) | `~/.kimi-code/skills/english-memory-method/` |
+| Windsurf / Continue / Roo Code | `~/.windsurf|.continue|.roo/skills/` |
+| OpenClaw / AutoClaw | `~/.openclaw-autoclaw/skills/english-memory-method/` |
 
 Trigger: paste an English article and ask for a memorization plan (出背诵方案, or 出记忆技巧).
+
+## 🖥 Platform Support (v2.1.1)
+
+This skill follows the open **Agent Skills standard** (`skills/<name>/SKILL.md`), now adopted by most mainstream agent platforms worldwide. Three support tiers:
+
+- **L1 · Native skill install** (full features: SVG diagram + self-contained HTML plan + per-sentence linking marks): AutoClaw / OpenClaw / Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi Code / Qwen Work / Windsurf / Continue / Roo Code
+- **L2 · Rule injection** (Markdown plan): Cursor / Qoder / GitHub Copilot / Gemini CLI / Cline / Aider — ready-to-use adapter files in [`platforms/`](platforms/README.md)
+- **L3 · DIY**: on any other platform, paste the `SKILL.md` content into its custom instructions
+
+Full matrix (20 platforms × install methods): **[platforms/README.md](platforms/README.md)**.
 
 ## 🎯 Use cases
 

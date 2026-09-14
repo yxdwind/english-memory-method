@@ -1,9 +1,15 @@
 #!/usr/bin/env bash
-# english-memory-method installer (macOS / Linux)
-# One-liner:
+# english-memory-method installer v3 (Linux / macOS)
+#
+# One-liner (installs to EVERY detected agent platform):
 #   curl -fsSL https://raw.githubusercontent.com/yxdwind/english-memory-method/main/install.sh | bash
-# With custom target:
-#   ./install.sh [target-skills-dir]
+#
+# Install to specific platform(s), comma-separated:
+#   ./install.sh claude,codex,trae
+#
+# Supported aliases:
+#   autoclaw, openclaw, agents, claude, codex, trae, lingma, comate,
+#   codebuddy, windsurf, continue, roo, kimi, qoder, qwen, workbuddy
 
 set -euo pipefail
 
@@ -13,29 +19,80 @@ SKILL="english-memory-method"
 RAW="https://raw.githubusercontent.com/$REPO/$BRANCH"
 FILES=("SKILL.md" "assets/plan-template.html")
 
-TARGET="${1:-}"
-if [ -z "$TARGET" ]; then
-  for c in "$HOME/.openclaw-autoclaw/skills" "$HOME/.openclaw/skills" "$HOME/.claude/skills"; do
-    if [ -d "$c" ]; then TARGET="$c"; break; fi
+# platform alias -> skills dir (relative to $HOME)
+declare -A PLATFORMS=(
+  [autoclaw]=".openclaw-autoclaw/skills"
+  [openclaw]=".openclaw/skills"
+  [agents]=".agents/skills"
+  [claude]=".claude/skills"
+  [codex]=".codex/skills"
+  [trae]=".trae/skills"
+  [lingma]=".lingma/skills"
+  [comate]=".comate/skills"
+  [codebuddy]=".codebuddy/skills"
+  [windsurf]=".windsurf/skills"
+  [continue]=".continue/skills"
+  [roo]=".roo/skills"
+  [kimi]=".kimi-code/skills"
+  [qoder]=".qoderwork/skills"
+  [qwen]=".qwenworkcn/skills"
+  [workbuddy]=".workbuddy/skills"
+)
+
+install_to() {
+  local dir="$1"
+  local dest="$dir/$SKILL"
+  for f in "${FILES[@]}"; do
+    mkdir -p "$(dirname "$dest/$f")"
+    curl -fsSL "$RAW/$f" -o "$dest/$f"
+    echo "  [OK] $f"
   done
-  TARGET="${TARGET:-$HOME/.openclaw/skills}"
-fi
+  echo "$dest"
+}
 
-DEST="$TARGET/$SKILL"
-mkdir -p "$DEST/assets"
-echo "Installing '$SKILL' -> $DEST"
+DESTS=()
 
-for f in "${FILES[@]}"; do
-  curl -fsSL "$RAW/$f" -o "$DEST/$f"
-  echo "  [OK] $f"
-done
-
-if ! head -n 5 "$DEST/SKILL.md" | grep -q "$SKILL"; then
-  echo "[WARN] SKILL.md content check failed - please verify manually" >&2
+if [ $# -gt 0 ] && [ -n "$1" ]; then
+  TARGET="$1"
+  if [ -d "$TARGET" ]; then
+    echo "Custom target: $TARGET"
+    DESTS+=("$(install_to "$TARGET")")
+  else
+    IFS=',' read -ra NAMES <<< "$TARGET"
+    for name in "${NAMES[@]}"; do
+      name=$(echo "$name" | tr '[:upper:]' '[:lower:]' | tr -d ' ')
+      if [[ -n "${PLATFORMS[$name]:-}" ]]; then
+        dir="$HOME/${PLATFORMS[$name]}"
+        mkdir -p "$dir"
+        echo "Platform [$name] -> $dir"
+        DESTS+=("$(install_to "$dir")")
+      else
+        echo "WARNING: unknown platform alias: $name" >&2
+      fi
+    done
+  fi
+else
+  echo "Auto-detecting agent platforms..."
+  FOUND=0
+  for name in "${!PLATFORMS[@]}"; do
+    dir="$HOME/${PLATFORMS[$name]}"
+    if [ -d "$dir" ]; then
+      FOUND=$((FOUND+1))
+      echo "Platform [$name] detected -> $dir"
+      DESTS+=("$(install_to "$dir")")
+    fi
+  done
+  if [ "$FOUND" -eq 0 ]; then
+    echo "WARNING: no known platform found - falling back to Claude Code default"
+    dir="$HOME/${PLATFORMS[claude]}"
+    mkdir -p "$dir"
+    DESTS+=("$(install_to "$dir")")
+  fi
 fi
 
 echo ""
-echo "[DONE] $SKILL installed to: $DEST"
-echo "No restart needed: the skills watcher (on by default) picks it up on"
-echo "your next message. If not refreshed, start a new conversation, or just"
-echo "ask your agent to read the SKILL.md directly."
+echo "[DONE] $SKILL installed to ${#DESTS[@]} location(s):"
+for d in "${DESTS[@]}"; do echo "  - $d"; done
+echo ""
+echo "Trigger: give your agent an English article and say"
+echo '"memorization plan" / "memory tricks" / "bei song fang an".'
