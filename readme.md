@@ -15,9 +15,9 @@
 
 配套:记忆钩子库(头韵 / 押韵 / 排比 / 对比 / 同义换词 / 首尾呼应 / 数字锚点 / 路标词)+ 挖空自测。
 
-**v2.1 新增**：原文逐句精读区 —— ① 逐句中文翻译（默认中文，可传参换语种，如“翻译成日语”）；② 全现象连读标注：连读 ⌒ / 弱读 / 缩读 / flap t / h 击穿行内标记 + 美式 IPA 读法注解，看原文就能“看到”读音。
+**v2.1 新增**:原文逐句精读区 -- 1 逐句中文翻译(默认中文,可传参换语种,如"翻译成日语");2 全现象连读标注:连读 ⌒ / 弱读 / 缩读 / flap t / h 击穿行内标记 + 美式 IPA 读法注解,看原文就能"看到"读音。
 
-**v2.1.1 新增**：① 「7.5 复述技巧包」—— 10 条纯技巧（卡壳自救 / 表达提速 / 练习要领）固定附在记忆钩子之后；② 多平台支持 —— 安装器自动铺装 16 个 agent 平台，并为无 skills 机制的平台提供规则适配文件（见 [platforms/](platforms/README.md)）。
+**v2.1.1 新增**:1 「7.5 复述技巧包」-- 10 条纯技巧(卡壳自救 / 表达提速 / 练习要领)固定附在记忆钩子之后;2 多平台支持 -- 安装器自动铺装 16 个 agent 平台,并为无 skills 机制的平台提供规则适配文件(见 [platforms/](platforms/README.md))。
 
 ## 🧠 为什么 v2 用"链"不用"钩子"
 
@@ -27,31 +27,31 @@ v2 把钩子焊成链:每一环由上一环"推"出来,**能被逻辑推出的�
 
 ## 📦 安装
 
-**一键安装（推荐）**——脚本自动探测本机全部已装平台（Claude Code / Codex / Trae / 通义灵码 / Comate / CodeBuddy / WorkBuddy / Kimi Code / Windsurf / Continue / Roo Code 等），逐一装入：
+**一键安装(推荐)**--脚本自动探测本机全部已装平台(Claude Code / Codex / Trae / 通义灵码 / Comate / CodeBuddy / WorkBuddy / Kimi Code / Windsurf / Continue / Roo Code 等),逐一装入:
 
-Windows（PowerShell）：
+Windows(PowerShell):
 ```powershell
 irm https://raw.githubusercontent.com/yxdwind/english-memory-method/main/install.ps1 | iex
 ```
 
-macOS / Linux：
+macOS / Linux:
 ```bash
 curl -fsSL https://raw.githubusercontent.com/yxdwind/english-memory-method/main/install.sh | bash
 ```
 
-**指定平台**（逗号分隔别名，也支持自定义目录）：
+**指定平台**(逗号分隔别名,也支持自定义目录):
 ```powershell
 ./install.ps1 -Target "claude,codex,trae"
 ./install.sh claude,codex,trae
 ```
 
-别名全集：`autoclaw` `openclaw` `agents` `claude` `codex` `trae` `lingma` `comate` `codebuddy` `windsurf` `continue` `roo` `kimi` `qoder` `qwen` `workbuddy`
+别名全集：`autoclaw` `openclaw` `agents` `claude` `codex` `trae` `lingma` `comate` `codebuddy` `windsurf` `continue` `roo` `kimi` `qoder` `qwen` `workbuddy` `minimax`
 
-若 raw.githubusercontent.com 访问不畅，用备选方案：`git clone https://github.com/yxdwind/english-memory-method.git` 后手动复制（见下）。
+若 raw.githubusercontent.com 访问不畅,用备选方案:`git clone https://github.com/yxdwind/english-memory-method.git` 后手动复制(见下)。
 
-**装完即用，无需重启**：技能目录有 watcher 监控（OpenClaw / AutoClaw 默认开启），装完下一条消息即可触发；若当前会话未刷新，开一个新会话，或直接让 agent 读取 `SKILL.md` 文件执行（Claude Code 无 watcher，新开会话生效）。
+**装完即用,无需重启**:技能目录有 watcher 监控(OpenClaw / AutoClaw 默认开启),装完下一条消息即可触发;若当前会话未刷新,开一个新会话,或直接让 agent 读取 `SKILL.md` 文件执行(Claude Code 无 watcher,新开会话生效)。
 
-**手动安装（备选）**：将 `SKILL.md` 和 `assets/` 复制到对应技能目录：
+**手动安装(备选)**:将 `SKILL.md` 和 `assets/` 复制到对应技能目录:
 
 | 平台 | 技能目录 |
 |---|---|
@@ -60,22 +60,23 @@ curl -fsSL https://raw.githubusercontent.com/yxdwind/english-memory-method/main/
 | Trae | `~/.trae/skills/english-memory-method/` |
 | 通义灵码 Lingma | `~/.lingma/skills/english-memory-method/` |
 | 文心快码 Comate | `~/.comate/skills/english-memory-method/` |
-| CodeBuddy / WorkBuddy | `~/.codebuddy/skills/` 、`~/.workbuddy/skills/` |
-| Kimi Code | `~/.kimi-code/skills/english-memory-method/` |
+｜ CodeBuddy / WorkBuddy ｜ `~/.codebuddy/skills/` 、`~/.workbuddy/skills/` ｜
+｜ Kimi Code ｜ `~/.kimi-code/skills/english-memory-method/` ｜
+｜ MiniMax ｜ `~/.minimax/skills/english-memory-method/` ｜
 | Windsurf / Continue / Roo Code | `~/.windsurf|continue|.roo/skills/` |
 | OpenClaw / AutoClaw | `~/.openclaw-autoclaw/skills/english-memory-method/` |
 
-触发方式：丢一篇英语文章 + 一句“出背诵方案”（或“出记忆技巧”）
+触发方式:丢一篇英语文章 + 一句"出背诵方案"(或"出记忆技巧")
 
-## 🖥 平台支持（v2.1.1）
+## 🖥 平台支持(v2.1.1)
 
-本 skill 遵循开放的 **Agent Skills 标准**（`skills/<name>/SKILL.md`），国内外主流 agent 平台已普遍采用。支持分三级：
+本 skill 遵循开放的 **Agent Skills 标准**(`skills/<name>/SKILL.md`),国内外主流 agent 平台已普遍采用。支持分三级:
 
-- **L1 · Skill 直装**（功能完整：SVG 结构图 + 自包含 HTML 方案 + 逐句连读标注）：AutoClaw / OpenClaw / Claude Code / Codex / Trae / 通义灵码 / Comate / CodeBuddy / WorkBuddy / Kimi Code / Qwen Work / Windsurf / Continue / Roo Code
-- **L2 · 规则注入**（Markdown 版方案）：Cursor / Qoder / GitHub Copilot / Gemini CLI / Cline / Aider —— 即用适配文件见 [`platforms/`](platforms/README.md)
-- **L3 · 手动跟随**：其他平台把 `SKILL.md` 内容粘贴到自定义指令即可
+- **L1 · Skill 直装**（功能完整：SVG 结构图 + 自包含 HTML 方案 + 逐句连读标注）：AutoClaw / OpenClaw / Claude Code / Codex / Trae / 通义灵码 / Comate / CodeBuddy / WorkBuddy / Kimi Code / MiniMax / Qwen Work / Windsurf / Continue / Roo Code
+- **L2 · 规则注入**(Markdown 版方案):Cursor / Qoder / GitHub Copilot / Gemini CLI / Cline / Aider -- 即用适配文件见 [`platforms/`](platforms/README.md)
+- **L3 · 手动跟随**:其他平台把 `SKILL.md` 内容粘贴到自定义指令即可
 
-完整矩阵（20 平台 × 安装方式）见 **[platforms/README.md](platforms/README.md)**。
+完整矩阵(20 平台 × 安装方式)见 **[platforms/README.md](platforms/README.md)**。
 
 ## 🎯 适用场景
 

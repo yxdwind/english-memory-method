@@ -47,7 +47,7 @@ curl -fsSL https://raw.githubusercontent.com/yxdwind/english-memory-method/main/
 ./install.sh claude,codex,trae
 ```
 
-Aliases: `autoclaw` `openclaw` `agents` `claude` `codex` `trae` `lingma` `comate` `codebuddy` `windsurf` `continue` `roo` `kimi` `qoder` `qwen` `workbuddy`
+Aliases: `autoclaw` `openclaw` `agents` `claude` `codex` `trae` `lingma` `comate` `codebuddy` `windsurf` `continue` `roo` `kimi` `qoder` `qwen` `workbuddy` `minimax`
 
 If raw.githubusercontent.com is unreachable, fall back to `git clone https://github.com/yxdwind/english-memory-method.git` and copy manually (below).
 
@@ -64,6 +64,7 @@ If raw.githubusercontent.com is unreachable, fall back to `git clone https://git
 | Comate (Baidu) | `~/.comate/skills/english-memory-method/` |
 | CodeBuddy / WorkBuddy (Tencent) | `~/.codebuddy/skills/`, `~/.workbuddy/skills/` |
 | Kimi Code (Moonshot) | `~/.kimi-code/skills/english-memory-method/` |
+| MiniMax | `~/.minimax/skills/english-memory-method/` |
 | Windsurf / Continue / Roo Code | `~/.windsurf|.continue|.roo/skills/` |
 | OpenClaw / AutoClaw | `~/.openclaw-autoclaw/skills/english-memory-method/` |
 
@@ -73,7 +74,7 @@ Trigger: paste an English article and ask for a memorization plan (出背诵方�
 
 This skill follows the open **Agent Skills standard** (`skills/<name>/SKILL.md`), now adopted by most mainstream agent platforms worldwide. Three support tiers:
 
-- **L1 · Native skill install** (full features: SVG diagram + self-contained HTML plan + per-sentence linking marks): AutoClaw / OpenClaw / Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi Code / Qwen Work / Windsurf / Continue / Roo Code
+- **L1 · Native skill install** (full features: SVG diagram + self-contained HTML plan + per-sentence linking marks): AutoClaw / OpenClaw / Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi Code / MiniMax / Qwen Work / Windsurf / Continue / Roo Code
 - **L2 · Rule injection** (Markdown plan): Cursor / Qoder / GitHub Copilot / Gemini CLI / Cline / Aider — ready-to-use adapter files in [`platforms/`](platforms/README.md)
 - **L3 · DIY**: on any other platform, paste the `SKILL.md` content into its custom instructions
 

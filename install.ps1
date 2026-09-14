@@ -12,7 +12,7 @@
 
   Supported platform aliases:
     autoclaw, openclaw, agents, claude, codex, trae, lingma, comate,
-    codebuddy, windsurf, continue, roo, kimi, qoder, qwen, workbuddy
+    codebuddy, windsurf, continue, roo, kimi, qoder, qwen, workbuddy, minimax
 
   Install to a custom directory:
     ./install.ps1 -Target "D:\my-skills"
@@ -48,6 +48,7 @@ $PlatformMap = [ordered]@{
   "qoder"     = ".qoderwork\skills"
   "qwen"      = ".qwenworkcn\skills"
   "workbuddy" = ".workbuddy\skills"
+  "minimax"   = ".minimax\skills"
 }
 
 function Install-To([string]$Dir) {

@@ -9,7 +9,7 @@
 #
 # Supported aliases:
 #   autoclaw, openclaw, agents, claude, codex, trae, lingma, comate,
-#   codebuddy, windsurf, continue, roo, kimi, qoder, qwen, workbuddy
+#   codebuddy, windsurf, continue, roo, kimi, qoder, qwen, workbuddy, minimax
 
 set -euo pipefail
 
@@ -37,6 +37,7 @@ declare -A PLATFORMS=(
   [qoder]=".qoderwork/skills"
   [qwen]=".qwenworkcn/skills"
   [workbuddy]=".workbuddy/skills"
+  [minimax]=".minimax/skills"
 )
 
 install_to() {
