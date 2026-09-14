@@ -19,6 +19,21 @@ SKILL="english-memory-method"
 RAW="https://raw.githubusercontent.com/$REPO/$BRANCH"
 FILES=("SKILL.md" "assets/plan-template.html")
 
+# download sources with fallback: raw -> jsdelivr CDN (China-friendly)
+SOURCES=("https://raw.githubusercontent.com/$REPO/$BRANCH" "https://cdn.jsdelivr.net/gh/$REPO@$BRANCH")
+
+fetch() {
+  local rel="$1" out="$2"
+  for s in "${SOURCES[@]}"; do
+    if curl -fsSL --max-time 25 "$s/$rel" -o "$out"; then
+      echo "  [OK] $rel  <- $s"
+      return 0
+    fi
+  done
+  echo "  [FAIL] $rel (all sources)" >&2
+  return 1
+}
+
 # platform alias -> skills dir (relative to $HOME)
 declare -A PLATFORMS=(
   [autoclaw]=".openclaw-autoclaw/skills"
@@ -45,8 +60,7 @@ install_to() {
   local dest="$dir/$SKILL"
   for f in "${FILES[@]}"; do
     mkdir -p "$(dirname "$dest/$f")"
-    curl -fsSL "$RAW/$f" -o "$dest/$f"
-    echo "  [OK] $f"
+    if ! fetch "$f" "$dest/$f"; then exit 1; fi
   done
   echo "$dest"
 }

@@ -30,6 +30,24 @@ $Skill  = "english-memory-method"
 $Raw    = "https://raw.githubusercontent.com/$Repo/$Branch"
 $Files  = @("SKILL.md", "assets/plan-template.html")
 
+# download sources with fallback: raw -> jsdelivr CDN (China-friendly)
+$Sources = @(
+  "https://raw.githubusercontent.com/$Repo/$Branch",
+  "https://cdn.jsdelivr.net/gh/$Repo@$Branch"
+)
+
+function Fetch-File([string]$rel, [string]$out) {
+  foreach ($s in $Sources) {
+    try {
+      Invoke-WebRequest -Uri "$s/$rel" -OutFile $out -UseBasicParsing -TimeoutSec 25
+      Write-Host "  [OK] $rel  <- $s"
+      return $true
+    } catch { }
+  }
+  Write-Warning "  [FAIL] $rel (all sources)"
+  return $false
+}
+
 # platform alias -> skills dir (relative to $HOME)
 $PlatformMap = [ordered]@{
   "autoclaw"  = ".openclaw-autoclaw\skills"
@@ -56,8 +74,7 @@ function Install-To([string]$Dir) {
   foreach ($f in $Files) {
     $out = Join-Path $Dest ($f -replace "/", "\")
     New-Item -ItemType Directory -Force -Path (Split-Path $out -Parent) | Out-Null
-    Invoke-WebRequest -Uri "$Raw/$f" -OutFile $out -UseBasicParsing
-    Write-Host "  [OK] $f"
+    if (-not (Fetch-File $f $out)) { throw "download failed: $f" }
   }
   $head = (Get-Content (Join-Path $Dest "SKILL.md") -TotalCount 5 -Encoding UTF8) -join " "
   if ($head -notmatch "english-memory-method") { Write-Warning "  SKILL.md content check failed - verify manually" }

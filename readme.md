@@ -27,17 +27,30 @@ v2 把钩子焊成链:每一环由上一环"推"出来,**能被逻辑推出的�
 
 ## 📦 安装
 
-**一键安装(推荐)**--脚本自动探测本机全部已装平台(Claude Code / Codex / Trae / 通义灵码 / Comate / CodeBuddy / WorkBuddy / Kimi Code / Windsurf / Continue / Roo Code 等),逐一装入:
+**方式一 · Claude Code 原生 plugin(零命令行,推荐)**:会话内执行 `/plugin marketplace add yxdwind/english-memory-method` 然后 `/plugin install english-memory-method`
+
+**方式二 · 一行命令铺装全部平台(推荐)**:脚本自动探测本机全部已装平台(Claude Code / Codex / Trae / 通义灵码 / Comate / CodeBuddy / WorkBuddy / Kimi Code / MiniMax / Windsurf / Continue / Roo Code 等),逐一装入;下载源自动降级(raw → jsdelivr CDN,国内友好):
 
 Windows(PowerShell):
 ```powershell
-irm https://raw.githubusercontent.com/yxdwind/english-memory-method/main/install.ps1 | iex
+irm https://cdn.jsdelivr.net/gh/yxdwind/english-memory-method@main/install.ps1 | iex
 ```
 
 macOS / Linux:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yxdwind/english-memory-method/main/install.sh | bash
+curl -fsSL https://cdn.jsdelivr.net/gh/yxdwind/english-memory-method@main/install.sh | bash
 ```
+
+> jsdelivr 有缓存延迟时,换官方源:irm https://raw.githubusercontent.com/yxdwind/english-memory-method/main/install.ps1 | iex
+
+**方式三 · npm / npx(Node 用户)**:
+
+```bash
+npx english-memory-method              # 铺装全部已检测平台
+npx english-memory-method claude,trae  # 指定平台
+```
+
+**方式四 · 平台内置 installer(无命令行)**:Codex / CodeBuddy 等内置技能安装器的平台,对话里直接说:"帮我安装 GitHub 上的 english-memory-method 这个 skill"(仓库:yxdwind/english-memory-method)
 
 **指定平台**(逗号分隔别名,也支持自定义目录):
 ```powershell

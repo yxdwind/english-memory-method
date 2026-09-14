@@ -29,17 +29,32 @@ See [SKILL.md](SKILL.md), sections 「核心理念」 and 「链式复述五级�
 
 ## 📥 Install
 
-**One-liner (recommended)** — auto-detects EVERY installed platform (Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi Code / Windsurf / Continue / Roo Code ...) and installs into each one:
+**Way 1 · Claude Code native plugin (zero CLI, recommended)**: in a Claude Code session run `/plugin marketplace add yxdwind/english-memory-method` then `/plugin install english-memory-method`
+
+**Way 2 · One-liner to deploy EVERY detected platform (recommended)**: the script auto-detects all installed platforms (Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi Code / MiniMax / Windsurf / Continue / Roo Code ...) and installs into each one; download sources auto-fallback (raw → jsdelivr CDN, China-friendly):
 
 Windows (PowerShell):
 ```powershell
-irm https://raw.githubusercontent.com/yxdwind/english-memory-method/main/install.ps1 | iex
+irm https://cdn.jsdelivr.net/gh/yxdwind/english-memory-method@main/install.ps1 | iex
 ```
 
 macOS / Linux:
 ```bash
-curl -fsSL https://raw.githubusercontent.com/yxdwind/english-memory-method/main/install.sh | bash
+curl -fsSL https://cdn.jsdelivr.net/gh/yxdwind/english-memory-method@main/install.sh | bash
 ```
+
+> If jsdelivr lags behind, use the official source: `irm https://raw.githubusercontent.com/yxdwind/english-memory-method/main/install.ps1 | iex`
+
+**Way 3 · npm / npx (Node users)**:
+
+```bash
+npx english-memory-method              # deploy to every detected platform
+npx english-memory-method claude,trae  # specific platforms
+```
+
+**Way 4 · Built-in platform installer (no CLI)**: on platforms with a built-in skill installer (Codex, CodeBuddy...), just tell the agent:
+
+> Install the skill english-memory-method from GitHub (repo: yxdwind/english-memory-method)
 
 **Target specific platforms** (comma-separated aliases; a custom dir also works):
 ```powershell
