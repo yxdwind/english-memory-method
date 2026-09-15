@@ -1,105 +1,126 @@
-# english-memory-method (English)
+<div align="center">
 
-**English Passage Memorization Method** — an AI skill (for Claude Code / OpenClaw) that turns "memorizing English articles" from rote grinding into a structured workflow.
+# 🧠 english-memory-method
 
-Paste any English article, and it produces: a structure diagram (SVG) + a full study plan (HTML, with fill-in-the-blank tests).
+**Turn "memorizing English articles" from rote grinding into a path you can actually walk.**
 
-## ✨ The Method (v2)
+Paste any English article, and it produces a **13-section study plan** (self-contained HTML):
+sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-**Four steps: Skeleton → Keywords welded into chains → Chained retelling (L1→L5) → Spaced review**
+![Version](https://img.shields.io/badge/version-2.3.0-blue)
+![Platforms](https://img.shields.io/badge/platforms-16+-teal)
+![Skill Sections](https://img.shields.io/badge/skill_sections-13-orange)
+![License](https://img.shields.io/badge/license-MIT-green)
+![Standard](https://img.shields.io/badge/Agent_Skills-standard-red)
 
-| Step | What it does |
-|---|---|
-| ① Skeleton | Detect genre & paragraph roles, compress the article into a structure map |
-| ② Keywords → Chains | Extract 1–2 hook words per sentence, then weld them into chains (choose by genre): Question Chain (argumentative) / Mental Movie (narrative) / Rails (universal) |
-| ③ Chained retelling L1→L5 | Hook table → structure map → titles only → bare hands → tell it to someone else — remove scaffolding level by level |
-| ④ Spaced review | Ebbinghaus schedule; review = ladder upgrade, not repetition |
+[Install](#-quick-start) · [Features](#-features) · [How it works](#-how-it-works13-section-closed-loop) · [Platforms](#-platform-support) · [中文](readme.md)
 
-Plus: a memory-hook library (alliteration / rhyme / parallelism / contrast / synonym swap / bookend echo / number anchors / signpost words) + fill-in-the-blank tests.
+</div>
 
-**New in v2.1**: a sentence-by-sentence close-reading section — ① per-sentence translation (Chinese by default; pass a parameter for any language, e.g. "翻译成日语"); ② full connected-speech marking: linking ⌒ / weak forms / contractions / flap t / h-dropping marked inline with American IPA annotations — see the pronunciation in the text itself.
+---
 
-**New in v2.1.1**: ① a "7.5 Retelling Toolkit" — 10 universal techniques (stall recovery / fluent delivery / practice tips) appended after the memory hooks; ② multi-platform support — the installer now deploys to 16 agent platforms at once, with rule-adapter files for platforms without a skills mechanism (see [platforms/](platforms/README.md)).
-**New in v2.2.0**: terminology feature — ① technical terms highlighted inline in the close-reading section; ② new "6.5 Terminology" table (term / word-formation breakdown / IPA / Chinese / memory hook); all 30 existing plans upgraded.
-**New in v2.2.1**: fill-in-blank answers are now hidden behind per-section "▶ 查看本段答案" toggles — fill first, check after; auto-hidden when printing.
-**New in v2.3.0**: ① the phrase list is now a 3-column table (phrase / meaning / **life example**) — plain English, daily scenes, ready to mimic; ② all sections renumbered 1–13 for a clean reading flow.
+## ✨ Features
 
-## 🧠 Why chains, not hooks
+| | Feature | In one line |
+|---|---|---|
+| 🧠 | **Chained retelling** | Hooks are welded into question chains: each link is *inferred* from the previous one — whatever can be derived doesn't need memorizing |
+| 📖 | **Close reading** | Chinese translation + full connected-speech marking (⌒ linking / weak forms / flap t / h-dropping) + term highlighting |
+| 📚 | **Terminology tables** | Word-formation breakdown (roots & affixes) + IPA + memory hooks — know the root, and new words become familiar ones |
+| 💬 | **Life examples for phrases** | Every collocation gets a plain-English daily sentence, **ready to mimic** (no translation — think in English) |
+| 🗂 | **13-section closed loop** | Strategy → close reading → hooks & chains → retelling ladder → three-pass → review → self-test → accumulation |
+| 🔒 | **Collapsed self-tests** | Fill the blanks first; answers hide behind "▶ 查看本段答案" toggles, auto-hidden when printing |
+| 🖥 | **16+ platforms, one command** | Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi / MiniMax… |
+| 📄 | **Self-contained single file** | Each plan is one HTML: inline SVG, collapsible, print-friendly, zero external dependencies |
 
-Isolated hooks = broken points: you must memorize the hooks, their order, AND their mapping to sentences — triple burden.
-v2 welds hooks into chains: each link is *inferred* from the previous one — **whatever can be logically derived doesn't need to be memorized**.
-See [SKILL.md](SKILL.md), sections 「核心理念」 and 「链式复述五级阶梯」 (Chinese).
+---
 
-## 📥 Install
+## 🚀 Quick Start
 
-**Way 1 · Claude Code native plugin (zero CLI, recommended)**: in a Claude Code session run `/plugin marketplace add yxdwind/english-memory-method` then `/plugin install english-memory-method`
+**Windows (PowerShell)**:
 
-**Way 2 · One-liner to deploy EVERY detected platform (recommended)**: the script auto-detects all installed platforms (Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi Code / MiniMax / Windsurf / Continue / Roo Code ...) and installs into each one; download sources auto-fallback (raw → jsdelivr CDN, China-friendly):
-
-Windows (PowerShell):
 ```powershell
 irm https://cdn.jsdelivr.net/gh/yxdwind/english-memory-method@main/install.ps1 | iex
 ```
 
-macOS / Linux:
+**macOS / Linux**:
+
 ```bash
 curl -fsSL https://cdn.jsdelivr.net/gh/yxdwind/english-memory-method@main/install.sh | bash
 ```
 
-> If jsdelivr lags behind, use the official source: `irm https://raw.githubusercontent.com/yxdwind/english-memory-method/main/install.ps1 | iex`
+**Claude Code (zero CLI)**:
 
-**Way 3 · npm / npx (Node users)**:
+```
+/plugin marketplace add yxdwind/english-memory-method
+/plugin install english-memory-method
+```
+
+**npm / npx**:
 
 ```bash
-npx english-memory-method              # deploy to every detected platform
-npx english-memory-method claude,trae  # specific platforms
+npx english-memory-method
 ```
 
-**Way 4 · Built-in platform installer (no CLI)**: on platforms with a built-in skill installer (Codex, CodeBuddy...), just tell the agent:
+> The installer auto-detects **every installed platform** and deploys to each one (16+ aliases — see [Platform Support](#-platform-support)).
+> If jsdelivr lags, switch to the official source: `irm https://raw.githubusercontent.com/yxdwind/english-memory-method/main/install.ps1 | iex`
 
-> Install the skill english-memory-method from GitHub (repo: yxdwind/english-memory-method)
+**Trigger**: paste an English article + ask for a memorization plan. No restart needed.
 
-**Target specific platforms** (comma-separated aliases; a custom dir also works):
-```powershell
-./install.ps1 -Target "claude,codex,trae"
-./install.sh claude,codex,trae
-```
+---
 
-Aliases: `autoclaw` `openclaw` `agents` `claude` `codex` `trae` `lingma` `comate` `codebuddy` `windsurf` `continue` `roo` `kimi` `qoder` `qwen` `workbuddy` `minimax`
+## 📖 How it works (13-section closed loop)
 
-If raw.githubusercontent.com is unreachable, fall back to `git clone https://github.com/yxdwind/english-memory-method.git` and copy manually (below).
+| # | Section | What it does |
+|---|---|---|
+| 1 | Strategy | Detect genre & skeleton, estimate length and days |
+| 2 | Structure map | Compress the article into one SVG map |
+| 3 | Close reading | Translation + linking marks + term highlighting, sentence by sentence |
+| 4 | Keyword table | 1–2 hook words per sentence + Chinese cues |
+| 5 | Question chain | Weld hooks into 4–7 signpost questions — self-QA when retelling |
+| 6 | Retelling ladder | L1 hooks → L2 chain → L3 titles → L4 bare hands → L5 tell someone |
+| 7 | Three-pass method | Read ×3 → retell with hooks → retell with the chain |
+| 8 | Spaced review | 5 min → tonight → next day → day 3 → day 7/15 |
+| 9 | Fill-in-blank test | 2–5 blanks per paragraph; answers collapsed |
+| 10 | Phrase list | 8–15 collocations + life examples |
+| 11 | Terminology | Word-formation breakdown + IPA + memory hooks |
+| 12 | Memory hooks | Alliteration / rhyme / parallelism / contrast / signposts / quotes |
+| 13 | Retelling toolkit | 10 techniques: stall recovery / delivery / practice tips |
 
-**No restart needed**: the skills watcher (on by default for OpenClaw / AutoClaw) picks the skill up on your next message. If the current session doesn't refresh, start a new conversation — or simply ask your agent to read the `SKILL.md` directly. (Claude Code has no watcher: a new session picks it up.)
+**Core idea**: isolated hooks = broken points — you memorize the hooks, the order, AND the mapping. Triple burden.
+v2 welds hooks into chains: each link is *inferred* from the previous one — **whatever can be logically derived doesn't need memorizing**.
 
-**Manual (fallback)**: copy `SKILL.md` and `assets/` into your skills dir, e.g.:
+---
 
-| Platform | Skills dir |
-|---|---|
-| Claude Code | `~/.claude/skills/english-memory-method/` |
-| Codex | `~/.codex/skills/english-memory-method/` |
-| Trae | `~/.trae/skills/english-memory-method/` |
-| Lingma (Alibaba) | `~/.lingma/skills/english-memory-method/` |
-| Comate (Baidu) | `~/.comate/skills/english-memory-method/` |
-| CodeBuddy (Tencent) | `~/.codebuddy/skills/english-memory-method/` |
-| WorkBuddy (Tencent) | `~/.workbuddy/skills/english-memory-method/` |
-| Kimi Code (Moonshot) | `~/.kimi-code/skills/english-memory-method/` |
-| MiniMax | `~/.minimax/skills/english-memory-method/` |
-| Windsurf | `~/.windsurf/skills/english-memory-method/` |
-| Continue | `~/.continue/skills/english-memory-method/` |
-| Roo Code | `~/.roo/skills/english-memory-method/` |
-| OpenClaw / AutoClaw | `~/.openclaw-autoclaw/skills/english-memory-method/` |
+## 🖥 Platform Support
 
-Trigger: paste an English article and ask for a memorization plan (出背诵方案, or 出记忆技巧).
+Built on the open **Agent Skills standard** (`skills/<name>/SKILL.md`). Three tiers:
 
-## 🖥 Platform Support (v2.3.0)
+- **L1 · Native skill install**: AutoClaw / OpenClaw / Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi Code / MiniMax / Qwen Work / Windsurf / Continue / Roo Code
+- **L2 · Rule injection** (Markdown plans): Cursor / Qoder / GitHub Copilot / Gemini CLI / Cline / Aider — adapters in [`platforms/`](platforms/README.md)
+- **L3 · Manual**: paste `SKILL.md` content into any platform's custom instructions
 
-This skill follows the open **Agent Skills standard** (`skills/<name>/SKILL.md`), now adopted by most mainstream agent platforms worldwide. Three support tiers:
+Full matrix (21 platforms × install methods): **[platforms/README.md](platforms/README.md)**.
 
-- **L1 · Native skill install** (full features: SVG diagram + self-contained HTML plan + per-sentence linking marks): AutoClaw / OpenClaw / Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi Code / MiniMax / Qwen Work / Windsurf / Continue / Roo Code
-- **L2 · Rule injection** (Markdown plan): Cursor / Qoder / GitHub Copilot / Gemini CLI / Cline / Aider — ready-to-use adapter files in [`platforms/`](platforms/README.md)
-- **L3 · DIY**: on any other platform, paste the `SKILL.md` content into its custom instructions
+---
 
-Full matrix (20 platforms × install methods): **[platforms/README.md](platforms/README.md)**.
+## 📜 Version History
+
+<details>
+<summary><b>Expand: all changes from v2.1 → v2.3.0</b></summary>
+
+**v2.1**: sentence-by-sentence close reading — per-sentence translation (any language) + full connected-speech marking (⌒ linking / weak forms / flap t / h-dropping) with American IPA.
+
+**v2.1.1**: ① "7.5 Retelling Toolkit" — 10 universal techniques appended after memory hooks; ② multi-platform support — installer deploys to 16 agent platforms, with rule adapters for platforms without skills.
+
+**v2.2.0**: terminology — ① inline term highlighting in close reading; ② "6.5 Terminology" table (term / word-formation / IPA / Chinese / memory hook); all 30 existing plans upgraded.
+
+**v2.2.1**: fill-in-blank answers hidden behind per-section toggles; auto-hidden when printing.
+
+**v2.3.0**: ① phrase list upgraded to a 3-column table with life examples; ② all sections renumbered 1–13.
+
+</details>
+
+---
 
 ## 🎯 Use cases
 
