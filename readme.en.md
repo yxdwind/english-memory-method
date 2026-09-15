@@ -21,6 +21,8 @@ Plus: a memory-hook library (alliteration / rhyme / parallelism / contrast / syn
 
 **New in v2.1.1**: ① a "7.5 Retelling Toolkit" — 10 universal techniques (stall recovery / fluent delivery / practice tips) appended after the memory hooks; ② multi-platform support — the installer now deploys to 16 agent platforms at once, with rule-adapter files for platforms without a skills mechanism (see [platforms/](platforms/README.md)).
 **New in v2.2.0**: terminology feature — ① technical terms highlighted inline in the close-reading section; ② new "6.5 Terminology" table (term / word-formation breakdown / IPA / Chinese / memory hook); all 30 existing plans upgraded.
+**New in v2.2.1**: fill-in-blank answers are now hidden behind per-section "▶ 查看本段答案" toggles — fill first, check after; auto-hidden when printing.
+**New in v2.3.0**: ① the phrase list is now a 3-column table (phrase / meaning / **life example**) — plain English, daily scenes, ready to mimic; ② all sections renumbered 1–13 for a clean reading flow.
 
 ## 🧠 Why chains, not hooks
 
@@ -89,7 +91,7 @@ If raw.githubusercontent.com is unreachable, fall back to `git clone https://git
 
 Trigger: paste an English article and ask for a memorization plan (出背诵方案, or 出记忆技巧).
 
-## 🖥 Platform Support (v2.1.1)
+## 🖥 Platform Support (v2.3.0)
 
 This skill follows the open **Agent Skills standard** (`skills/<name>/SKILL.md`), now adopted by most mainstream agent platforms worldwide. Three support tiers:
 
