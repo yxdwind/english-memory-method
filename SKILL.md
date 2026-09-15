@@ -80,7 +80,7 @@ description: 英语篇章背诵法 v2.2.0：结构骨架图、关键词链式化
 
 ### Step 7 · 挖空自测
 
-- 每段挖 2~5 个关键空（优先挖钩子词位置），答案用 `<details><summary>段落名</summary>…<div class="answer">答案</div></details>` 折叠展示。
+- 每段挖 2~5 个关键空（优先挖钩子词位置）。**挖空段始终可见**，每段答案包在独立折叠条内：`<details class="answer-toggle"><summary>▶ 查看本段答案</summary><div class="answer">答案</div></details>`（summary 统一文案“▶ 查看本段答案”，禁止直接显示答案或以段名作 summary）；段名用 `<p class="sec-label">段名</p>` 呈现。
 
 ### Step 8 · 交付
 
