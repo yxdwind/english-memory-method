@@ -67,7 +67,7 @@
 </header>
 
 <!-- ② 整体策略：一句话点出本篇文章的背诵捷径 -->
-<h2>0. 整体策略</h2>
+<h2>1. 整体策略</h2>
 <div class="card">
   四步走：<b>拆骨架 → 串关键词 → 三遍法输入 → 间隔复习</b>。
   {{本篇特有的记忆捷径，如"靠逻辑路标词推进""首尾呼应"等}}。
@@ -75,14 +75,14 @@
 </div>
 
 <!-- ③ 结构图：替换图片路径与说明文字 -->
-<h2>1. 文章结构图（背诵地图）</h2>
+<h2>2. 文章结构图（背诵地图）</h2>
 <figure>
   <img src="assets/{{topic}}-structure.svg" alt="{{TITLE}}结构图">
   <figcaption>{{对结构图的一句话导读}}</figcaption>
 </figure>
 
 <!-- ③b 原文逐句区（v2.1 必需）：每句三层 sent-en（行内语音标记）→ sent-zh（翻译，默认中文，可传参换语种）→ pron（连读注解 ≤6 条） -->
-<h2>1.5 原文逐句精读（翻译 + 连读标注 · v2.1）</h2>
+<h2>3. 原文逐句精读（翻译 + 连读标注 · v2.1）</h2>
 <div class="legend"><span><b style="color:#d97706">⌒</b> 连读</span><span><i style="color:#9ca3af">灰色斜体</i> 弱读</span><span><b style="color:#b91c1c">t</b> flap t / 失爆</span><span><mark style="background:#fef3c7;border-bottom:2px solid #f59e0b;padding:0 2px">专业词汇</mark></span><span><u style="text-decoration:underline dashed #9ca3af">h</u> h 击穿</span><span>翻译默认中文 · 需要其他语言在对话里说一声</span></div>
 <div class="sent">
   <div class="sent-en">{{英文原句，行内语音标记：连读词对加 tie⌒，弱读词加 wk，flap t/失爆的 t 加 ft，被击穿的 h 加 hk；不替换原词}}</div>
@@ -91,7 +91,7 @@
 </div>
 
 <!-- ④ 关键词表：每段一张表，三列 原句|关键词钩子|中文提示 -->
-<h2>2. 关键词串联表（每句一个钩子）</h2>
+<h2>4. 关键词串联表（每句一个钩子）</h2>
 <p style="font-size:14px;color:#374151;">每句只抓 1~2 个"钩子词"。合上书，看着中文提示往外说英文，卡住就瞄一眼关键词。</p>
 
 <h3>第 1 段 · {{逻辑角色}}</h3>
@@ -103,7 +103,7 @@
 </table>
 
 <!-- ⑤ 三遍法（每段 15~20 分钟），三步固定 -->
-<h2>3. 当天"三遍法"（一段约 {{15~20}} 分钟）</h2>
+<h2>7. 当天"三遍法"（一段约 {{15~20}} 分钟）</h2>
 <div class="tl">
   <div class="step"><span class="marker">1</span><div><div class="t">理解朗读 ×3</div><div class="d">先查清不认识的搭配（{{本段生词搭配示例}}），大声朗读 3 遍。</div></div></div>
   <div class="step"><span class="marker">2</span><div><div class="t">关键词复述 ×2</div><div class="d">合上书，看着中文提示把英文说出来；卡住就瞄一眼钩子词，两轮后基本顺。</div></div></div>
@@ -111,7 +111,7 @@
 </div>
 
 <!-- ⑥ 艾宾浩斯复习计划，五个时间点固定 -->
-<h2>4. 艾宾浩斯复习计划</h2>
+<h2>8. 艾宾浩斯复习计划</h2>
 <div class="tl">
   <div class="step"><span class="marker">✓</span><div><div class="t">背完后 5 分钟</div><div class="d">合书快速复述一遍。</div></div></div>
   <div class="step"><span class="marker">✓</span><div><div class="t">当晚睡前</div><div class="d">完整背诵全文 + 默写一遍。</div></div></div>
@@ -121,7 +121,7 @@
 </div>
 
 <!-- ⑦ 挖空自测：每段一个 details，挖 2~5 个关键空，答案放 .answer -->
-<h2>5. 挖空自测（先自己填，再点开对答案）</h2>
+<h2>9. 挖空自测（先自己填，再点开对答案）</h2>
 <p class="sec-label">第 1 段 · {{逻辑角色}}</p>
 <p style="font-size:15px;margin-top:10px;">{{挖空后的段落原文，空用 ______ 表示}}</p>
 <details class="answer-toggle"><summary>▶ 查看本段答案</summary>
@@ -129,7 +129,7 @@
 </details>
 
 <!-- ⑧ 短语清单：8~15 条，格式 **搭配** —— 中文释义（简短提示） -->
-<h2>6. 必背短语清单</h2>
+<h2>10. 必背短语清单</h2>
 <div class="card">
 <ul>
 <li><b>{{搭配}}</b> —— {{中文释义（简短词源/用法提示）}}</li>
@@ -137,7 +137,7 @@
 </div>
 
 <!-- ⑨ 记忆钩子：从文中找头韵/押韵/排比/对比/同义换词/首尾呼应/数字锚点/路标词/金句 -->
-<h2>6.5 专业词汇梳理（v2.2.0）</h2>
+<h2>11. 专业词汇梳理（v2.2.0）</h2>
 <div class="card">
 <p style="font-size:14px;color:#374151;margin-bottom:10px;">这些词是文章的"地基"——先于背诵掌握。构词拆解是最省力的记忆法：认得词根，生词就变成了熟词的组合。</p>
 <table>
@@ -148,7 +148,7 @@
 </table>
 </div>
 
-<h2>7. 记忆钩子（把句子"粘"起来）</h2>
+<h2>12. 记忆钩子（把句子"粘"起来）</h2>
 <div class="card">
 <ul>
 <li><b>{{钩子类型}}</b>：{{示例}}</li>
@@ -158,7 +158,7 @@
 <!-- ⑩ 小贴士：录音对比法 + 本篇专属建议 -->
 <div class="tip">💡 额外技巧：录音对比法 —— 录下自己的背诵回放对照原文；{{本篇专属建议}}。</div>
 
-<h2>7.5 复述技巧包（纯技巧 · 通用）</h2>
+<h2>13. 复述技巧包（纯技巧 · 通用）</h2>
 <div class="card">
 <p style="font-size:14px;color:#374151;margin-bottom:10px;">复述 ≠ 背诵原文。以下 10 条技巧篇篇通用：卡壳时用它救场，表达时用它提速。</p>
 <ul>
@@ -169,7 +169,7 @@
 <li><b>⑤ Paraphrase 合法化</b>：换词是加分不是作弊——big→huge、protect→keep ... safe，意思对就算对</li>
 <li><b>⑥ 顺序词撑骨架</b>：<b>first / then / after that / finally</b>——卡壳时先抛顺序词，句子自动长出来</li>
 <li><b>⑦ 一句一信息</b>：一句话只装一个信息点，说完就停——拆短句永远比拽长句稳</li>
-<li><b>⑧ 三遍降梯法</b>：第 1 遍看钩子说 → 第 2 遍只看问题链/段标题说 → 第 3 遍空手说（对应 2.6 的 L1→L3，不必每次冲 L5）</li>
+<li><b>⑧ 三遍降梯法</b>：第 1 遍看钩子说 → 第 2 遍只看问题链/段标题说 → 第 3 遍空手说（对应 6 的 L1→L3，不必每次冲 L5）</li>
 <li><b>⑨ 录音自查法</b>：录一遍回听，只挑 <b>3 个卡壳点</b>——下次专练这 3 处，别全文重来</li>
 <li><b>⑩ 90 秒限时法</b>：全文复述限时 90 秒——限时逼你抓主干、丢细节，复述天然变利落</li>
 </ul>
