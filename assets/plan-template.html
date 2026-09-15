@@ -52,6 +52,7 @@
   .sent-zh{color:var(--muted);font-size:14px;border-left:3px solid var(--accent-border);padding-left:10px;margin:6px 0;}
   .pron{font-size:13.5px;background:#f8f5ec;border-left:3px solid #d97706;padding:7px 12px;color:#4b4030;line-height:2;border-radius:0 6px 6px 0;}
   .pron .lbl{font-size:11px;letter-spacing:.15em;color:#d97706;display:block;}
+  .sent-en .term{background:#fef3c7;border-bottom:2px solid #f59e0b;padding:0 2px;border-radius:3px;}
   footer{margin-top:44px;color:var(--muted);font-size:13px;text-align:center;}
 </style>
 </head>
@@ -82,7 +83,7 @@
 
 <!-- ③b 原文逐句区（v2.1 必需）：每句三层 sent-en（行内语音标记）→ sent-zh（翻译，默认中文，可传参换语种）→ pron（连读注解 ≤6 条） -->
 <h2>1.5 原文逐句精读（翻译 + 连读标注 · v2.1）</h2>
-<div class="legend"><span><b style="color:#d97706">⌒</b> 连读</span><span><i style="color:#9ca3af">灰色斜体</i> 弱读</span><span><b style="color:#b91c1c">t</b> flap t / 失爆</span><span><u style="text-decoration:underline dashed #9ca3af">h</u> h 击穿</span><span>翻译默认中文 · 需要其他语言在对话里说一声</span></div>
+<div class="legend"><span><b style="color:#d97706">⌒</b> 连读</span><span><i style="color:#9ca3af">灰色斜体</i> 弱读</span><span><b style="color:#b91c1c">t</b> flap t / 失爆</span><span><mark style="background:#fef3c7;border-bottom:2px solid #f59e0b;padding:0 2px">专业词汇</mark></span><span><u style="text-decoration:underline dashed #9ca3af">h</u> h 击穿</span><span>翻译默认中文 · 需要其他语言在对话里说一声</span></div>
 <div class="sent">
   <div class="sent-en">{{英文原句，行内语音标记：连读词对加 tie⌒，弱读词加 wk，flap t/失爆的 t 加 ft，被击穿的 h 加 hk；不替换原词}}</div>
   <div class="sent-zh">{{中文翻译，默认中文；用户传参可换语种}}</div>
@@ -135,6 +136,17 @@
 </div>
 
 <!-- ⑨ 记忆钩子：从文中找头韵/押韵/排比/对比/同义换词/首尾呼应/数字锚点/路标词/金句 -->
+<h2>6.5 专业词汇梳理（v2.2.0）</h2>
+<div class="card">
+<p style="font-size:14px;color:#374151;margin-bottom:10px;">这些词是文章的"地基"——先于背诵掌握。构词拆解是最省力的记忆法：认得词根，生词就变成了熟词的组合。</p>
+<table>
+<thead><tr><th style="width:20%">术语</th><th style="width:26%">构词拆解</th><th style="width:16%">音标</th><th style="width:14%">中文</th><th>记忆钩子</th></tr></thead>
+<tbody>
+{{TERM_ROWS}}
+</tbody>
+</table>
+</div>
+
 <h2>7. 记忆钩子（把句子"粘"起来）</h2>
 <div class="card">
 <ul>

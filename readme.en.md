@@ -20,6 +20,7 @@ Plus: a memory-hook library (alliteration / rhyme / parallelism / contrast / syn
 **New in v2.1**: a sentence-by-sentence close-reading section — ① per-sentence translation (Chinese by default; pass a parameter for any language, e.g. "翻译成日语"); ② full connected-speech marking: linking ⌒ / weak forms / contractions / flap t / h-dropping marked inline with American IPA annotations — see the pronunciation in the text itself.
 
 **New in v2.1.1**: ① a "7.5 Retelling Toolkit" — 10 universal techniques (stall recovery / fluent delivery / practice tips) appended after the memory hooks; ② multi-platform support — the installer now deploys to 16 agent platforms at once, with rule-adapter files for platforms without a skills mechanism (see [platforms/](platforms/README.md)).
+**New in v2.2.0**: terminology feature — ① technical terms highlighted inline in the close-reading section; ② new "6.5 Terminology" table (term / word-formation breakdown / IPA / Chinese / memory hook); all 30 existing plans upgraded.
 
 ## 🧠 Why chains, not hooks
 
