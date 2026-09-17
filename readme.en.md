@@ -7,7 +7,7 @@
 Paste any English article, and it produces a **13-section study plan** (self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.3.0-blue)
+![Version](https://img.shields.io/badge/version-2.4.0-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-13-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -106,7 +106,7 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 ## 📜 Version History
 
 <details>
-<summary><b>Expand: all changes from v2.1 → v2.3.0</b></summary>
+<summary><b>Expand: all changes from v2.1 → v2.4.0</b></summary>
 
 **v2.1**: sentence-by-sentence close reading — per-sentence translation (any language) + full connected-speech marking (⌒ linking / weak forms / flap t / h-dropping) with American IPA.
 
@@ -117,6 +117,8 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 **v2.2.1**: fill-in-blank answers hidden behind per-section toggles; auto-hidden when printing.
 
 **v2.3.0**: ① phrase list upgraded to a 3-column table with life examples; ② all sections renumbered 1–13.
+
+**v2.4.0**: phrase examples upgraded to authentic-corpus style (news / TED voice), collocations bolded inline, no translation — 728 examples rewritten across all 30 plans.
 
 </details>
 

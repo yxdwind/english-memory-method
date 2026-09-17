@@ -7,7 +7,7 @@
 丢给它任何一篇英语文章，它还你一份 **13 节完整背诵方案**（自包含 HTML）：
 逐句连读标注、钩子焊成问题链、复述五级阶梯、专业词汇梳理、折叠自测——全在一份文件里。
 
-![Version](https://img.shields.io/badge/version-2.3.0-blue)
+![Version](https://img.shields.io/badge/version-2.4.0-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-13-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -106,7 +106,7 @@ v2 把钩子焊成链：每一环由上一环"推"出来，**能被逻辑推出�
 ## 📜 版本历史
 
 <details>
-<summary><b>展开查看 v2.1 → v2.3.0 全部变更</b></summary>
+<summary><b>展开查看 v2.1 → v2.4.0 全部变更</b></summary>
 
 **v2.1**：原文逐句精读区——逐句中文翻译（可传参换语种）+ 全现象连读标注（⌒ 连读 / 弱读 / flap t / h 击穿）+ 美式 IPA 读法注解。
 
@@ -117,6 +117,8 @@ v2 把钩子焊成链：每一环由上一环"推"出来，**能被逻辑推出�
 **v2.2.1**：挖空自测答案折叠——每段答案装进「▶ 查看本段答案」折叠条，先自己填、再点开核对，打印时自动隐藏。
 
 **v2.3.0**：① 必背短语清单升级为三列表格（短语 / 中文释义 / 生活例句）——例句纯英文、贴近日常、直接模仿；② 全部章节重排为 1~13 顺序编号，阅读流更清晰。
+
+**v2.4.0**：必背短语例句升级为真实语料风格（新闻 / TED / 原版素材语感），搭配句中加粗、无翻译、可直接迁移写作；30 篇 728 条例句全量重写。
 
 </details>
 
