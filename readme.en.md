@@ -83,7 +83,7 @@ npx english-memory-method
 | 9 | Fill-in-blank test | 2–5 blanks per paragraph; answers collapsed |
 | 10 | Phrase list | 8–15 collocations + life examples |
 | 11 | Terminology | Word-formation breakdown + IPA + memory hooks |
-| 12 | Memory hooks | Alliteration / rhyme / parallelism / contrast / signposts / quotes |
+| 12 | Memory hooks | In-text hooks + **three-layer hook chain**: paragraph hook → sentence-hook chain (logic bridges) → English anchors |
 | 13 | Retelling toolkit | 10 techniques: stall recovery / delivery / practice tips |
 
 **Core idea**: isolated hooks = broken points — you memorize the hooks, the order, AND the mapping. Triple burden.
@@ -106,7 +106,7 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 ## 📜 Version History
 
 <details>
-<summary><b>Expand: all changes from v2.1 → v2.4.0</b></summary>
+<summary><b>Expand: all changes from v2.1 → v2.5.0</b></summary>
 
 **v2.1**: sentence-by-sentence close reading — per-sentence translation (any language) + full connected-speech marking (⌒ linking / weak forms / flap t / h-dropping) with American IPA.
 
@@ -119,6 +119,10 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 **v2.3.0**: ① phrase list upgraded to a 3-column table with life examples; ② all sections renumbered 1–13.
 
 **v2.4.0**: phrase examples upgraded to authentic-corpus style (news / TED voice), collocations bolded inline, no translation — 728 examples rewritten across all 30 plans.
+
+**v2.5.0**: Terminology IPA upgraded to three-accent annotation — US default, UK differences on a separate `UK:` line, Indian English per system rules on `IN:`; 189 terms fully annotated (57 UK/US contrasts, 68 Indian-English notes).
+
+**v2.6.0**: Memory hooks upgraded to the **three-layer hook chain** — (1) paragraph hook: one vivid hook per paragraph; (2) sentence-hook chain: a 2–4 character micro-hook per sentence, linked by logic bridges (⇒ cause / ↔ contrast / → progression / ＋ parallel / : example); (3) English anchors: 2–3 anchor words from the original sentence after every hook (Chinese hook → anchor → sentence). Cover the text, follow the chain, speak one sentence per hook; wherever you get stuck is exactly the sentence to re-drill. All 30 plans upgraded: 124 chains / 423 hooks.
 
 </details>
 

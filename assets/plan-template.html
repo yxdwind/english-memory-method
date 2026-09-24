@@ -54,6 +54,13 @@
   .pron .lbl{font-size:11px;letter-spacing:.15em;color:#d97706;display:block;}
   .sent-en .term{background:#fef3c7;border-bottom:2px solid #f59e0b;padding:0 2px;border-radius:3px;}
   footer{margin-top:44px;color:var(--muted);font-size:13px;text-align:center;}
+/* v2.6.0 三层钩子链 */
+.hook-chain{background:#fffbeb;border:1px solid #fcd34d;border-left:4px solid #f59e0b;border-radius:10px;padding:12px 14px;margin:10px 0;font-size:14.5px;line-height:2;}
+.hook-chain .seg{display:inline-block;background:#fff;border:1px solid #fde68a;border-radius:8px;padding:2px 10px;margin:2px 0;font-weight:600;color:#92400e;}
+.hook-chain .anchor{font-family:Consolas,'Courier New',monospace;font-weight:400;font-size:13px;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:0 6px;margin-left:6px;}
+.hook-chain .bridge{display:inline-block;font-size:12px;color:#fff;background:#f59e0b;border-radius:10px;padding:1px 8px;margin:0 4px;}
+.hook-chain .para-hook{display:inline-block;font-size:13px;font-weight:700;color:#92400e;background:#fde68a;border-radius:8px;padding:2px 10px;margin-right:6px;}
+@media print{.hook-chain{background:#fff;border-color:#9ca3af}.hook-chain .seg,.hook-chain .anchor{border-color:#9ca3af}.hook-chain .anchor{color:#000;background:#fff}.hook-chain .bridge{background:#374151}}
 </style>
 </head>
 <body>
@@ -151,14 +158,16 @@
 </table>
 </div>
 
-<h2>12. 记忆钩子（把句子"粘"起来）</h2>
+<h2>12. 记忆钩子（把句子“粘”起来）</h2>
 <div class="card">
+<p style="font-size:14px;color:#374151;margin-bottom:8px;">两部分：<b>文内语言钩</b>——作者自己埋的记忆点；<b>三层钩子链</b>——逐句放行的复述轨道。盖住原文，只看链条，从上一钩推出下一钩。</p>
 <ul>
 <li><b>{{钩子类型}}</b>：{{示例}}</li>
 </ul>
+<h3 style="font-size:16px;margin:14px 0 6px;color:#92400e;">三层钩子链（v2.6.0 · 每段一条，逐句放行）</h3>
+<p style="font-size:13.5px;color:#6b7280;margin-bottom:10px;">用法：盖住原文 → 只看链 → 一钩一句往外说。段钩＝这段讲什么；句钩＝该句关键词；桥（⇒因果 / ↔转折 / →递进 / ＋并列 / :举例）解释下一钩为什么接得上；<span style="font-family:Consolas,monospace;color:#1d4ed8;">[方括号]</span>是原句英文锚词——卡壳看锚词，锚词带出原句。卡在哪一钩，就回原文只重背那一句。</p>
+{{HOOK_CHAINS}}
 </div>
-
-<!-- ⑩ 小贴士：录音对比法 + 本篇专属建议 -->
 <div class="tip">💡 额外技巧：录音对比法 —— 录下自己的背诵回放对照原文；{{本篇专属建议}}。</div>
 
 <h2>13. 复述技巧包（纯技巧 · 通用）</h2>
