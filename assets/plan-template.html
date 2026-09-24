@@ -189,5 +189,216 @@
 
 <footer>English teacher · 背诵方案 · 建议每天 20 分钟，{{X}}~{{Y}} 天完成</footer>
 </div>
+
+<script>
+/* ===== v2.7.0 Review Loop (self-contained; no deps) ===== */
+(function(){
+  "use strict";
+  var CSS = ''
+  + '.rv-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:#ecfdf5;border:1px solid #6ee7b7;border-left:4px solid #10b981;border-radius:10px;padding:10px 14px;margin:12px 0;font-size:14px;}'
+  + '.rv-btn{cursor:pointer;border:1px solid #10b981;background:#fff;color:#047857;border-radius:8px;padding:3px 12px;font-size:13px;font-weight:600;}'
+  + '.rv-btn:hover{background:#d1fae5;}'
+  + '.rv-btn.rv-danger{border-color:#f87171;color:#b91c1c;}'
+  + '.rv-btn.rv-danger:hover{background:#fee2e2;}'
+  + '.rv-stat{font-size:13px;color:#065f46;}'
+  + '.rv-dash{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 14px;margin:10px 0;font-size:13.5px;color:#065f46;line-height:1.9;}'
+  + '.rv-dash b{color:#065f46;}'
+  + '.rv-progress{height:8px;background:#d1fae5;border-radius:4px;overflow:hidden;margin:6px 0;}'
+  + '.rv-progress i{display:block;height:100%;background:#10b981;width:0;}'
+  + '.rv-judge{display:none;gap:4px;margin-left:8px;vertical-align:middle;}'
+  + '.sent{position:relative;}'
+  + '.rv-mode .rv-judge{display:inline-flex;}'
+  + '.rv-judge button{cursor:pointer;border:1px solid #cbd5e1;background:#fff;border-radius:6px;font-size:11px;padding:1px 7px;color:#475569;}'
+  + '.rv-judge button.rv-ok-on{background:#10b981;border-color:#10b981;color:#fff;}'
+  + '.rv-judge button.rv-bad-on{background:#ef4444;border-color:#ef4444;color:#fff;}'
+  + '.rv-weakline{border-left:3px solid #ef4444;}'
+  + '@media print{.rv-bar,.rv-dash,.rv-judge{display:none !important;}}'
+  + '';
+
+  function keyOf(){
+    var t = document.title || '';
+    var h = document.querySelector('h1');
+    return 'emm-progress:' + (h ? h.textContent.trim().slice(0, 40) : (t.slice(0, 40) || 'plan'));
+  }
+
+  function loadState(){
+    try { return JSON.parse(localStorage.getItem(keyOf()) || 'null') || fresh(); }
+    catch(e){ return fresh(); }
+  }
+  function fresh(){
+    return { done:{}, streak:{}, weak:{}, rounds:[], mode:false, current:null };
+  }
+  function save(s){ try { localStorage.setItem(keyOf(), JSON.stringify(s)); } catch(e){} }
+
+  var state, sentences = [];
+
+  function init(){
+    var style = document.createElement('style');
+    style.textContent = CSS;
+    document.head.appendChild(style);
+
+    state = loadState();
+
+    // collect sentence nodes
+    document.querySelectorAll('.sent').forEach(function(node){
+      var en = node.querySelector('.sent-en');
+      if(!en) return;
+      var idx = sentences.length;
+      sentences.push({ node: node, en: en, text: en.textContent.trim() });
+      var jspan = document.createElement('span');
+      jspan.className = 'rv-judge';
+      jspan.innerHTML = '<button type="button" data-v="ok" title="顺">顺</button><button type="button" data-v="bad" title="卡">卡</button>';
+      node.appendChild(jspan);
+      jspan.querySelector('[data-v=ok]').addEventListener('click', function(){ judge(idx, 'ok'); });
+      jspan.querySelector('[data-v=bad]').addEventListener('click', function(){ judge(idx, 'bad'); });
+    });
+    if(!sentences.length) return;
+
+    buildRoundBar();
+    buildDashboard();
+    applyJudgeState();
+    renderDash();
+  }
+
+  function buildRoundBar(){
+    var bar = document.createElement('div');
+    bar.className = 'rv-bar';
+    bar.innerHTML = '<b>🔁 复习打卡</b>'
+      + '<button type="button" class="rv-btn rv-round"></button>'
+      + '<span class="rv-stat rv-count"></span>'
+      + '<button type="button" class="rv-btn rv-danger rv-reset">重置进度</button>';
+    var host = document.querySelector('.sent');
+    if(host && host.parentNode) host.parentNode.insertBefore(bar, host);
+    bar.querySelector('.rv-reset').addEventListener('click', function(){
+      if(confirm('确定清空本篇全部复习进度？此操作不可恢复。')){
+        state = fresh(); save(state); applyJudgeState(); renderDash(); renderRound();
+      }
+    });
+    renderRound();
+    return bar;
+  }
+
+  function roundBtn(){ return document.querySelector('.rv-btn.rv-round'); }
+
+  function renderRound(){
+    var b = roundBtn(); if(!b) return;
+    if(state.mode){
+      b.textContent = '✅ 结束本轮（第 ' + (state.rounds.length + 1) + ' 轮）';
+      b.onclick = endRound;
+    } else {
+      var wk = Object.keys(state.weak).length;
+      b.textContent = wk ? ('▶ 开始本轮（第 ' + (state.rounds.length + 1) + ' 轮 · 薄弱 ' + wk + ' 句）') : ('▶ 开始本轮（第 ' + (state.rounds.length + 1) + ' 轮）');
+      b.onclick = startRound;
+    }
+    var c = document.querySelector('.rv-count');
+    if(c){
+      var judged = Object.keys(state.done).length;
+      c.textContent = state.mode ? ('已评 ' + judged + ' / ' + sentences.length + ' 句') : '';
+    }
+  }
+
+  function startRound(){
+    state.mode = true;
+    save(state);
+    document.body.classList.add('rv-mode');
+    renderRound();
+    window.scrollTo({ top: document.querySelector('.rv-bar').getBoundingClientRect().top + window.scrollY - 12, behavior: 'smooth' });
+  }
+
+  function endRound(){
+    state.mode = false;
+    // settle: ok streak++, bad -> weak
+    var d = new Date();
+    var round = { date: d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'), ok: 0, bad: 0 };
+    Object.keys(state.done).forEach(function(k){
+      if(state.done[k] === 'ok'){
+        round.ok++;
+        if(state.weak[k]){ state.streak[k] = (state.streak[k] || 0) + 1; if(state.streak[k] >= 2){ delete state.weak[k]; delete state.streak[k]; delete state.done[k]; } }
+      } else {
+        round.bad++;
+        state.weak[k] = true; state.streak[k] = 0;
+      }
+    });
+    state.rounds.push(round);
+    state.done = {};
+    save(state);
+    document.body.classList.remove('rv-mode');
+    applyJudgeState(); renderDash(); renderRound();
+  }
+
+  function judge(idx, v){
+    state.done[idx] = v;
+    save(state);
+    var chips = sentences[idx].node.querySelectorAll('.rv-judge button');
+    chips.forEach(function(b){
+      var on = b.getAttribute('data-v') === v ? (v === 'ok' ? 'rv-ok-on' : 'rv-bad-on') : '';
+      b.classList.remove('rv-ok-on', 'rv-bad-on');
+      if(on) b.classList.add(on);
+    });
+    renderRound();
+  }
+
+  function applyJudgeState(){
+    sentences.forEach(function(s, idx){
+      var v = state.done[idx];
+      s.node.querySelectorAll('.rv-judge button').forEach(function(b){
+        b.classList.remove('rv-ok-on', 'rv-bad-on');
+        var vv = b.getAttribute('data-v');
+        if(v && vv === v) b.classList.add(v === 'ok' ? 'rv-ok-on' : 'rv-bad-on');
+      });
+      s.node.classList.toggle('rv-weakline', !!state.weak[idx]);
+    });
+  }
+
+  function buildDashboard(){
+    var dash = document.createElement('div');
+    dash.className = 'rv-dash';
+    var bar = document.querySelector('.rv-bar');
+    if(bar && bar.parentNode) bar.parentNode.insertBefore(dash, bar.nextSibling);
+  }
+
+  function renderDash(){
+    var dash = document.querySelector('.rv-dash'); if(!dash) return;
+    var total = sentences.length;
+    var weakList = Object.keys(state.weak).map(Number).sort(function(a,b){ return a-b; });
+    var judged = Object.keys(state.done).length;
+    var pct = total ? Math.round(weakList.length ? ((total - weakList.length) / total * 100) : 100) : 0;
+    var html = '<b>📊 复习仪表</b> · 本篇 ' + total + ' 句'
+      + ' · 薄弱句 <b>' + weakList.length + '</b>'
+      + ' · 已完成 ' + state.rounds.length + ' 轮'
+      + '<div class="rv-progress"><i style="width:' + pct + '%"></i></div>';
+    if(state.rounds.length){
+      html += '<div>🗓 轮次记录：' + state.rounds.map(function(r, i){
+        return '第' + (i+1) + '轮 ' + r.date + '（顺' + r.ok + '/卡' + r.bad + '）';
+      }).join(' · ') + '</div>';
+    }
+    if(weakList.length){
+      html += '<div style="margin-top:6px;"><b>🎯 薄弱句清单</b>（连顺 2 轮自动毕业）：<br>'
+        + weakList.map(function(idx){
+          var txt = sentences[idx].text.slice(0, 60);
+          return '<a href="#" data-jump="' + idx + '" style="color:#b91c1c;text-decoration:none;display:block;padding:2px 0;">#' + (idx+1) + ' ' + txt + (sentences[idx].text.length > 60 ? '…' : '') + '</a>';
+        }).join('') + '</div>';
+    } else {
+      html += '<div style="margin-top:6px;">✅ 暂无薄弱句——开一轮打卡，卡壳句会自动进清单。</div>';
+    }
+    dash.innerHTML = html;
+    dash.querySelectorAll('[data-jump]').forEach(function(a){
+      a.addEventListener('click', function(ev){
+        ev.preventDefault();
+        var idx = Number(a.getAttribute('data-jump'));
+        var target = sentences[idx].node;
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        target.style.transition = 'background-color .3s';
+        target.style.backgroundColor = '#fef3c7';
+        setTimeout(function(){ target.style.backgroundColor = ''; }, 1600);
+      });
+    });
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+
 </body>
 </html>

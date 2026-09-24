@@ -106,7 +106,7 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 ## 📜 Version History
 
 <details>
-<summary><b>Expand: all changes from v2.1 → v2.5.0</b></summary>
+<summary><b>Expand: all changes from v2.1 → v2.6.0</b></summary>
 
 **v2.1**: sentence-by-sentence close reading — per-sentence translation (any language) + full connected-speech marking (⌒ linking / weak forms / flap t / h-dropping) with American IPA.
 
@@ -123,6 +123,8 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 **v2.5.0**: Terminology IPA upgraded to three-accent annotation — US default, UK differences on a separate `UK:` line, Indian English per system rules on `IN:`; 189 terms fully annotated (57 UK/US contrasts, 68 Indian-English notes).
 
 **v2.6.0**: Memory hooks upgraded to the **three-layer hook chain** — (1) paragraph hook: one vivid hook per paragraph; (2) sentence-hook chain: a 2–4 character micro-hook per sentence, linked by logic bridges (⇒ cause / ↔ contrast / → progression / ＋ parallel / : example); (3) English anchors: 2–3 anchor words from the original sentence after every hook (Chinese hook → anchor → sentence). Cover the text, follow the chain, speak one sentence per hook; wherever you get stuck is exactly the sentence to re-drill. All 30 plans upgraded: 124 chains / 423 hooks.
+
+**v2.7.0**: Review loop — plans now ship with a built-in sentence-level check-in widget: mark each sentence OK/stuck, stuck ones auto-join the **weak-sentence list** (click to jump to the text), graduate after 2 consecutive OK rounds; rounds settle with dates, progress persists in localStorage, controls hidden when printing. Built into all 30 plans — just open the file to track progress.
 
 </details>
 
