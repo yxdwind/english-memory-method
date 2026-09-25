@@ -4,10 +4,10 @@
 
 **Turn "memorizing English articles" from rote grinding into a path you can actually walk.**
 
-Paste any English article, and it produces a **13-section study plan** (self-contained HTML):
+Paste any English article, and it produces a **14-section study plan** (self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.4.0-blue)
+![Version](https://img.shields.io/badge/version-2.8.0-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-13-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -70,7 +70,7 @@ npx english-memory-method
 
 ---
 
-## 📖 How it works (13-section closed loop)
+## 📖 How it works (14-section closed loop)
 
 | # | Section | What it does |
 |---|---|---|
@@ -83,10 +83,11 @@ npx english-memory-method
 | 7 | Three-pass method | Read ×3 → retell with hooks → retell with the chain |
 | 8 | Spaced review | 5 min → tonight → next day → day 3 → day 7/15 |
 | 9 | Fill-in-blank test | 2–5 blanks per paragraph; answers collapsed |
-| 10 | Phrase list | 8–15 collocations + life examples |
+| 10 | Phrase list | 8–15 collocations + corpus-style examples, ready to reuse |
 | 11 | Terminology | Word-formation breakdown + IPA + memory hooks |
 | 12 | Memory hooks | In-text hooks + **three-layer hook chain**: paragraph hook → sentence-hook chain (logic bridges) → English anchors |
 | 13 | Retelling toolkit | 10 techniques: stall recovery / delivery / practice tips |
+| 14 | Palace map | 25-station daily-life route, one sentence per station — spatial backup for lost sentences |
 
 **Core idea**: isolated hooks = broken points — you memorize the hooks, the order, AND the mapping. Triple burden.
 v2 welds hooks into chains: each link is *inferred* from the previous one — **whatever can be logically derived doesn't need memorizing**.
