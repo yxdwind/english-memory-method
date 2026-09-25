@@ -61,6 +61,18 @@
 .hook-chain .bridge{display:inline-block;font-size:12px;color:#fff;background:#f59e0b;border-radius:10px;padding:1px 8px;margin:0 4px;}
 .hook-chain .para-hook{display:inline-block;font-size:13px;font-weight:700;color:#92400e;background:#fde68a;border-radius:8px;padding:2px 10px;margin-right:6px;}
 @media print{.hook-chain{background:#fff;border-color:#9ca3af}.hook-chain .seg,.hook-chain .anchor{border-color:#9ca3af}.hook-chain .anchor{color:#000;background:#fff}.hook-chain .bridge{background:#374151}}
+/* v2.8.0 palace map */
+.palace-route{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;}
+.palace-stop{background:#f5f3ff;border:1px solid #c4b5fd;border-left:4px solid #7c3aed;border-radius:10px;padding:8px 10px;min-width:150px;flex:1 1 160px;max-width:240px;}
+.palace-stop .st-no{display:inline-block;font-size:11px;font-weight:700;color:#fff;background:#7c3aed;border-radius:8px;padding:1px 8px;margin-bottom:4px;}
+.palace-stop .st-name{font-weight:700;color:#5b21b6;font-size:14px;}
+.palace-stop .st-hook{font-size:13px;color:#374151;margin-top:3px;font-weight:600;}
+.palace-stop .st-anchor{font-family:Consolas,'Courier New',monospace;font-size:12px;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:0 6px;display:inline-block;margin-top:3px;}
+.palace-stop .st-lead{font-size:12px;color:#9ca3af;margin-top:3px;font-style:italic;}
+.palace-stop.palace-weak{border-color:#f87171;border-left-color:#ef4444;background:#fef2f2;}
+.palace-stop.palace-weak .st-no{background:#ef4444;}
+.palace-arrow{align-self:center;color:#a78bfa;font-weight:700;}
+@media print{.palace-route{gap:4px}.palace-stop{background:#fff;border-color:#9ca3af}.palace-stop .st-anchor{color:#000;background:#fff;border-color:#9ca3af}}
 </style>
 </head>
 <body>
@@ -185,6 +197,15 @@
 <li><b>⑨ 录音自查法</b>：录一遍回听，只挑 <b>3 个卡壳点</b>——下次专练这 3 处，别全文重来</li>
 <li><b>⑩ 90 秒限时法</b>：全文复述限时 90 秒——限时逼你抓主干、丢细节，复述天然变利落</li>
 </ul>
+</div>
+
+<h2>14. 记忆宫殿映射（v2.8.0 · 空间位置线索）</h2>
+<div class="card">
+<p style="font-size:14px;color:#374151;margin-bottom:8px;">钩子链是<b>逻辑线索</b>，宫殿是<b>空间线索</b>——两条独立记忆线互为兜底。随机丢句时改走宫殿："走到哪儿"直接提示"该哪句"，<b>空的站点</b>会立刻暴露丢句位置。句钩与锚词直接来自第 12 节钩子链，无需另记内容。</p>
+<p style="font-size:13.5px;color:#6b7280;margin-bottom:6px;"><b>踩点脚本</b>：闭眼从站 1 走到末站，每站停下默念该站句钩与锚词，走完即复习一遍全文顺序。平时走逻辑线（钩子链），卡壳或复习时走空间线（宫殿）。</p>
+<div class="palace-route">
+{{PALACE_STOPS}}
+</div>
 </div>
 
 <footer>English teacher · 背诵方案 · 建议每天 20 分钟，{{X}}~{{Y}} 天完成</footer>
