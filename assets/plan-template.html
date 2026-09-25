@@ -277,8 +277,24 @@
 
     buildRoundBar();
     buildDashboard();
+    collectStops();
     applyJudgeState();
     renderDash();
+  }
+
+  var stops = [];
+  function collectStops(){
+    stops = Array.prototype.slice.call(document.querySelectorAll('.palace-stop'));
+  }
+
+  function applyWeakStops(){
+    stops.forEach(function(st, i){
+      st.classList.toggle('palace-weak', !!state.weak[i]);
+      var no = st.querySelector('.st-no');
+      if(no && state.weak[i] && !no.getAttribute('title')){
+        no.setAttribute('title', '薄弱站：点击跳到原句');
+      }
+    });
   }
 
   function buildRoundBar(){
@@ -369,6 +385,7 @@
       });
       s.node.classList.toggle('rv-weakline', !!state.weak[idx]);
     });
+    applyWeakStops();
   }
 
   function buildDashboard(){
