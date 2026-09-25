@@ -13,7 +13,7 @@ sentence-by-sentence linking marks, hooks welded into question chains, a retelli
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Standard](https://img.shields.io/badge/Agent_Skills-standard-red)
 
-[Install](#-quick-start) · [Features](#-features) · [How it works](#-how-it-works13-section-closed-loop) · [Platforms](#-platform-support) · [中文](readme.md)
+[Install](#-quick-start) · [Features](#-features) · [How it works](#-how-it-works14-section-closed-loop) · [Platforms](#-platform-support) · [中文](readme.md)
 
 </div>
 
