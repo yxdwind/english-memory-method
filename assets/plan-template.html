@@ -233,7 +233,19 @@
   + '.rv-judge button.rv-ok-on{background:#10b981;border-color:#10b981;color:#fff;}'
   + '.rv-judge button.rv-bad-on{background:#ef4444;border-color:#ef4444;color:#fff;}'
   + '.rv-weakline{border-left:3px solid #ef4444;}'
-  + '@media print{.rv-bar,.rv-dash,.rv-judge{display:none !important;}}'
+  + '.rv-dict{background:#eff6ff;border:1px solid #93c5fd;border-left:4px solid #3b82f6;border-radius:10px;padding:10px 14px;margin:12px 0;font-size:14px;}'
+  + '.rv-dict .d-btn{cursor:pointer;border:1px solid #3b82f6;background:#fff;color:#1d4ed8;border-radius:8px;padding:3px 12px;font-size:13px;font-weight:600;margin-right:6px;}'
+  + '.rv-dict .d-btn:hover{background:#dbeafe;}'
+  + '.rv-dict input.d-input{border:1px solid #93c5fd;border-radius:8px;padding:5px 10px;font-size:14px;width:70%;margin:6px 0;}'
+  + '.rv-dict .d-sent{font-size:15px;margin:8px 0 4px;color:#1e3a8a;font-weight:600;}'
+  + '.rv-dict .w-ok{color:#059669;}'
+  + '.rv-dict .w-bad{background:#fef08a;color:#92400e;border-radius:4px;padding:0 3px;}'
+  + '.rv-dict .w-miss{background:#fee2e2;color:#b91c1c;border-radius:4px;padding:0 3px;text-decoration:line-through;}'
+  + '.rv-dict .w-extra{color:#9ca3af;text-decoration:line-through;}'
+  + '.rv-dict .d-hint{font-size:12.5px;color:#6b7280;margin-top:4px;}'
+  + '@media print{.rv-dict{display:none !important;}}'
+
+  + '@media print{.rv-bar,.rv-dash,.rv-judge,.rv-dict{display:none !important;}}'
   + '';
 
   function keyOf(){
@@ -278,6 +290,7 @@
     buildRoundBar();
     buildDashboard();
     collectStops();
+    buildDict();
     applyJudgeState();
     renderDash();
   }
@@ -431,6 +444,156 @@
         setTimeout(function(){ target.style.backgroundColor = ''; }, 1600);
       });
     });
+  }
+
+
+  /* ===== v2.9.0 dictation ===== */
+  var dict = { active:false, idx:0, wrong:0, done:0 };
+  var DK = null;
+
+  function norm(s){
+    s = (s || '').toLowerCase().replace(/['’]/g, "'").replace(/[^a-z0-9' ]/g, ' ').replace(/\s+/g, ' ').trim();
+    var exp = { "it's":'it is', "don't":'do not', "can't":'cannot', "won't":'will not', "isn't":'is not', "aren't":'are not', "doesn't":'does not', "didn't":'did not', "i'm":'i am', "you're":'you are', "they're":'they are', "we're":'we are', "there's":'there is', "that's":'that is', "let's":'let us', "i'd":'i would', "i'll":'i will', "we'd":'we would', "he's":'he is', "she's":'she is' };
+    var parts = s.split(' ').map(function(w){ return exp[w] || w; });
+    // split contractions with spaces like "it s"
+    var out = [];
+    parts.forEach(function(w){
+      if(w === 's' || w === 't' || w === 're' || w === 've' || w === 'll' || w === 'd' || w === 'm'){
+        if(out.length){ out[out.length-1] = out[out.length-1]; }
+      }
+      out.push(w);
+    });
+    return out;
+  }
+
+  function align(user, orig){
+    // LCS-based word alignment; returns array of {w, st} for orig words + extras
+    var m = user.length, n = orig.length;
+    var dp = [];
+    for(var i = 0; i <= m; i++){ dp.push(new Array(n + 1).fill(0)); }
+    for(var i = 1; i <= m; i++){
+      for(var j = 1; j <= n; j++){
+        dp[i][j] = (user[i-1] === orig[j-1]) ? dp[i-1][j-1] + 1 : Math.max(dp[i-1][j], dp[i][j-1]);
+      }
+    }
+    var res = [];
+    var i2 = m, j2 = n;
+    while(i2 > 0 || j2 > 0){
+      if(i2 > 0 && j2 > 0 && user[i2-1] === orig[j2-1]){
+        res.push({ w: orig[j2-1], st: 'ok' }); i2--; j2--;
+      } else if(j2 > 0 && (i2 === 0 || dp[i2][j2-1] >= dp[i2-1][j2])){
+        res.push({ w: orig[j2-1], st: 'miss' }); j2--;
+      } else if(i2 > 0){
+        res.push({ w: user[i2-1], st: 'extra' }); i2--;
+      }
+    }
+    return res.reverse();
+  }
+
+  function speak(text, cb){
+    try {
+      if(!('speechSynthesis' in window)){ if(cb) cb(false); return; }
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      var vs = speechSynthesis.getVoices();
+      var v = null;
+      for(var i = 0; i < vs.length; i++){
+        if(/en[-_]US/i.test(vs[i].lang)){ v = vs[i]; if(/(natural|google|microsoft)/i.test(vs[i].name)) break; }
+      }
+      if(v) u.voice = v;
+      u.lang = 'en-US';
+      u.rate = 1;
+      if(cb){ u.onend = function(){ cb(true); }; u.onerror = function(){ cb(false); }; }
+      speechSynthesis.speak(u);
+    } catch(e){ if(cb) cb(false); }
+  }
+
+  function dictBarHtml(){
+    return '<b>🎧 听写模式</b>'
+      + '<button type="button" class="d-btn d-toggle">开始听写</button>'
+      + '<span class="d-stat"></span>'
+      + '<div class="d-panel" style="display:none;margin-top:8px;">'
+      + '<div class="d-sent"></div>'
+      + '<div><button type="button" class="d-btn d-play">▶ 播放</button>'
+      + '<button type="button" class="d-btn d-again">🔁 重听</button></div>'
+      + '<input type="text" class="d-input" placeholder="输入你听到的句子…" />'
+      + '<div><button type="button" class="d-btn d-check">✔ 比对</button>'
+      + '<button type="button" class="d-btn d-skip">跳过</button></div>'
+      + '<div class="d-result"></div>'
+      + '<div class="d-hint">全对自动下一句；有错的句子自动进入薄弱清单（与打卡共用），重听不限次。</div>'
+      + '</div>';
+  }
+
+  function curText(){ return sentences[dict.idx].text; }
+
+  function renderDict(){
+    var bar = document.querySelector('.rv-dict'); if(!bar) return;
+    var tog = bar.querySelector('.d-toggle');
+    tog.textContent = dict.active ? '结束听写' : (dict.done ? '继续听写（' + dict.done + '/' + sentences.length + '）' : '开始听写');
+    bar.querySelector('.d-stat').textContent = dict.active ? ('进度 ' + dict.done + '/' + sentences.length + ' · 错 ' + dict.wrong + ' 句') : '';
+    var panel = bar.querySelector('.d-panel');
+    panel.style.display = dict.active ? 'block' : 'none';
+    if(dict.active){
+      if(dict.idx >= sentences.length){ finishDict(); return; }
+      bar.querySelector('.d-sent').textContent = '第 ' + (dict.idx + 1) + ' 句 / 共 ' + sentences.length + ' 句';
+      bar.querySelector('.d-result').innerHTML = '';
+      bar.querySelector('.d-input').value = '';
+      speak(curText());
+    }
+    try { localStorage.setItem(DK, JSON.stringify(dict)); } catch(e){}
+  }
+
+  function finishDict(){
+    dict.active = false;
+    var bar = document.querySelector('.rv-dict');
+    bar.querySelector('.d-result').innerHTML = '<b>🎉 本篇听写完成：错 ' + dict.wrong + ' 句已入薄弱清单，背诵打卡里连顺 2 轮即可毕业。</b>';
+    dict.idx = 0; dict.done = 0;
+    try { localStorage.setItem(DK, JSON.stringify(dict)); } catch(e){}
+    renderDash();
+  }
+
+  function buildDict(){
+    if(!('speechSynthesis' in window)) return; // no TTS, no bar
+    DK = keyOf() + ':dict';
+    try { var saved = JSON.parse(localStorage.getItem(DK) || 'null'); if(saved){ dict = saved; } } catch(e){}
+    var bar = document.createElement('div');
+    bar.className = 'rv-dict';
+    bar.innerHTML = dictBarHtml();
+    var anchor = document.querySelector('.rv-bar');
+    if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(bar, anchor.nextSibling);
+    var tog = bar.querySelector('.d-toggle');
+    tog.addEventListener('click', function(){
+      dict.active = !dict.active;
+      if(dict.active && dict.idx >= sentences.length){ dict.idx = 0; dict.done = 0; }
+      renderDict();
+    });
+    bar.querySelector('.d-play').addEventListener('click', function(){ speak(curText()); });
+    bar.querySelector('.d-again').addEventListener('click', function(){ speak(curText()); });
+    bar.querySelector('.d-skip').addEventListener('click', function(){
+      dict.idx++; renderDict();
+    });
+    bar.querySelector('.d-check').addEventListener('click', function(){
+      var val = bar.querySelector('.d-input').value;
+      var user = norm(val), orig = norm(curText());
+      var res = align(user, orig);
+      var html = res.map(function(r){
+        var cls = r.st === 'ok' ? 'w-ok' : (r.st === 'miss' ? 'w-miss' : 'w-extra');
+        return '<span class="' + cls + '">' + r.w.replace(/</g, '&lt;') + '</span>';
+      }).join(' ');
+      var misses = res.filter(function(r){ return r.st === 'miss'; }).length;
+      var extras = res.filter(function(r){ return r.st === 'extra'; }).length;
+      bar.querySelector('.d-result').innerHTML = html;
+      if(!user.length){ return; }
+      if(!misses && !extras && user.length === orig.length){
+        dict.done++; dict.idx++;
+        setTimeout(renderDict, 500);
+      } else {
+        if(!state.weak[dict.idx]){ state.weak[dict.idx] = true; save(state); applyJudgeState(); renderDash(); }
+        dict.wrong++;
+        bar.querySelector('.d-stat').textContent = '进度 ' + dict.done + '/' + sentences.length + ' · 错 ' + dict.wrong + ' 句';
+      }
+    });
+    renderDict();
   }
 
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

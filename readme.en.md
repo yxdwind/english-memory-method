@@ -30,6 +30,7 @@ sentence-by-sentence linking marks, hooks welded into question chains, a retelli
 | 🗂 | **14-section closed loop** | Strategy → close reading → hooks & chains → retelling ladder → three-pass → review → self-test → accumulation |
 | 🔁 | **Review loop** | Sentence-level OK/stuck check-in → weak-sentence list (click to jump) → graduate after 2 clean rounds; progress persists in your browser |
 | 🏛 | **Memory palace** | 25-station daily-life route, one sentence per station — weak stations auto-marked red on check-in, cleared on graduation |
+| 🎧 | **Dictation check** | TTS reads each sentence → type what you hear → word-level diff; mistakes flow into the weak list |
 | 🔒 | **Collapsed self-tests** | Fill the blanks first; answers hide behind "▶ 查看本段答案" toggles, auto-hidden when printing |
 | 🖥 | **16+ platforms, one command** | Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi / MiniMax… |
 | 📄 | **Self-contained single file** | Each plan is one HTML: inline SVG, collapsible, print-friendly, zero external dependencies |
@@ -109,7 +110,7 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 ## 📜 Version History
 
 <details>
-<summary><b>Expand: all changes from v2.1 → v2.8.1</b></summary>
+<summary><b>Expand: all changes from v2.1 → v2.9.0</b></summary>
 
 **v2.1**: sentence-by-sentence close reading — per-sentence translation (any language) + full connected-speech marking (⌒ linking / weak forms / flap t / h-dropping) with American IPA.
 
@@ -132,6 +133,8 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 **v2.8.0**: Memory-palace layer — new Section 14 "Palace map": a 25-station daily-life route (bed → … → bed-side; replaceable with your own route via parameter), one sentence per station in order, hooks & anchors reused straight from the hook chain. Walk the logic line (hook chain) normally; switch to the spatial line (palace) when stuck — an "empty station" pinpoints the lost sentence instantly. Injected into all 30 plans.
 
 **v2.8.1**: Palace × check-in linkage completed — on "end round", stations of weak sentences turn red automatically; graduate on 2 clean rounds clears the mark; reopening the file restores marks from saved progress, so the palace always mirrors current weak spots.
+
+**v2.9.0**: Dictation mode — new "🎧 Dictation" entry above the sentence list: browser US-English TTS reads each sentence aloud (zero setup), you type what you hear, word-by-word diff highlighting (wrong = yellow, missing = red strike, extra = grey strike, correct = green); wrong sentences flow straight into the weak-sentence list, synced with check-in marks and palace red stations. Progress saved separately; controls hidden when printing. Built into all 30 plans.
 
 </details>
 
