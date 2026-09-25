@@ -7,7 +7,7 @@
 Paste any English article, and it produces a **14-section study plan** (self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.8.0-blue)
+![Version](https://img.shields.io/badge/version-2.9.0-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-13-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
