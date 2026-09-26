@@ -73,6 +73,10 @@
 .palace-stop.palace-weak .st-no{background:#ef4444;}
 .palace-arrow{align-self:center;color:#a78bfa;font-weight:700;}
 @media print{.palace-route{gap:4px}.palace-stop{background:#fff;border-color:#9ca3af}.palace-stop .st-anchor{color:#000;background:#fff;border-color:#9ca3af}}
+/* v2.10.0 golden patterns */
+.ptn-table th:first-child{width:34%;}
+.ptn-tpl{color:#92400e;font-weight:700;}
+@media print{.ptn-tpl{color:#000}}
 </style>
 </head>
 <body>
@@ -170,7 +174,18 @@
 </table>
 </div>
 
-<h2>12. 记忆钩子（把句子“粘”起来）</h2>
+<h2>12. 金句句型库（写作/演讲可复用 · v2.10.0）</h2>
+<div class="card">
+<p style="font-size:14px;color:#374151;margin-bottom:10px;">从文中精选可直接迁移的句型：<b>实用框架</b>（开场、警告、对比、因果——背了就能套进自己的写作/演讲）与<b>经典修辞</b>（类比、谚语、排比——值得品味与背诵）。「可替换模板」列给出换装示范，换主语换话题即可复用。</p>
+<table class="ptn-table">
+<thead><tr><th>句型（原文摘录 · 加粗为可替换部分）</th><th style="width:20%">中文释义</th><th style="width:24%">可替换模板</th><th>使用场景</th></tr></thead>
+<tbody>
+{{PTN_ROWS}}
+</tbody>
+</table>
+</div>
+
+<h2>13. 记忆钩子（把句子“粘”起来）</h2>
 <div class="card">
 <p style="font-size:14px;color:#374151;margin-bottom:8px;">两部分：<b>文内语言钩</b>——作者自己埋的记忆点；<b>三层钩子链</b>——逐句放行的复述轨道。盖住原文，只看链条，从上一钩推出下一钩。</p>
 <ul>
@@ -182,7 +197,7 @@
 </div>
 <div class="tip">💡 额外技巧：录音对比法 —— 录下自己的背诵回放对照原文；{{本篇专属建议}}。</div>
 
-<h2>13. 复述技巧包（纯技巧 · 通用）</h2>
+<h2>14. 复述技巧包（纯技巧 · 通用）</h2>
 <div class="card">
 <p style="font-size:14px;color:#374151;margin-bottom:10px;">复述 ≠ 背诵原文。以下 10 条技巧篇篇通用：卡壳时用它救场，表达时用它提速。</p>
 <ul>
@@ -199,9 +214,9 @@
 </ul>
 </div>
 
-<h2>14. 记忆宫殿映射（v2.8.0 · 空间位置线索）</h2>
+<h2>15. 记忆宫殿映射（v2.8.0 · 空间位置线索）</h2>
 <div class="card">
-<p style="font-size:14px;color:#374151;margin-bottom:8px;">钩子链是<b>逻辑线索</b>，宫殿是<b>空间线索</b>——两条独立记忆线互为兜底。随机丢句时改走宫殿："走到哪儿"直接提示"该哪句"，<b>空的站点</b>会立刻暴露丢句位置。句钩与锚词直接来自第 12 节钩子链，无需另记内容。</p>
+<p style="font-size:14px;color:#374151;margin-bottom:8px;">钩子链是<b>逻辑线索</b>，宫殿是<b>空间线索</b>——两条独立记忆线互为兜底。随机丢句时改走宫殿："走到哪儿"直接提示"该哪句"，<b>空的站点</b>会立刻暴露丢句位置。句钩与锚词直接来自第 13 节钩子链，无需另记内容。</p>
 <p style="font-size:13.5px;color:#6b7280;margin-bottom:6px;"><b>踩点脚本</b>：闭眼从站 1 走到末站，每站停下默念该站句钩与锚词，走完即复习一遍全文顺序。平时走逻辑线（钩子链），卡壳或复习时走空间线（宫殿）。</p>
 <div class="palace-route">
 {{PALACE_STOPS}}

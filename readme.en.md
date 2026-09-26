@@ -4,10 +4,10 @@
 
 **Turn "memorizing English articles" from rote grinding into a path you can actually walk.**
 
-Paste any English article, and it produces a **14-section study plan** (self-contained HTML):
+Paste any English article, and it produces a **15-section study plan** (self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.9.0-blue)
+![Version](https://img.shields.io/badge/version-2.10.0-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-13-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -31,6 +31,7 @@ sentence-by-sentence linking marks, hooks welded into question chains, a retelli
 | 🔁 | **Review loop** | Sentence-level OK/stuck check-in → weak-sentence list (click to jump) → graduate after 2 clean rounds; progress persists in your browser |
 | 🏛 | **Memory palace** | 25-station daily-life route, one sentence per station — weak stations auto-marked red on check-in, cleared on graduation |
 | 🎧 | **Dictation check** | TTS reads each sentence → type what you hear → word-level diff; mistakes flow into the weak list |
+| 💎 | **Golden Patterns** | 5–9 transferable patterns per article (bold replaceable part + swappable template) — straight into your writing/speeches |
 | 🔒 | **Collapsed self-tests** | Fill the blanks first; answers hide behind "▶ 查看本段答案" toggles, auto-hidden when printing |
 | 🖥 | **16+ platforms, one command** | Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi / MiniMax… |
 | 📄 | **Self-contained single file** | Each plan is one HTML: inline SVG, collapsible, print-friendly, zero external dependencies |
@@ -71,7 +72,7 @@ npx english-memory-method
 
 ---
 
-## 📖 How it works (14-section closed loop)
+## 📖 How it works (15-section closed loop)
 
 | # | Section | What it does |
 |---|---|---|
@@ -86,9 +87,10 @@ npx english-memory-method
 | 9 | Fill-in-blank test | 2–5 blanks per paragraph; answers collapsed |
 | 10 | Phrase list | 8–15 collocations + corpus-style examples, ready to reuse |
 | 11 | Terminology | Word-formation breakdown + IPA + memory hooks |
-| 12 | Memory hooks | In-text hooks + **three-layer hook chain**: paragraph hook → sentence-hook chain (logic bridges) → English anchors |
-| 13 | Retelling toolkit | 10 techniques: stall recovery / delivery / practice tips |
-| 14 | Palace map | 25-station daily-life route, one sentence per station — spatial backup for lost sentences |
+| 12 | Golden Patterns | Four-column transferable patterns: pattern / meaning / swappable template / usage scene |
+| 13 | Memory hooks | In-text hooks + **three-layer hook chain**: paragraph hook → sentence-hook chain (logic bridges) → English anchors |
+| 14 | Retelling toolkit | 10 techniques: stall recovery / delivery / practice tips |
+| 15 | Palace map | 25-station daily-life route, one sentence per station — spatial backup for lost sentences |
 
 **Core idea**: isolated hooks = broken points — you memorize the hooks, the order, AND the mapping. Triple burden.
 v2 welds hooks into chains: each link is *inferred* from the previous one — **whatever can be logically derived doesn't need memorizing**.
@@ -110,7 +112,7 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 ## 📜 Version History
 
 <details>
-<summary><b>Expand: all changes from v2.1 → v2.9.0</b></summary>
+<summary><b>Expand: all changes from v2.1 → v2.10.0</b></summary>
 
 **v2.1**: sentence-by-sentence close reading — per-sentence translation (any language) + full connected-speech marking (⌒ linking / weak forms / flap t / h-dropping) with American IPA.
 
@@ -135,6 +137,8 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 **v2.8.1**: Palace × check-in linkage completed — on "end round", stations of weak sentences turn red automatically; graduate on 2 clean rounds clears the mark; reopening the file restores marks from saved progress, so the palace always mirrors current weak spots.
 
 **v2.9.0**: Dictation mode — new "🎧 Dictation" entry above the sentence list: browser US-English TTS reads each sentence aloud (zero setup), you type what you hear, word-by-word diff highlighting (wrong = yellow, missing = red strike, extra = grey strike, correct = green); wrong sentences flow straight into the weak-sentence list, synced with check-in marks and palace red stations. Progress saved separately; controls hidden when printing. Built into all 30 plans.
+
+**v2.10.0**: New Section 12 "Golden Patterns (reusable for writing & speeches)" — 5–9 transferable sentence patterns per article in two flavors (practical frameworks + classic rhetoric), as a four-column table: pattern (replaceable part in bold) / meaning / swappable template / usage scene. Sections after it shift: hooks→13, retelling toolkit→14, palace→15. All 30 plans retrofilled with 187 patterns.
 
 </details>
 
