@@ -93,6 +93,33 @@ npx english-memory-method
 | 14 | Retelling toolkit | 10 techniques: stall recovery / delivery / practice tips |
 | 15 | Palace map | 25-station daily-life route, one sentence per station — spatial backup for lost sentences |
 
+<details>
+<summary><b>🎤 Speech-mode section table (16 sections)</b></summary>
+
+| # | Section | Notes |
+|----|------|------|
+| 1 | Strategy | Speech path: skeleton → keywords → three-pass → spaced review |
+| 2 | Structure map | Three-act SVG map |
+| **3** | **Speech Skeleton** 🎤 | Three-act stations (hook / argument / crescendo) with rhetorical function + transferable technique; breathing groups & intonation |
+| 4 | Close reading | Translation + linking marks, sentence by sentence |
+| 5 | Keyword table | Hook words + Chinese cues |
+| 6 | Question chain | **Audience-viewpoint** "what's next?" self-QA |
+| 7 | Retelling ladder | L3 = **retell from the skeleton** |
+| 8 | Three-pass method | Read ×3 → retell with hooks → retell with the chain |
+| 9 | Spaced review | 5 min → tonight → next day → day 3 → day 7/15 |
+| 10 | Fill-in-blank test | Collapsed answers, fill first |
+| 11 | Phrase list | Collocations + corpus-style examples |
+| 12 | Terminology | Word-formation + three-accent IPA + memory hooks |
+| 13 | Golden Patterns | Speech-pattern four-column table (opening / parallelism / closing templates) |
+| 14 | Memory hooks | Three-layer hook chain |
+| 15 | Retelling toolkit | 10 techniques (incl. speech recovery) |
+| 16 | Palace map | 25-station route, spatial backup |
+
+Sample: the Gettysburg Address plan (triple negation → deed-vs-words line → of-by-for the people).
+
+</details>
+
+
 **Core idea**: isolated hooks = broken points — you memorize the hooks, the order, AND the mapping. Triple burden.
 v2 welds hooks into chains: each link is *inferred* from the previous one — **whatever can be logically derived doesn't need memorizing**.
 
