@@ -73,7 +73,7 @@ npx english-memory-method
 
 ---
 
-## 📖 How it works (16-section closed loop)
+## 📖 How it works (15/16/17-section loop by article type)
 
 | # | Section | What it does |
 |---|---|---|
@@ -140,7 +140,7 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 ## 📜 Version History
 
 <details>
-<summary><b>Expand: all changes from v2.1 → v2.11.0</b></summary>
+<summary><b>Expand: all changes from v2.1 → v2.12.0</b></summary>
 
 **v2.1**: sentence-by-sentence close reading — per-sentence translation (any language) + full connected-speech marking (⌒ linking / weak forms / flap t / h-dropping) with American IPA.
 
@@ -169,6 +169,8 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 **v2.10.0**: New Section 12 "Golden Patterns (reusable for writing & speeches)" — 5–9 transferable sentence patterns per article in two flavors (practical frameworks + classic rhetoric), as a four-column table: pattern (replaceable part in bold) / meaning / swappable template / usage scene. Sections after it shift: hooks→13, retelling toolkit→14, palace→15. All 30 plans retrofilled with 187 patterns.
 
 **v2.11.0**: Speech mode — feed it a speech and it produces a 16-section plan with a new Section 3 "Speech Skeleton" (three-act stations: opening hook / argument / crescendo, each with its rhetorical function and a transferable technique, plus breathing groups and intonation guidance); the question chain becomes audience-viewpoint self-QA and ladder L3 becomes "retell from the skeleton". Sample plan: the Gettysburg Address.
+
+**v2.12.0**: Longform mode — articles of 500–2000 words (or 12+ sentences) automatically produce a 17-section plan: new Section 3 "Segment Dashboard" (per-segment row: name / schedule / 🔒▶✅ state driven by check-ins / weak count), sections 4.1–4.N per-segment units (each with its own close reading + keywords + question chain + hook chain), per-segment staggered Ebbinghaus schedules plus a full-text assembly day, a cross-segment master chain to learn first, and a continuous 21-station palace. Sample: the Declaration of Independence condensed edition (5 segments / 21 sentences).
 
 </details>
 
