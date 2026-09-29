@@ -13,7 +13,7 @@ sentence-by-sentence linking marks, hooks welded into question chains, a retelli
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Standard](https://img.shields.io/badge/Agent_Skills-standard-red)
 
-[Install](#-quick-start) · [Features](#-features) · [How it works](#-how-it-works14-section-closed-loop) · [Platforms](#-platform-support) · [中文](readme.md)
+[Install](#-quick-start) · [Features](#-features) · [How it works](#-how-it-works151617-section-loop-by-article-type) · [Platforms](#-platform-support) · [中文](readme.md)
 
 </div>
 
@@ -118,6 +118,30 @@ npx english-memory-method
 Sample: the Gettysburg Address plan (triple negation → deed-vs-words line → of-by-for the people).
 
 </details>
+
+<details>
+<summary><b>📜 Longform-mode section table (17 sections · auto-enabled for 500–2000 words)</b></summary>
+
+| # | Section | Notes |
+|----|------|------|
+| 1 | Strategy | Includes the per-segment schedule: 1–2 segments per day |
+| 2 | Structure map | Full-text map with the cross-segment master chain |
+| **3** | **Segment Dashboard** 📜 | One row per segment: name / schedule / 🔒▶✅ state driven by check-ins / weak count |
+| 4.1–4.N | **Segment units** 📜 | Each segment is a self-contained loop: annotated close reading + keywords + question chain + hook chain |
+| 9 | Three-pass method | For today's segment only |
+| 10 | Spaced review | **Per-segment staggered schedules** + a full-text assembly day |
+| 11 | Fill-in-blank test | Per-segment blanks + collapsed answers |
+| 12 | Phrase list | Full-text phrases |
+| 13 | Terminology | Full-text terms |
+| 14 | Golden Patterns | Full-text patterns |
+| 15 | Memory hooks | **Cross-segment master chain**: learn it first |
+| 16 | Retelling toolkit | 10 techniques |
+| 17 | Palace map | Station numbering continuous across segments (station 1 = first sentence) |
+
+Sample: the [Declaration of Independence condensed edition](declaration-memorization-plan.html) (5 segments / 21 sentences / ~830 words / 5 days).
+
+</details>
+
 
 
 **Core idea**: isolated hooks = broken points — you memorize the hooks, the order, AND the mapping. Triple burden.
