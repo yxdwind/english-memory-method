@@ -7,7 +7,7 @@
 丢给它任何一篇英语文章，它还你一份完整背诵方案（普通文章 15 节 · 演讲稿 16 节含骨架 · 长文 17 节含分段仪表，自包含 HTML）：
 逐句连读标注、钩子焊成问题链、复述五级阶梯、专业词汇梳理、折叠自测——全在一份文件里。
 
-![Version](https://img.shields.io/badge/version-2.11.0-blue)
+![Version](https://img.shields.io/badge/version-2.12.0-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-13-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
