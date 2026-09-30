@@ -5,6 +5,8 @@
   所有样式已内联，不依赖外部资源；结构图引用相对路径 assets/<topic>-structure.svg。
   v2.13.0 组件新增：今日任务排期（含 .ics 导出）、自测模式（遮译文/全遮）、复述阶梯追踪、
   亲手改造留白（每段主线 / 宫殿画面）、?check=1 结构自检报告。
+  v2.14.0 组件新增：⚡ 薄弱句快刷（只显示薄弱句的短会话模式）、挖空交互化（______ 自动转输入框、
+  回车/失焦自动批改、错空直通薄弱清单）、今日任务直达锚点（去背诵 / 去自测 / 看薄弱）。
 -->
 <html lang="zh-CN">
 <head>
@@ -107,6 +109,19 @@
   .wb-input{color:#1f2937!important;font-style:normal!important;}
   .wb-input:empty::before{content:"";}
 }
+/* v2.14.0 drill mode / interactive cloze */
+.emm-drill .sent{display:none;}
+.emm-drill .sent.rv-weakline{display:block;}
+.emm-drill .wb-line{display:none;}
+.emm-today a{color:#b45309;font-weight:600;text-decoration:none;}
+.emm-clz{border:none;border-bottom:2px solid #94a3b8;outline:none;font-weight:600;text-align:center;font-family:inherit;background:transparent;padding:0 2px;margin:0 2px;font-size:15px;}
+.emm-clz:focus{border-bottom-color:#7c3aed;background:#f5f3ff;}
+.emm-clz.emm-clz-ok{color:#047857;border-bottom-color:#10b981;}
+.emm-clz.emm-clz-bad{color:#b91c1c;border-bottom-color:#ef4444;background:#fef2f2;}
+.emm-clz-mark{font-size:12px;font-weight:700;margin-left:2px;}
+.emm-clz-mark.ok{color:#059669;}
+.emm-clz-mark.bad{color:#b91c1c;}
+@media print{.emm-drill .sent{display:block!important;}.emm-clz{border-bottom:1px solid #333;}.emm-clz-mark{display:none;}}
 </style>
 </head>
 <body>
@@ -383,6 +398,7 @@
     buildWorkbook();
     wireReveal();
     selfCheck();
+    buildCloze();
   }
 
   var stops = [];
@@ -406,13 +422,15 @@
     bar.innerHTML = '<b>🔁 复习打卡</b>'
       + '<button type="button" class="rv-btn rv-round"></button>'
       + '<button type="button" class="rv-btn rv-quiz"></button>'
+      + '<button type="button" class="rv-btn rv-drill"></button>'
       + '<span class="rv-stat rv-count"></span>'
       + '<button type="button" class="rv-btn rv-danger rv-reset">重置进度</button>';
     var host = document.querySelector('.sent');
     if(host && host.parentNode) host.parentNode.insertBefore(bar, host);
+    bar.querySelector('.rv-drill').addEventListener('click', toggleDrill);
     bar.querySelector('.rv-reset').addEventListener('click', function(){
       if(confirm('确定清空本篇全部复习进度？此操作不可恢复。')){
-        state = fresh(); save(state); applyJudgeState(); renderDash(); renderRound(); applyQuiz(); renderToday();
+        state = fresh(); save(state); applyJudgeState(); renderDash(); renderRound(); applyQuiz(); renderToday(); renderDrill();
       }
     });
     wireQuiz();
@@ -491,11 +509,13 @@
       s.node.classList.toggle('rv-weakline', !!state.weak[idx]);
     });
     applyWeakStops();
+    renderDrill();
   }
 
   function buildDashboard(){
     var dash = document.createElement('div');
     dash.className = 'rv-dash';
+    dash.id = 'emm-dash';
     var bar = document.querySelector('.rv-bar');
     if(bar && bar.parentNode) bar.parentNode.insertBefore(dash, bar.nextSibling);
   }
@@ -775,9 +795,13 @@
   }
   function segTodayHtml(si){
     var ld = learnDayOf(si), dayN = dayNumberOf();
-    if(ld === dayN) return '<b style="color:#b45309">📖 今天新学</b>（当晚睡前再完整背一遍）';
+    if(ld === dayN) return '<b style="color:#b45309">📖 今天新学</b>（当晚睡前再完整背一遍）<a href="#emm-seg' + si + '">去背诵→</a>';
     for(var i = 0; i < REVIEW_OFF.length; i++){
-      if(ld + REVIEW_OFF[i][0] === dayN) return '🔁 今天复习 · ' + REVIEW_OFF[i][1];
+      if(ld + REVIEW_OFF[i][0] === dayN){
+        if(REVIEW_OFF[i][0] === 1) return '🔁 今天复习 · 次日自测 <a href="#emm-cloze">去自测→</a>';
+        if(REVIEW_OFF[i][0] === 3) return '🔁 今天复习 · ' + REVIEW_OFF[i][1] + ' <a href="#emm-dash">看薄弱→</a>';
+        return '🔁 今天复习 · ' + REVIEW_OFF[i][1];
+      }
     }
     if(ld > dayN) return '🔒 Day ' + ld;
     return '<span style="color:#9ca3af">已学</span>';
@@ -785,6 +809,7 @@
   function buildTodayCard(){
     if(!segments.length) return;
     if(!state.start){ state.start = todayKey(); save(state); }
+    segments.forEach(function(s, i){ if(s.el && !s.el.id){ s.el.id = 'emm-seg' + i; } });
     todayCard = document.createElement('div');
     todayCard.className = 'emm-today';
     todayCard.innerHTML = ''
@@ -951,6 +976,117 @@
     rpt.textContent = L.join('\n');
     var w = document.querySelector('.wrap') || document.body;
     w.insertBefore(rpt, w.firstChild);
+  }
+
+  /* ===== v2.14.0 EMM_DRILL_CLOZE_V214: weak-only drill / interactive cloze ===== */
+  function renderDrill(){
+    var b = document.querySelector('.rv-drill'); if(!b) return;
+    var on = document.body.classList.contains('emm-drill');
+    var n = Object.keys(state.weak).length;
+    b.textContent = on ? '⚡ 快刷中（薄弱 ' + n + '）·退出' : '⚡ 只刷薄弱(' + n + ')';
+    b.title = '只显示薄弱句，配合「开始本轮」5 分钟过完卡壳句；再点退出恢复全文';
+  }
+  function toggleDrill(){
+    if(!document.body.classList.contains('emm-drill')){
+      if(!Object.keys(state.weak).length){
+        var d = document.querySelector('.rv-dash');
+        if(d && typeof d.scrollIntoView === 'function'){
+          d.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          d.style.transition = 'background-color .3s';
+          d.style.backgroundColor = '#fef3c7';
+          setTimeout(function(){ d.style.backgroundColor = ''; }, 1200);
+        }
+        renderDrill(); return;
+      }
+      document.body.classList.add('emm-drill');
+    } else {
+      document.body.classList.remove('emm-drill');
+    }
+    renderDrill();
+  }
+
+  function normJoin(s){ return norm(s).join(' '); }
+  function markWeakByAnswer(ans){
+    var a = normJoin(ans);
+    for(var i = 0; i < sentences.length; i++){
+      if(normJoin(sentences[i].text).indexOf(a) >= 0){
+        if(!state.weak[i]){
+          state.weak[i] = true; state.streak[i] = 0;
+          save(state); applyJudgeState(); renderDash();
+        }
+        return;
+      }
+    }
+  }
+  function buildCloze(){
+    var h2s = document.querySelectorAll('h2');
+    for(var i = 0; i < h2s.length; i++){
+      if(/挖空自测/.test(h2s[i].textContent)){ h2s[i].id = 'emm-cloze'; break; }
+    }
+    document.querySelectorAll('details.answer-toggle').forEach(function(dt){
+      var p = dt.previousElementSibling, hops = 0;
+      while(p && hops < 3 && !/_{3,}/.test(p.textContent || '')){ p = p.previousElementSibling; hops++; }
+      if(!p) return;
+      var ansDiv = dt.querySelector('.answer'); if(!ansDiv) return;
+      var answers = ansDiv.textContent.replace(/^答案：?/, '').split(/[\/、，,]/).map(function(w){ return w.trim(); }).filter(Boolean);
+      if(!answers.length) return;
+      var totalBlanks = (p.textContent.match(/_{3,}/g) || []).length;
+      var textBlanks = 0;
+      Array.prototype.forEach.call(p.childNodes, function(node){
+        if(node.nodeType === 3) textBlanks += (node.textContent.match(/_{3,}/g) || []).length;
+      });
+      if(totalBlanks !== answers.length || textBlanks !== totalBlanks) return; // 失配保护：保持静态
+      var bi = 0;
+      var frag = document.createDocumentFragment();
+      Array.prototype.slice.call(p.childNodes).forEach(function(node){
+        if(node.nodeType === 3){
+          node.textContent.split(/(_{3,})/).forEach(function(pt){
+            if(!pt) return;
+            if(/^_{3,}$/.test(pt)){
+              var ans = answers[bi] || '';
+              var inp = document.createElement('input');
+              inp.type = 'text'; inp.className = 'emm-clz';
+              inp.setAttribute('autocomplete', 'off'); inp.setAttribute('spellcheck', 'false');
+              inp.style.width = Math.max(6, ans.length + 2) + 'ch';
+              inp.setAttribute('aria-label', '第' + (bi + 1) + '空');
+              var mk = document.createElement('span'); mk.className = 'emm-clz-mark';
+              wireClz(inp, mk, ans);
+              frag.appendChild(inp); frag.appendChild(mk);
+              bi++;
+            } else {
+              frag.appendChild(document.createTextNode(pt));
+            }
+          });
+        } else {
+          frag.appendChild(node);
+        }
+      });
+      p.innerHTML = ''; p.appendChild(frag);
+    });
+  }
+  function wireClz(inp, mk, ans){
+    function grade(){
+      var v = normJoin(inp.value), a = normJoin(ans);
+      if(!v){
+        inp.classList.remove('emm-clz-ok', 'emm-clz-bad');
+        mk.textContent = ''; mk.className = 'emm-clz-mark';
+        return;
+      }
+      if(v === a){
+        inp.classList.add('emm-clz-ok'); inp.classList.remove('emm-clz-bad');
+        mk.textContent = '✓'; mk.className = 'emm-clz-mark ok';
+      } else {
+        inp.classList.add('emm-clz-bad'); inp.classList.remove('emm-clz-ok');
+        mk.textContent = '✗'; mk.className = 'emm-clz-mark bad';
+        markWeakByAnswer(ans);
+      }
+    }
+    inp.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); grade(); } });
+    inp.addEventListener('blur', grade);
+    inp.addEventListener('input', function(){
+      inp.classList.remove('emm-clz-ok', 'emm-clz-bad');
+      mk.textContent = ''; mk.className = 'emm-clz-mark';
+    });
   }
 
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
