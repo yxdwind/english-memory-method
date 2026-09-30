@@ -7,7 +7,7 @@
 Paste any English article, and it produces a complete memorization plan (15 sections for regular articles · 16 for speeches with skeleton · 17 for longform with segment dashboard — self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, today's schedule & self-test mode, memory palace & dictation — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.14.0-blue)
+![Version](https://img.shields.io/badge/version-2.15.0-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-13-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -169,7 +169,7 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 ## 📜 Version History
 
 <details>
-<summary><b>Expand: all changes from v2.1 → v2.14.0</b></summary>
+<summary><b>Expand: all changes from v2.1 → v2.15.0</b></summary>
 
 **v2.1**: sentence-by-sentence close reading — per-sentence translation (any language) + full connected-speech marking (⌒ linking / weak forms / flap t / h-dropping) with American IPA.
 
@@ -204,6 +204,8 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 **v2.13.0**: Self-test & schedule suite (built into the component, zero generation cost) — ① a "📅 Today" card: set a start date and per-segment Ebbinghaus auto-computes "which segment to learn today, which to review", tickable per segment, one-click .ics calendar export for system-level reminders; ② a three-state "🙈 Self-test" toggle: hide translations & linking marks while retelling, click a sentence to reveal, full-hide also flattens inline marking styles — killing recognition-style fake fluency; ③ retelling-ladder tracking: per-segment L1~L5 levels recorded with dates; ④ make-it-yours blanks: per-segment "✍️ my mainline" and per-station "🎨 my image" editable fields, printed as blank lines for handwriting; ⑤ a `?check=1` structural self-check report (palace stops & numbering, hook counts, bridges, anchor coverage, blanks vs answers), paired with six generation-side content checks and a "when in doubt, don't mark" precision policy in SKILL.md.
 
 **v2.14.0**: Weak-sentence drill & interactive cloze — ① "⚡ Drill weak (N)": one click hides all non-weak sentences so a check-in round covers only your stuck ones in ~5 minutes; composes with self-test mode (drill × hidden translations = a high-intensity short session); empty weak list bounces you to the dashboard instead; ② interactive cloze: `______` runs convert to inputs at load, auto-graded on Enter/blur (case/punctuation/contraction tolerant); a miss maps "answer word → its sentence" and flows straight into the weak list (shared with check-ins, palace red stations, dictation); paragraphs whose blank count mismatches answers stay static (fail-safe); ③ today-card deep links: "learn today" → segment, "next-day self-test" → cloze section, "day-3 wrong-only" → weak list.
+
+**v2.15.0**: Robustness patch — ① **progress content fingerprint**: state stores a fingerprint of the article's sentences; when a plan is regenerated, a changed fingerprint prompts "reset progress (keep blanks & start date) / keep as-is", so old progress no longer misaligns by sentence index; ② **palace data-sents annotations**: every station card declares the sentence numbers it carries, making weak-station highlighting and the `?check=1` report exact for 25+ sentence articles (legacy plans fall back to 1:1 station order); ③ **scheduling owned solely by the "📅 Today" card**: plans no longer hard-code dates, removing the double-source conflict; ④ **smoke tests in-repo**: `npm test` (tests/smoke.test.js, 102 jsdom assertions).
 
 </details>
 

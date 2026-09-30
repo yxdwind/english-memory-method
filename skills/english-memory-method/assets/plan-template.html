@@ -7,6 +7,8 @@
   亲手改造留白（每段主线 / 宫殿画面）、?check=1 结构自检报告。
   v2.14.0 组件新增：⚡ 薄弱句快刷（只显示薄弱句的短会话模式）、挖空交互化（______ 自动转输入框、
   回车/失焦自动批改、错空直通薄弱清单）、今日任务直达锚点（去背诵 / 去自测 / 看薄弱）。
+  v2.15.0 组件新增：进度内容指纹（方案更新后检测并询问重置，防旧进度错位）、
+  宫殿 data-sents 句号标注（>25 句同站多物的红站联动与自检精确化）。
 -->
 <html lang="zh-CN">
 <head>
@@ -152,7 +154,7 @@
 <!-- ②c 分段进度仪表（v2.12.0 · 仅长文启用）：段名/排期/状态/打卡入口/段薄弱句，状态随打卡自动流转 -->
 <h2>3. 分段进度仪表（Segment Dashboard · v2.12.0）</h2>
 <div class="card">
-<p style="font-size:14px;color:#374151;margin-bottom:10px;">长文背诵的「导航台」：每段一行，状态随打卡自动流转（该段全部句子评「顺」→ ✅）。建议按排期推进。</p>
+<p style="font-size:14px;color:#374151;margin-bottom:10px;">长文背诵的「导航台」：每段一行，状态随打卡自动流转（该段全部句子评「顺」→ ✅）。排期由「📅 今日任务」卡按开始日期自动计算。</p>
 <table class="seg-table">
 <thead><tr><th style="width:36%">段落</th><th style="width:12%">排期</th><th style="width:12%">状态</th><th style="width:16%">打卡</th><th>段薄弱句</th></tr></thead>
 <tbody>
@@ -358,7 +360,7 @@
   }
   function fresh(){
     return { done:{}, streak:{}, weak:{}, rounds:[], mode:false, current:null,
-             quiz:0, start:'', perDay:1, ladder:{}, log:{}, wb:{ main:{}, pal:{} } };
+             quiz:0, start:'', perDay:1, ladder:{}, log:{}, wb:{ main:{}, pal:{} }, fingerprint:'' };
   }
   function save(s){ try { localStorage.setItem(keyOf(), JSON.stringify(s)); } catch(e){} }
 
@@ -387,6 +389,7 @@
     });
     if(!sentences.length) return;
 
+    checkFingerprint();
     detectSegments();
     buildRoundBar();
     buildDashboard();
@@ -408,9 +411,11 @@
 
   function applyWeakStops(){
     stops.forEach(function(st, i){
-      st.classList.toggle('palace-weak', !!state.weak[i]);
+      var idxs = parseSents(st) || [i];
+      var weak = idxs.some(function(ix){ return !!state.weak[ix]; });
+      st.classList.toggle('palace-weak', weak);
       var no = st.querySelector('.st-no');
-      if(no && state.weak[i] && !no.getAttribute('title')){
+      if(no && weak && !no.getAttribute('title')){
         no.setAttribute('title', '薄弱站：点击跳到原句');
       }
     });
@@ -939,12 +944,28 @@
     var stops = document.querySelectorAll('.palace-stop');
     if(!stops.length){ L.push('— 宫殿：本篇未启用'); }
     else {
-      L.push((stops.length === sentences.length ? '✅' : '⚠') + ' 宫殿站数 ' + stops.length + ' / 句数 ' + sentences.length);
+      var withData = Array.prototype.filter.call(stops, function(st){ return st.getAttribute('data-sents'); });
       var bad = [];
       Array.prototype.forEach.call(stops, function(st, i){
         var m = (st.querySelector('.st-no') || { textContent: '' }).textContent.match(/\d+/);
         if(!m || +m[0] !== i + 1) bad.push('第' + (i + 1) + '站标为' + (m ? m[0] : '?'));
       });
+      if(withData.length === stops.length){
+        var seen = {}, dups = [], missing = [];
+        Array.prototype.forEach.call(stops, function(st){
+          parseSents(st).forEach(function(ix){
+            if(seen[ix]) dups.push('句' + (ix + 1)); else seen[ix] = true;
+          });
+        });
+        for(var si = 0; si < sentences.length; si++){ if(!seen[si]) missing.push(si + 1); }
+        var cover = (!dups.length && !missing.length) ? '✅' : '⚠';
+        L.push(cover + ' 宫殿 data-sents 覆盖 ' + Object.keys(seen).length + ' / 句数 ' + sentences.length
+          + (dups.length ? '；重复: ' + dups.join(',') : '')
+          + (missing.length ? '；缺句: ' + missing.join(',') : ''));
+      } else {
+        L.push((stops.length === sentences.length ? '✅' : '⚠') + ' 宫殿站数 ' + stops.length + ' / 句数 ' + sentences.length
+          + (stops.length !== sentences.length ? '（同站多物需为每站标注 data-sents）' : ''));
+      }
       L.push(bad.length ? '⚠ 站号不连续：' + bad.join('、') : '✅ 站号 1..' + stops.length + ' 连续');
     }
     var nChain = document.querySelectorAll('.hook-chain').length;
@@ -1087,6 +1108,34 @@
       inp.classList.remove('emm-clz-ok', 'emm-clz-bad');
       mk.textContent = ''; mk.className = 'emm-clz-mark';
     });
+  }
+
+  /* ===== v2.15.0 EMM_V215_STABLE: content fingerprint / palace data-sents ===== */
+  function parseSents(st){
+    var d = st.getAttribute('data-sents');
+    if(!d) return null;
+    return d.split(',').map(function(x){ return parseInt(x, 10) - 1; }).filter(function(x){ return !isNaN(x) && x >= 0; });
+  }
+  function contentFingerprint(){
+    return sentences.map(function(s){ return s.text.length + ':' + s.text.slice(0, 32); }).join('|').slice(0, 4000);
+  }
+  function checkFingerprint(){
+    var fp = contentFingerprint();
+    if(!state.fingerprint){
+      state.fingerprint = fp; save(state);
+      return;
+    }
+    if(state.fingerprint === fp) return;
+    var reset = true;
+    try {
+      reset = confirm('检测到方案内容已更新，旧的背诵进度（打卡/薄弱/阶梯）可能与新方案错位。\n\n确定＝重置进度（保留留白与开始日期）\n取消＝暂不处理（保留旧进度）');
+    } catch(e){}
+    if(reset){
+      state.done = {}; state.streak = {}; state.weak = {}; state.rounds = [];
+      state.mode = false; state.ladder = {}; state.log = {}; state.quiz = 0;
+    }
+    state.fingerprint = fp;
+    save(state);
   }
 
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
