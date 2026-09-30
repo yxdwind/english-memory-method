@@ -3,6 +3,8 @@
   English Memory Method · 背诵方案模板
   用法：复制本文件为 <topic>-memorization-plan.html，按下方 <!-- ① ... --> 注释逐节替换内容。
   所有样式已内联，不依赖外部资源；结构图引用相对路径 assets/<topic>-structure.svg。
+  v2.13.0 组件新增：今日任务排期（含 .ics 导出）、自测模式（遮译文/全遮）、复述阶梯追踪、
+  亲手改造留白（每段主线 / 宫殿画面）、?check=1 结构自检报告。
 -->
 <html lang="zh-CN">
 <head>
@@ -77,6 +79,34 @@
 .ptn-table th:first-child{width:34%;}
 .ptn-tpl{color:#92400e;font-weight:700;}
 @media print{.ptn-tpl{color:#000}}
+/* v2.13.0 today / quiz / ladder / workbook / self-check */
+.emm-today{background:#fffbeb;border:1px solid #fcd34d;border-left:4px solid #f59e0b;border-radius:10px;padding:12px 16px;margin:12px 0;font-size:14px;}
+.emm-today table{margin:8px 0;}
+.emm-today th,.emm-today td{font-size:13px;padding:6px 8px;}
+.emm-meta{font-size:12.5px;color:#92400e;}
+.emm-lv{cursor:pointer;border:1px solid #cbd5e1;background:#fff;border-radius:6px;font-size:11px;padding:1px 7px;color:#475569;margin-right:3px;}
+.emm-lv:hover{background:#fef3c7;}
+.emm-lv.emm-lv-on{background:#f59e0b;border-color:#f59e0b;color:#fff;font-weight:700;}
+.emm-donechk{transform:scale(1.2);cursor:pointer;}
+.wb-line{font-size:13.5px;color:#374151;background:#f5f3ff;border:1px dashed #ddd6fe;border-radius:8px;padding:6px 10px;margin:8px 0;}
+.wb-input{display:inline-block;min-width:45%;min-height:1.4em;border-bottom:1px solid #a78bfa;outline:none;font-style:italic;color:#5b21b6;padding:0 4px;}
+.wb-input:focus{background:#fff;}
+.wb-input:empty::before{content:"点此亲手写——自己写过的记得更牢";color:#c4b5fd;font-size:12px;}
+.palace-stop .wb-line{margin:6px 0 0;font-size:12.5px;padding:4px 8px;}
+.emm-quiz1 .sent-zh,.emm-quiz1 .pron{display:none;}
+.emm-quiz1 .sent.revealed .sent-zh,.emm-quiz1 .sent.revealed .pron{display:block;}
+.emm-quiz2 .sent-en .tie{color:inherit!important;font-weight:inherit!important;}
+.emm-quiz2 .sent-en .wk{color:inherit!important;font-style:normal!important;}
+.emm-quiz2 .sent-en .ft{color:inherit!important;font-weight:inherit!important;text-decoration:none!important;}
+.emm-quiz2 .sent-en .hk{color:inherit!important;text-decoration:none!important;}
+.emm-quiz2 .sent-en .term{background:none!important;border-bottom:none!important;}
+.emm-check-rpt{background:#f8fafc;border:1px solid #cbd5e1;border-left:4px solid #64748b;border-radius:10px;padding:12px 16px;margin:12px 0;font-size:13.5px;font-family:Consolas,'Courier New',monospace;white-space:pre-wrap;line-height:1.9;}
+@media print{
+  .emm-today,.emm-check-rpt{display:none!important;}
+  .wb-line{background:#fff;border-color:#bbb;}
+  .wb-input{color:#1f2937!important;font-style:normal!important;}
+  .wb-input:empty::before{content:"";}
+}
 </style>
 </head>
 <body>
@@ -299,11 +329,21 @@
   }
 
   function loadState(){
-    try { return JSON.parse(localStorage.getItem(keyOf()) || 'null') || fresh(); }
-    catch(e){ return fresh(); }
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem(keyOf()) || 'null'); } catch(e){ s = null; }
+    var f = fresh();
+    if(!s) return f;
+    for(var k in s){ f[k] = s[k]; }
+    f.ladder = f.ladder || {}; f.log = f.log || {};
+    if(!f.wb) f.wb = { main: {}, pal: {} };
+    if(!f.wb.main) f.wb.main = {};
+    if(!f.wb.pal) f.wb.pal = {};
+    f.quiz = f.quiz || 0; f.perDay = f.perDay || 1;
+    return f;
   }
   function fresh(){
-    return { done:{}, streak:{}, weak:{}, rounds:[], mode:false, current:null };
+    return { done:{}, streak:{}, weak:{}, rounds:[], mode:false, current:null,
+             quiz:0, start:'', perDay:1, ladder:{}, log:{}, wb:{ main:{}, pal:{} } };
   }
   function save(s){ try { localStorage.setItem(keyOf(), JSON.stringify(s)); } catch(e){} }
 
@@ -321,6 +361,7 @@
       var en = node.querySelector('.sent-en');
       if(!en) return;
       var idx = sentences.length;
+      node.__emmIdx = idx;
       sentences.push({ node: node, en: en, text: en.textContent.trim() });
       var jspan = document.createElement('span');
       jspan.className = 'rv-judge';
@@ -331,12 +372,17 @@
     });
     if(!sentences.length) return;
 
+    detectSegments();
     buildRoundBar();
     buildDashboard();
     collectStops();
     buildDict();
     applyJudgeState();
     renderDash();
+    buildTodayCard();
+    buildWorkbook();
+    wireReveal();
+    selfCheck();
   }
 
   var stops = [];
@@ -359,15 +405,17 @@
     bar.className = 'rv-bar';
     bar.innerHTML = '<b>🔁 复习打卡</b>'
       + '<button type="button" class="rv-btn rv-round"></button>'
+      + '<button type="button" class="rv-btn rv-quiz"></button>'
       + '<span class="rv-stat rv-count"></span>'
       + '<button type="button" class="rv-btn rv-danger rv-reset">重置进度</button>';
     var host = document.querySelector('.sent');
     if(host && host.parentNode) host.parentNode.insertBefore(bar, host);
     bar.querySelector('.rv-reset').addEventListener('click', function(){
       if(confirm('确定清空本篇全部复习进度？此操作不可恢复。')){
-        state = fresh(); save(state); applyJudgeState(); renderDash(); renderRound();
+        state = fresh(); save(state); applyJudgeState(); renderDash(); renderRound(); applyQuiz(); renderToday();
       }
     });
+    wireQuiz();
     renderRound();
     return bar;
   }
@@ -638,6 +686,271 @@
       }
     });
     renderDict();
+  }
+
+  /* ===== v2.13.0 EMM_TODAY_V213: today view / quiz mode / ladder / workbook / self-check ===== */
+  var segments = [];
+
+  function todayKey(){
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function parseDate(s){
+    var m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(s || '');
+    return m ? new Date(+m[1], +m[2]-1, +m[3]) : new Date();
+  }
+  function diffDays(a, b){ return Math.round((b - a) / 86400000); }
+  function addDays(d, n){ return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+  function icsDate(d){
+    return '' + d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+  }
+  function detectSegments(){
+    segments = [];
+    var cur = null;
+    var nodes = document.querySelectorAll('h2, h3, .sent');
+    Array.prototype.forEach.call(nodes, function(el){
+      if(el.matches('h2, h3')){
+        var t = (el.textContent || '').trim();
+        if(el.tagName === 'H2' && /^4\.\d+/.test(t)){
+          var name = t.replace(/^4\.\d+\s*/, '').replace(/（[^）]*）/g, '').replace(/[·:：\s]+$/g, '').slice(0, 16);
+          cur = { name: name || ('段' + (segments.length + 1)), el: el, idxs: [] };
+          segments.push(cur);
+        }
+      } else {
+        if(!cur){ cur = { name: '全文', el: null, idxs: [] }; segments.push(cur); }
+        cur.idxs.push(el.__emmIdx);
+      }
+    });
+    if(segments.length === 1 && !segments[0].el){
+      var hs = document.querySelectorAll('h2');
+      for(var i = 0; i < hs.length; i++){
+        if(/精读/.test(hs[i].textContent)){ segments[0].el = hs[i]; break; }
+      }
+    }
+  }
+  function dayNumberOf(){ return diffDays(parseDate(state.start || todayKey()), parseDate(todayKey())) + 1; }
+  function learnDayOf(i){ return Math.floor(i / (state.perDay || 1)) + 1; }
+  function planDaysTotal(){
+    if(!segments.length) return 1;
+    return learnDayOf(segments.length - 1) + 15;
+  }
+  var REVIEW_OFF = [[1, '次日自测'], [3, '第3天只背错句'], [7, '第7天快背'], [15, '第15天快背']];
+
+  /* —— 自测模式（P0：盖住复述，防假流利） —— */
+  function wireQuiz(){
+    var b = document.querySelector('.rv-quiz');
+    if(!b) return;
+    b.addEventListener('click', function(){
+      state.quiz = ((state.quiz || 0) + 1) % 3;
+      save(state); applyQuiz();
+    });
+    applyQuiz();
+  }
+  function applyQuiz(){
+    document.body.classList.toggle('emm-quiz1', state.quiz >= 1);
+    document.body.classList.toggle('emm-quiz2', state.quiz >= 2);
+    var b = document.querySelector('.rv-quiz');
+    if(b){
+      b.textContent = '🙈 自测：' + ['关', '遮译文', '全遮'][state.quiz || 0];
+      b.title = '遮住译文与注解复述（防假流利），点句子临时揭开核对；全遮同时隐藏行内标注样式';
+    }
+  }
+  function wireReveal(){
+    sentences.forEach(function(s){
+      s.node.addEventListener('click', function(e){
+        if(!state.quiz) return;
+        if(e.target.closest('button, input, a, .rv-judge, .rv-dict')) return;
+        s.node.classList.toggle('revealed');
+      });
+    });
+  }
+
+  /* —— 今日排期 + 复述阶梯（P0：让艾宾浩斯到期可见，让升级留痕） —— */
+  var todayCard = null;
+  function segHasToday(si){
+    var ld = learnDayOf(si), dayN = dayNumberOf();
+    if(ld === dayN) return true;
+    for(var i = 0; i < REVIEW_OFF.length; i++){ if(ld + REVIEW_OFF[i][0] === dayN) return true; }
+    return false;
+  }
+  function segTodayHtml(si){
+    var ld = learnDayOf(si), dayN = dayNumberOf();
+    if(ld === dayN) return '<b style="color:#b45309">📖 今天新学</b>（当晚睡前再完整背一遍）';
+    for(var i = 0; i < REVIEW_OFF.length; i++){
+      if(ld + REVIEW_OFF[i][0] === dayN) return '🔁 今天复习 · ' + REVIEW_OFF[i][1];
+    }
+    if(ld > dayN) return '🔒 Day ' + ld;
+    return '<span style="color:#9ca3af">已学</span>';
+  }
+  function buildTodayCard(){
+    if(!segments.length) return;
+    if(!state.start){ state.start = todayKey(); save(state); }
+    todayCard = document.createElement('div');
+    todayCard.className = 'emm-today';
+    todayCard.innerHTML = ''
+      + '<b>📅 今日任务</b> <span class="emm-meta emm-dayline"></span><br>'
+      + '<span class="emm-meta">开始日期 <input type="date" class="emm-start"> '
+      + (segments.length > 1 ? ' · 每天新学 <select class="emm-perday"><option value="1">1 段</option><option value="2">2 段</option></select> ' : '')
+      + '<button type="button" class="rv-btn emm-ics">📥 导出日历(.ics)</button></span>'
+      + '<table><thead><tr><th style="width:26%">段落</th><th style="width:9%">排期</th><th>今日</th><th style="width:30%">🪜 复述阶梯</th><th style="width:6%">✓</th></tr></thead>'
+      + '<tbody class="emm-rows"></tbody></table>'
+      + '<div class="emm-meta">🪜 点你当前能稳定复述到的级别（升级前至少隔一轮复习，跳级=假流利）；✓ 勾掉今天完成的任务。与打卡进度同存本机。</div>';
+    var bar = document.querySelector('.rv-bar');
+    if(bar && bar.parentNode) bar.parentNode.insertBefore(todayCard, bar);
+    var inp = todayCard.querySelector('.emm-start');
+    inp.value = state.start;
+    inp.addEventListener('change', function(){
+      state.start = inp.value || todayKey();
+      save(state); renderToday();
+    });
+    var sel = todayCard.querySelector('.emm-perday');
+    if(sel){
+      sel.value = String(state.perDay || 1);
+      sel.addEventListener('change', function(){ state.perDay = +sel.value; save(state); renderToday(); });
+    }
+    todayCard.querySelector('.emm-ics').addEventListener('click', downloadICS);
+    var rows = todayCard.querySelector('.emm-rows');
+    rows.addEventListener('click', function(e){
+      var b = e.target.closest('.emm-lv'); if(!b) return;
+      var si = +b.getAttribute('data-seg');
+      state.ladder[si] = { lv: +b.getAttribute('data-lv'), date: todayKey() };
+      save(state); renderToday();
+    });
+    rows.addEventListener('change', function(e){
+      var c = e.target.closest('input.emm-donechk'); if(!c) return;
+      var k = todayKey() + '|s' + c.getAttribute('data-seg');
+      if(c.checked){ state.log[k] = 1; } else { delete state.log[k]; }
+      save(state);
+    });
+    renderToday();
+  }
+  function renderToday(){
+    if(!todayCard) return;
+    var dayN = dayNumberOf(), dl = todayCard.querySelector('.emm-dayline');
+    if(dayN < 1){ dl.textContent = '· ⏳ 开始于 ' + state.start + '，还有 ' + (1 - dayN) + ' 天'; }
+    else if(dayN > planDaysTotal()){ dl.textContent = '· 🎉 排期（' + planDaysTotal() + ' 天）已完成，建议每周全文快背一遍保持'; }
+    else { dl.textContent = '· 第 ' + dayN + ' 天 / 计划约 ' + planDaysTotal() + ' 天'; }
+    var html = '';
+    segments.forEach(function(s, i){
+      var lv = (state.ladder[i] || {}).lv || 0;
+      var btns = '';
+      for(var k = 1; k <= 5; k++){
+        btns += '<button type="button" class="emm-lv' + (lv >= k ? ' emm-lv-on' : '') + '" data-seg="' + i + '" data-lv="' + k + '" title="' + (lv ? '当前 L' + lv + ' · ' + state.ladder[i].date : '未定级') + '">L' + k + '</button>';
+      }
+      var chk = segHasToday(i)
+        ? '<input type="checkbox" class="emm-donechk" data-seg="' + i + '"' + (state.log[todayKey() + '|s' + i] ? ' checked' : '') + '>'
+        : '';
+      html += '<tr><td>' + s.name + '</td><td>Day ' + learnDayOf(i) + '</td><td>' + segTodayHtml(i) + '</td><td>' + btns + '</td><td>' + chk + '</td></tr>';
+    });
+    todayCard.querySelector('.emm-rows').innerHTML = html;
+  }
+  function escICS(s){ return String(s).replace(/\\/g, '\\\\').replace(/([,;])/g, '\\$1'); }
+  function downloadICS(){
+    var title = (document.querySelector('h1') || { textContent: '背诵' }).textContent.replace(/背诵方案.*$/, '').trim() || '背诵';
+    var start = parseDate(state.start || todayKey());
+    var lines = ['BEGIN:VCALENDAR', 'VERSION:2.0', 'PRODID:-//english-memory-method//v2.13//CN'];
+    var k = 0;
+    segments.forEach(function(s, i){
+      var ld = learnDayOf(i);
+      var evts = [[ld - 1, '📖 背诵《' + title + '》· ' + s.name + '（当晚睡前再背一遍）']];
+      REVIEW_OFF.forEach(function(r){ evts.push([ld - 1 + r[0], '🔁 复习《' + title + '》· ' + s.name + ' · ' + r[1]]); });
+      evts.forEach(function(e){
+        lines.push('BEGIN:VEVENT',
+          'UID:emm-' + (k++) + '-' + icsDate(start) + '@local',
+          'DTSTAMP:' + icsDate(new Date()),
+          'DTSTART;VALUE=DATE:' + icsDate(addDays(start, e[0])),
+          'SUMMARY:' + escICS(e[1]),
+          'END:VEVENT');
+      });
+    });
+    lines.push('END:VCALENDAR');
+    var blob = new Blob([lines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'emm-schedule.ics';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+  }
+
+  /* —— 亲手改造留白（P0：生成效应落地） —— */
+  function buildWorkbook(){
+    if(!state.wb) state.wb = { main: {}, pal: {} };
+    segments.forEach(function(s, i){
+      if(!s.el) return;
+      var div = document.createElement('div');
+      div.className = 'wb-line';
+      div.innerHTML = '✍️ 我的一句话主线（亲手写，记忆翻倍）：<span class="wb-input" contenteditable="true" data-k="m' + i + '"></span>';
+      s.el.parentNode.insertBefore(div, s.el.nextSibling);
+    });
+    var stops = document.querySelectorAll('.palace-stop');
+    Array.prototype.forEach.call(stops, function(st, i){
+      var div = document.createElement('div');
+      div.className = 'wb-line';
+      div.innerHTML = '🎨 我的画面：<span class="wb-input" contenteditable="true" data-k="p' + i + '"></span>';
+      st.appendChild(div);
+    });
+    var timer = null;
+    document.querySelectorAll('.wb-input').forEach(function(ed){
+      var k = ed.getAttribute('data-k');
+      var store = k.charAt(0) === 'p' ? state.wb.pal : state.wb.main;
+      var idx = k.slice(1);
+      if(store[idx]) ed.textContent = store[idx];
+      ed.addEventListener('input', function(){
+        store[idx] = ed.textContent.trim();
+        clearTimeout(timer);
+        timer = setTimeout(function(){ save(state); }, 400);
+      });
+    });
+  }
+
+  /* —— ?check=1 自检报告（P0：结构对齐可查；原文比对在生成端执行） —— */
+  function selfCheck(){
+    if(!/[?&]check/.test(location.search)) return;
+    var L = ['EMM 自检报告（v2.13.0 · ?check=1）', '─ 分段识别', '句数：' + sentences.length];
+    segments.forEach(function(s, i){
+      L.push('段' + (i + 1) + ' [' + s.name + '] ' + s.idxs.length + ' 句' + (s.idxs.length ? '（第 ' + (s.idxs[0] + 1) + '~' + (s.idxs[s.idxs.length - 1] + 1) + ' 句）' : ''));
+    });
+    L.push('─ 结构对齐');
+    var stops = document.querySelectorAll('.palace-stop');
+    if(!stops.length){ L.push('— 宫殿：本篇未启用'); }
+    else {
+      L.push((stops.length === sentences.length ? '✅' : '⚠') + ' 宫殿站数 ' + stops.length + ' / 句数 ' + sentences.length);
+      var bad = [];
+      Array.prototype.forEach.call(stops, function(st, i){
+        var m = (st.querySelector('.st-no') || { textContent: '' }).textContent.match(/\d+/);
+        if(!m || +m[0] !== i + 1) bad.push('第' + (i + 1) + '站标为' + (m ? m[0] : '?'));
+      });
+      L.push(bad.length ? '⚠ 站号不连续：' + bad.join('、') : '✅ 站号 1..' + stops.length + ' 连续');
+    }
+    var nChain = document.querySelectorAll('.hook-chain').length;
+    if(!nChain){ L.push('— 钩子链：未找到'); }
+    else {
+      var nSeg = document.querySelectorAll('.hook-chain .seg').length;
+      var nBr = document.querySelectorAll('.hook-chain .bridge').length;
+      var nAn = document.querySelectorAll('.hook-chain .anchor').length;
+      L.push((nSeg === sentences.length ? '✅' : '⚠') + ' 句钩总数 ' + nSeg + ' / 句数 ' + sentences.length);
+      L.push((nBr === nSeg - nChain ? '✅' : '⚠') + ' 逻辑桥 ' + nBr + '（期望 ' + (nSeg - nChain) + ' = 句钩数−段钩数）');
+      L.push((nAn >= nSeg ? '✅' : '⚠') + ' 英文锚点 ' + nAn + ' / 句钩 ' + nSeg);
+    }
+    var dts = document.querySelectorAll('details.answer-toggle');
+    if(!dts.length){ L.push('— 挖空：未找到'); }
+    else {
+      dts.forEach(function(dt){
+        var p = dt.previousElementSibling, hops = 0;
+        while(p && hops < 3 && !/_{3,}/.test(p.textContent || '')){ p = p.previousElementSibling; hops++; }
+        var blanks = p ? ((p.textContent || '').match(/_{3,}/g) || []).length : 0;
+        var ans = dt.querySelector('.answer');
+        var words = ans ? (ans.textContent.replace(/^答案：?/, '').split(/[\/、，,]/).filter(function(w){ return w.trim(); })).length : 0;
+        L.push(blanks && blanks === words ? '✅ 挖空：空数 ' + blanks + ' == 答案数 ' + words : '⚠ 挖空：空数 ' + blanks + ' ≠ 答案数 ' + words + '（' + (p ? p.textContent.trim().slice(0, 12) : '?') + '…）');
+      });
+    }
+    L.push('');
+    L.push('— 逐句文本==原文、词汇/金句溯源需在生成端执行，见 SKILL.md「内容校验」清单');
+    var rpt = document.createElement('div');
+    rpt.className = 'emm-check-rpt';
+    rpt.textContent = L.join('\n');
+    var w = document.querySelector('.wrap') || document.body;
+    w.insertBefore(rpt, w.firstChild);
   }
 
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);

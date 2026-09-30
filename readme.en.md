@@ -7,7 +7,7 @@
 Paste any English article, and it produces a **17-section longform plan (15 basic / 16 speech / 17 longform) (speeches: 16 sections incl. skeleton)** (self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.12.0-blue)
+![Version](https://img.shields.io/badge/version-2.13.0-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-13-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -29,6 +29,10 @@ sentence-by-sentence linking marks, hooks welded into question chains, a retelli
 | 💬 | **Life examples for phrases** | Every collocation gets a plain-English daily sentence, **ready to mimic** (no translation — think in English) |
 | 🗂 | **14-section closed loop** | Strategy → close reading → hooks & chains → retelling ladder → three-pass → review → self-test → accumulation |
 | 🔁 | **Review loop** | Sentence-level OK/stuck check-in → weak-sentence list (click to jump) → graduate after 2 clean rounds; progress persists in your browser |
+| 📅 | **Today schedule** | Start date + per-segment Ebbinghaus auto-computes "what to memorize today"; tick off per segment, export the whole schedule as a calendar (.ics) |
+| 🙈 | **Self-test mode** | One click hides translations & linking marks for recall practice; click a sentence to reveal — kills "recognition disguised as fluency" |
+| 🪜 | **Ladder tracking** | Per-segment L1~L5 retelling level recorded as you climb; skipping levels = fake fluency |
+| ✍️ | **Make-it-yours blanks** | Per-segment mainline & palace images are editable (generation effect); blank lines stay printable for handwriting |
 | 🏛 | **Memory palace** | 25-station daily-life route, one sentence per station — weak stations auto-marked red on check-in, cleared on graduation |
 | 🎧 | **Dictation check** | TTS reads each sentence → type what you hear → word-level diff; mistakes flow into the weak list |
 | 💎 | **Golden Patterns** | 5–9 transferable patterns per article (bold replaceable part + swappable template) — straight into your writing/speeches |
@@ -164,7 +168,7 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 ## 📜 Version History
 
 <details>
-<summary><b>Expand: all changes from v2.1 → v2.12.0</b></summary>
+<summary><b>Expand: all changes from v2.1 → v2.13.0</b></summary>
 
 **v2.1**: sentence-by-sentence close reading — per-sentence translation (any language) + full connected-speech marking (⌒ linking / weak forms / flap t / h-dropping) with American IPA.
 
@@ -195,6 +199,8 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 **v2.11.0**: Speech mode — feed it a speech and it produces a 16-section plan with a new Section 3 "Speech Skeleton" (three-act stations: opening hook / argument / crescendo, each with its rhetorical function and a transferable technique, plus breathing groups and intonation guidance); the question chain becomes audience-viewpoint self-QA and ladder L3 becomes "retell from the skeleton". Sample plan: the Gettysburg Address.
 
 **v2.12.0**: Longform mode — articles of 500–2000 words (or 12+ sentences) automatically produce a 17-section plan: new Section 3 "Segment Dashboard" (per-segment row: name / schedule / 🔒▶✅ state driven by check-ins / weak count), sections 4.1–4.N per-segment units (each with its own close reading + keywords + question chain + hook chain), per-segment staggered Ebbinghaus schedules plus a full-text assembly day, a cross-segment master chain to learn first, and a continuous 21-station palace. Sample: the Declaration of Independence condensed edition (5 segments / 21 sentences).
+
+**v2.13.0**: Self-test & schedule suite (built into the component, zero generation cost) — ① a "📅 Today" card: set a start date and per-segment Ebbinghaus auto-computes "which segment to learn today, which to review", tickable per segment, one-click .ics calendar export for system-level reminders; ② a three-state "🙈 Self-test" toggle: hide translations & linking marks while retelling, click a sentence to reveal, full-hide also flattens inline marking styles — killing recognition-style fake fluency; ③ retelling-ladder tracking: per-segment L1~L5 levels recorded with dates; ④ make-it-yours blanks: per-segment "✍️ my mainline" and per-station "🎨 my image" editable fields, printed as blank lines for handwriting; ⑤ a `?check=1` structural self-check report (palace stops & numbering, hook counts, bridges, anchor coverage, blanks vs answers), paired with six generation-side content checks and a "when in doubt, don't mark" precision policy in SKILL.md.
 
 </details>
 
