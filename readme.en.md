@@ -4,8 +4,8 @@
 
 **Turn "memorizing English articles" from rote grinding into a path you can actually walk.**
 
-Paste any English article, and it produces a **17-section longform plan (15 basic / 16 speech / 17 longform) (speeches: 16 sections incl. skeleton)** (self-contained HTML):
-sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
+Paste any English article, and it produces a complete memorization plan (15 sections for regular articles · 16 for speeches with skeleton · 17 for longform with segment dashboard — self-contained HTML):
+sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, today's schedule & self-test mode, memory palace & dictation — all in one file.
 
 ![Version](https://img.shields.io/badge/version-2.13.0-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
@@ -27,7 +27,7 @@ sentence-by-sentence linking marks, hooks welded into question chains, a retelli
 | 📖 | **Close reading** | Chinese translation + full connected-speech marking (⌒ linking / weak forms / flap t / h-dropping) + term highlighting |
 | 📚 | **Terminology tables** | Word-formation breakdown (roots & affixes) + IPA + memory hooks — know the root, and new words become familiar ones |
 | 💬 | **Life examples for phrases** | Every collocation gets a plain-English daily sentence, **ready to mimic** (no translation — think in English) |
-| 🗂 | **14-section closed loop** | Strategy → close reading → hooks & chains → retelling ladder → three-pass → review → self-test → accumulation |
+| 🗂 | **15-section closed loop** | Strategy → close reading → hooks & chains → retelling ladder → three-pass → review → self-test → accumulation |
 | 🔁 | **Review loop** | Sentence-level OK/stuck check-in → weak-sentence list (click to jump) → graduate after 2 clean rounds; progress persists in your browser |
 | 📅 | **Today schedule** | Start date + per-segment Ebbinghaus auto-computes "what to memorize today"; tick off per segment, export the whole schedule as a calendar (.ics) |
 | 🙈 | **Self-test mode** | One click hides translations & linking marks for recall practice; click a sentence to reveal — kills "recognition disguised as fluency" |
