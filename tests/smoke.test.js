@@ -50,6 +50,9 @@ function fixture(withSegments, palaceMode) {
   } else {
     body += `<h2>3. 原文逐句精读</h2>` + sent(1) + sent(2) + sent(3) + sent(4);
   }
+  body += `<h2>4. 关键词串联表</h2>
+  <table><thead><tr><th style="width:44%">原句</th><th style="width:20%">关键词钩子</th><th>中文提示</th></tr></thead>
+  <tbody><tr><td>Test sentence number 1 the words.</td><td>words</td><td>第 1 句提示</td></tr></tbody></table>`;
   body += `<h2>15. 记忆钩子</h2>
   <div class="hook-chain"><span class="para-hook">段钩1</span><span class="seg">钩A</span><span class="bridge">⇒</span><span class="seg">钩B</span><span class="anchor">[anchor1]</span><span class="anchor">[anchor2]</span></div>
   <div class="hook-chain"><span class="para-hook">段钩2</span><span class="seg">钩C</span><span class="bridge">→</span><span class="seg">钩D</span><span class="anchor">[anchor3]</span><span class="anchor">[anchor4]</span></div>`;
@@ -238,6 +241,15 @@ async function run(name, withSegments, query) {
     setDay(1);
     ok(card.querySelector('.emm-rows').innerHTML.includes('href="#emm-cloze"'), '单篇「次日自测」带去自测链接');
   }
+
+  // v2.16 移动端自适应
+  const allWrapped = Array.prototype.every.call(doc.querySelectorAll('table'), (t) => t.parentNode.classList.contains('emm-tblwrap'));
+  ok(allWrapped, '所有表格（含今日卡）已套横滚容器');
+  ok(doc.querySelectorAll('.emm-tblwrap').length >= 2, '横滚容器数量正确');
+  const td0 = card.querySelector('.emm-rows td');
+  ok(td0 && td0.getAttribute('data-l') === '段落', '今日卡单元格带 data-l 标签（窄屏堆叠用）');
+  ok(template.includes('@media (max-width:720px)'), '窄屏媒体查询已在模板主样式块');
+  ok(template.includes('body.rv-mode .rv-bar,body.emm-drill .rv-bar,body.emm-quiz1 .rv-bar'), '工具条吸顶规则已在模板主样式块');
 }
 
 (async () => {

@@ -9,6 +9,8 @@
   回车/失焦自动批改、错空直通薄弱清单）、今日任务直达锚点（去背诵 / 去自测 / 看薄弱）。
   v2.15.0 组件新增：进度内容指纹（方案更新后检测并询问重置，防旧进度错位）、
   宫殿 data-sents 句号标注（>25 句同站多物的红站联动与自检精确化）。
+  v2.16.0 组件新增：移动端自适应——表格横滚容器、今日任务卡窄屏堆叠、
+  复习/快刷/自测工具条吸顶（仅窄屏与激活态生效，桌面端零变化）。
 -->
 <html lang="zh-CN">
 <head>
@@ -124,6 +126,25 @@
 .emm-clz-mark.ok{color:#059669;}
 .emm-clz-mark.bad{color:#b91c1c;}
 @media print{.emm-drill .sent{display:block!important;}.emm-clz{border-bottom:1px solid #333;}.emm-clz-mark{display:none;}}
+/* v2.16.0 mobile adaptation (id marker lives in the component JS below) */
+.emm-tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+@media (max-width:720px){
+  .wrap{padding:16px 12px 48px;}
+  header{padding:20px 16px;border-radius:12px;margin-bottom:20px;}
+  header h1{font-size:21px;}
+  h2{font-size:18px;margin:26px 0 10px;}
+  .sent-en{font-size:16px;}
+  .pron{font-size:12.5px;}
+  .legend{font-size:11.5px;}
+  .emm-tblwrap table{min-width:640px;}
+  body.rv-mode .rv-bar,body.emm-drill .rv-bar,body.emm-quiz1 .rv-bar{position:sticky;top:6px;z-index:60;box-shadow:0 2px 12px rgba(16,185,129,.18);}
+  .emm-today table{display:block;border:none;background:transparent;margin:8px 0;}
+  .emm-today thead{display:none;}
+  .emm-today tbody,.emm-today tr{display:block;}
+  .emm-today tr{background:#fff;border:1px solid #fcd34d;border-radius:10px;margin:8px 0;padding:4px 10px;}
+  .emm-today td{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 10px;border:none;padding:5px 0;background:none!important;}
+  .emm-today td::before{content:attr(data-l);flex:0 0 auto;font-size:12px;color:#92400e;font-weight:700;}
+}
 </style>
 </head>
 <body>
@@ -402,6 +423,7 @@
     wireReveal();
     selfCheck();
     buildCloze();
+    wrapTables();
   }
 
   var stops = [];
@@ -870,7 +892,7 @@
       var chk = segHasToday(i)
         ? '<input type="checkbox" class="emm-donechk" data-seg="' + i + '"' + (state.log[todayKey() + '|s' + i] ? ' checked' : '') + '>'
         : '';
-      html += '<tr><td>' + s.name + '</td><td>Day ' + learnDayOf(i) + '</td><td>' + segTodayHtml(i) + '</td><td>' + btns + '</td><td>' + chk + '</td></tr>';
+      html += '<tr><td data-l="段落">' + s.name + '</td><td data-l="排期">Day ' + learnDayOf(i) + '</td><td data-l="今日">' + segTodayHtml(i) + '</td><td data-l="🪜 阶梯">' + btns + '</td><td data-l="✓">' + chk + '</td></tr>';
     });
     todayCard.querySelector('.emm-rows').innerHTML = html;
   }
@@ -1136,6 +1158,17 @@
     }
     state.fingerprint = fp;
     save(state);
+  }
+
+  /* ===== v2.16.0 EMM_MOBILE_V216: wrap tables for mobile horizontal scroll ===== */
+  function wrapTables(){
+    document.querySelectorAll('table').forEach(function(t){
+      if(!t.parentNode || !t.parentNode.classList || t.parentNode.classList.contains('emm-tblwrap')) return;
+      var d = document.createElement('div');
+      d.className = 'emm-tblwrap';
+      t.parentNode.insertBefore(d, t);
+      d.appendChild(t);
+    });
   }
 
   if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
