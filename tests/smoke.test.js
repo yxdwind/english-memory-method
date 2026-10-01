@@ -1,18 +1,27 @@
 /**
- * english-memory-method · 背诵方案组件冒烟测试
+ * english-memory-method · 组件冒烟测试
  * 运行：npm test（首次需 npm i --no-save jsdom@16）
  * 覆盖：v2.13 今日排期/自测模式/阶梯/留白/自检，v2.14 快刷/交互挖空/锚点，
- *       v2.15 内容指纹/宫殿 data-sents；长文与单篇两形态。
+ *       v2.15 内容指纹/宫殿 data-sents，v2.17 记忆库（书架/进度/搜索/轻刷/自检）；
+ *       长文与单篇两形态。
  */
 const fs = require('fs');
 const path = require('path');
 
-let JSDOM;
+let JSDOM, VirtualConsole;
 try {
   JSDOM = require('jsdom').JSDOM;
+  VirtualConsole = require('jsdom').VirtualConsole;
 } catch (e) {
   console.error('缺少 jsdom：请先执行 npm i --no-save jsdom@16 后重跑 npm test');
   process.exit(1);
+}
+
+// jsdom 对 <a> 点击导航等"Not implemented"能力打印完整栈,属已知噪音（.ics 导出 mock 场景）,过滤之
+function quietConsole() {
+  const vc = new VirtualConsole();
+  vc.on('jsdomError', (e) => { if (!/^Not implemented/.test(e.message || '')) console.error('jsdomError:', e.message); });
+  return vc;
 }
 
 const template = fs.readFileSync(path.join(__dirname, '..', 'assets', 'plan-template.html'), 'utf8');
@@ -80,10 +89,12 @@ async function boot(opts = {}) {
   const dom = new JSDOM(fixture(opts.withSegments, opts.palaceMode), {
     runScripts: 'outside-only',
     url: 'http://localhost/plan.html' + (opts.query || ''),
+    virtualConsole: quietConsole(),
   });
   const w = dom.window;
   w.URL.createObjectURL = () => 'blob:mock';
   w.URL.revokeObjectURL = () => {};
+  w.scrollTo = () => {};
   if (opts.confirmReturn !== undefined) { w.confirm = () => opts.confirmReturn; }
   if (opts.confirmCounter) { w.confirm = () => { opts.confirmCounter.n++; return opts.confirmReturn; }; }
   if (opts.seed) { w.localStorage.setItem(KEY, JSON.stringify(opts.seed)); }
@@ -311,6 +322,8 @@ async function run(name, withSegments, query) {
 
     await run('长文模式（4.x 段落单元）+ ?check=1', true, '?check=1');
     await run('普通单篇（无 4.x）+ ?check=1', false, '?check=1');
+
+    await runLibrary();
   } catch (e) {
     console.error('!! 异常:', e && (e.stack || e.message || e));
     failed++;
@@ -319,3 +332,159 @@ async function run(name, withSegments, query) {
   console.log('\n结果: ' + passed + ' 通过, ' + failed + ' 失败');
   process.exit(failed ? 1 : 0);
 })();
+
+/* ===== v2.17 个人记忆库（library-template.html） ===== */
+const libTemplate = fs.readFileSync(path.join(__dirname, '..', 'assets', 'library-template.html'), 'utf8');
+const libJs = libTemplate.match(/<script>([\s\S]*)<\/script>/)[1];
+
+const libA = {
+  topic: 'success', file: 'success-memorization-plan.html', key: 'Success 背诵方案',
+  title: 'Success', type: '议论文', sents: 3, words: 120, days: 16, date: '2026-10-01',
+  chain: [
+    { para: '起点钩', steps: [
+      { h: '钩A', b: '⇒', a: 'test sentence', sidx: 1, en: 'Test sentence number 1 the words.' },
+      { h: '钩B', b: '→', a: 'number two', sidx: 2, en: 'Test sentence number 2 the words.' },
+    ] },
+    { para: '收束钩', steps: [
+      { h: '钩C', b: '', a: 'number three', sidx: 3, en: 'Test sentence number 3 the words.' },
+    ] },
+  ],
+  cloze: [ { q: 'Test sentence ______ number 1 the words.', a: ['words'] } ],
+};
+const libB = {
+  topic: 'dream', file: 'dream-memorization-plan.html', key: 'Dream 背诵方案',
+  title: 'Dream', type: '长文', sents: 2, words: 80, days: 17, date: '2026-09-20',
+  chain: [ { para: '段钩D', steps: [
+    { h: '钩D', b: '', a: 'anchor d', sidx: 1, en: 'Dream sentence one here.' },
+    { h: '钩E', b: '', a: 'anchor e', sidx: 2, en: 'Dream sentence two here.' },
+  ] } ],
+  cloze: [ { q: 'Dream one ______ and ______ here.', a: ['onlyone'] } ],
+};
+
+const KEY_A = 'emm-progress:Success 背诵方案';
+const seededA = { done: {}, streak: {}, weak: { '1': true }, rounds: [{ date: '2026-09-01', ok: 2, bad: 1 }],
+  mode: false, current: null, quiz: 0, start: '2026-09-01', perDay: 1, ladder: {}, log: {},
+  wb: { main: {}, pal: {} }, fingerprint: '' };
+
+function fillLib(articles) {
+  // {{ARTICLES}} 位于 articles: [ ... ] 内,填逗号分隔的对象字面量（与 SKILL.md 约定一致）,
+  // 不能填 JSON 数组（会双重嵌套）。末尾多留一个对象供失配断言。
+  return libTemplate
+    .replace('{{DATE}}', '2026-10-01')
+    .replace('{{ARTICLES}}', articles.map((a) => JSON.stringify(a)).join(',\n'));
+}
+
+async function bootLib(articles, opts = {}) {
+  const html = fillLib(articles);
+  const js = html.match(/<script>([\s\S]*)<\/script>/)[1];
+  const dom = new JSDOM(html, {
+    runScripts: 'outside-only',
+    url: 'http://localhost/memory-library.html' + (opts.query || ''),
+    virtualConsole: quietConsole(),
+  });
+  const w = dom.window;
+  w.Element.prototype.scrollIntoView = () => {};
+  w.scrollTo = () => {};
+  if (opts.seed) { w.localStorage.setItem(KEY_A, JSON.stringify(seededA)); }
+  w.eval(js);
+  await new Promise((r) => setTimeout(r, 60));
+  return { w, doc: w.document };
+}
+
+function snapshotProgress(w) {
+  const out = {};
+  for (let i = 0; i < w.localStorage.length; i++) {
+    const k = w.localStorage.key(i);
+    if (k.indexOf('emm-progress:') === 0) out[k] = w.localStorage.getItem(k);
+  }
+  return JSON.stringify(out);
+}
+
+async function runLibrary() {
+  console.log('\n== v2.17 记忆库：书架 / 进度 / 搜索 ==');
+  ok((libTemplate.match(/EMM_LIBRARY_V217/g) || []).length === 1, 'EMM_LIBRARY_V217 标识恰好一次');
+  {
+    const { w, doc } = await bootLib([libA, libB], { seed: true });
+    const cards = doc.querySelectorAll('.lib-card');
+    ok(cards.length === 2, '书架渲染 2 张文章卡');
+    ok(doc.querySelector('header .lib-sub').textContent.includes('已收录 2 篇 · 共 5 句'), '头部统计：2 篇 5 句');
+    ok(doc.querySelector('header .lib-sub').textContent.includes('1 篇已有打卡进度'), '头部统计：1 篇有进度');
+    const cardA = doc.querySelector('.lib-card[data-idx="0"]');
+    ok(cardA.textContent.includes('已打卡 1 轮 · 薄弱 1 句 · 67%'), 'A 卡进度实时读取（1 轮/薄弱 1/67%）');
+    ok(cardA.querySelector('.lib-bar i').style.width === '67%', 'A 卡进度条宽度 67%');
+    ok(cardA.textContent.includes('天未复习，建议回温'), 'A 卡超 14 天未复习出现回温徽标');
+    const cardB = doc.querySelector('.lib-card[data-idx="1"]');
+    ok(cardB.textContent.includes('尚未打开方案打卡'), 'B 卡无进度显示未开始');
+    ok(cardB.querySelector('.lib-btn-open').getAttribute('href') === 'dream-memorization-plan.html', 'B 卡原方案相对链接正确');
+
+    const search = doc.querySelector('.lib-search');
+    search.value = 'success';
+    search.dispatchEvent(new w.Event('input', { bubbles: true }));
+    await new Promise((r) => setTimeout(r, 250));
+    ok(doc.querySelectorAll('.lib-card').length === 1, '搜索 success 只剩 1 张卡');
+    search.value = 'zzz-nope';
+    search.dispatchEvent(new w.Event('input', { bubbles: true }));
+    await new Promise((r) => setTimeout(r, 250));
+    ok(doc.querySelectorAll('.lib-card').length === 0 && !doc.getElementById('emm-lib-empty').hidden, '无匹配时显示空态提示');
+    search.value = '';
+    search.dispatchEvent(new w.Event('input', { bubbles: true }));
+    await new Promise((r) => setTimeout(r, 250));
+    ok(doc.querySelectorAll('.lib-card').length === 2, '清空搜索恢复 2 张卡');
+  }
+
+  console.log('== v2.17 记忆库：轻刷会话（结果不落盘） ==');
+  {
+    const { w, doc } = await bootLib([libA, libB], { seed: true });
+    const before = snapshotProgress(w);
+    doc.querySelector('.lib-card[data-idx="0"] [data-drill]').click();
+    const session = doc.getElementById('emm-lib-session');
+    ok(!session.hidden && doc.getElementById('emm-lib-shelf').hidden, '轻刷打开：会话显示、书架隐藏');
+    ok(session.querySelectorAll('.ls-step').length === 3, '链回忆渲染 3 句');
+    ok(session.querySelector('.ls-stage').textContent.includes('① 链回忆'), '阶段一：链回忆');
+    const step0 = session.querySelector('.ls-step');
+    step0.querySelector('.ls-hook').click();
+    ok(step0.classList.contains('open') && step0.querySelector('.ls-en').textContent.includes('Test sentence number 1'), '点钩子揭开原句');
+    const mark = session.querySelectorAll('.ls-mark')[1];
+    mark.click();
+    ok(mark.classList.contains('on'), '第 2 句标记「卡了」');
+    ok(snapshotProgress(w) === before, '链回忆全程未写 localStorage');
+
+    session.querySelector('#emm-lib-toclz').click();
+    ok(session.querySelector('.ls-stage').textContent.includes('② 挖空挑战'), '阶段二：挖空挑战');
+    const inp = session.querySelector('input.emm-clz');
+    ok(!!inp && inp.getAttribute('data-ans') === 'words', '挖空输入框带答案数据');
+    inp.value = 'WORDS!';
+    inp.dispatchEvent(new w.Event('blur'));
+    ok(inp.classList.contains('emm-clz-ok'), '正确答案（大小写/标点不敏感）判 ✓');
+    inp.value = 'nope';
+    inp.dispatchEvent(new w.Event('blur'));
+    ok(inp.classList.contains('emm-clz-bad'), '错误答案判 ✗');
+    inp.value = '';
+    inp.dispatchEvent(new w.Event('blur'));
+    ok(!inp.classList.contains('emm-clz-bad') && !inp.classList.contains('emm-clz-ok'), '清空输入重置判定');
+    inp.value = 'nope';
+    inp.dispatchEvent(new w.Event('blur'));
+
+    session.querySelector('#emm-lib-tosum').click();
+    ok(session.querySelector('.ls-stage').textContent.includes('③ 结算'), '阶段三：结算');
+    ok(session.querySelector('.ls-sum').textContent.includes('自判卡壳 1') && session.querySelector('.ls-sum').textContent.includes('错 1 / 1 空'), '结算统计：卡壳 1 句、错 1/1 空');
+    ok(session.querySelector('.ls-miss').textContent.includes('第 2 句') && session.querySelector('.ls-miss').textContent.includes('错空词「words」'), '结算列出卡壳句号与错空词');
+    ok(snapshotProgress(w) === before, '轻刷全程（含挖空批改）未写 localStorage');
+
+    session.querySelector('#emm-lib-done').click();
+    ok(session.hidden && !doc.getElementById('emm-lib-shelf').hidden, '完成返回书架');
+  }
+
+  console.log('== v2.17 记忆库：空库与 ?check=1 自检 ==');
+  {
+    const { doc } = await bootLib([]);
+    ok(!doc.getElementById('emm-lib-empty').hidden && doc.getElementById('emm-lib-empty').textContent.includes('记忆库还是空的'), '空库显示引导');
+  }
+  {
+    const { doc } = await bootLib([libA, libB], { query: '?check=1' });
+    const t = doc.querySelector('.emm-check-rpt').textContent;
+    ok(t.includes('《Success》') && t.includes('✅ 链回忆 3 句'), '自检：A 链句数对齐判 ✅');
+    ok(t.includes('✅ 挖空#1：空数 1 == 答案数 1'), '自检：A 挖空配对判 ✅');
+    ok(t.includes('《Dream》') && t.includes('⚠ 挖空#1：空数 2 ≠ 答案数 1'), '自检：B 挖空失配判 ⚠');
+  }
+}

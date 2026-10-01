@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<!--
+  English Memory Method · 个人记忆库模板 (v2.17.0)
+  用法：复制本文件为 memory-library.html（与各 *-memorization-plan.html 同目录），
+  按下方 <!-- ① ... --> 注释填充 var LIB 数据后交付。
+  数据来源：扫描工作区全部 *-memorization-plan.html，逐篇提取元数据与轻刷数据；
+  进度不填充——打开时实时读取本机 localStorage（键 emm-progress:<方案h1前40字>，与方案组件 keyOf() 一致）。
+  轻刷结果不落盘（会话内有效）；打卡/薄弱清单永远以原方案为准。
+  自检：打开 memory-library.html?check=1 查看数据体检报告。
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>我的记忆库</title>
+<style>
+  :root{--accent:#7c3aed;--accent-bg:#f5f3ff;--accent-border:#ddd6fe;--ink:#1f2937;--muted:#6b7280;--line:#e5e7eb;--ok:#10b981;--ok-bg:#ecfdf5;--warn:#f59e0b;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif;background:#f6f8fb;color:var(--ink);line-height:1.75;}
+  .wrap{max-width:980px;margin:0 auto;padding:32px 20px 64px;}
+  header{background:linear-gradient(135deg,#5b21b6,#7c3aed);color:#fff;border-radius:16px;padding:28px 34px;margin-bottom:24px;}
+  header h1{font-size:26px;margin-bottom:6px;}
+  header .lib-sub{opacity:.92;font-size:14px;}
+  .lib-search{width:100%;margin-top:14px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.15);color:#fff;border-radius:10px;padding:9px 14px;font-size:14.5px;outline:none;}
+  .lib-search::placeholder{color:rgba(255,255,255,.75);}
+  .lib-search:focus{background:rgba(255,255,255,.25);}
+  .lib-shelf{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;}
+  .lib-card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:16px 18px;display:flex;flex-direction:column;gap:8px;}
+  .lib-card:hover{border-color:#c4b5fd;box-shadow:0 2px 10px rgba(124,58,237,.08);}
+  .lib-card .lc-top{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
+  .lib-card .lc-title{font-size:16.5px;font-weight:700;color:#4c1d95;}
+  .lib-badge{display:inline-block;background:var(--accent-bg);border:1px solid var(--accent-border);color:#6d28d9;border-radius:999px;padding:1px 10px;font-size:12px;font-weight:600;}
+  .lib-badge.lt-speech{background:#fffbeb;border-color:#fcd34d;color:#92400e;}
+  .lib-badge.lt-long{background:#eff6ff;border-color:#bfdbfe;color:#1d4ed8;}
+  .lib-card .lc-meta{font-size:12.5px;color:var(--muted);}
+  .lib-card .lc-prog{font-size:12.5px;color:#065f46;}
+  .lib-bar{height:8px;background:#d1fae5;border-radius:4px;overflow:hidden;}
+  .lib-bar i{display:block;height:100%;background:var(--ok);width:0;}
+  .lib-bar i.hasweak{background:#fbbf24;}
+  .lib-flag{font-size:12px;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:2px 8px;display:inline-block;}
+  .lib-card .lc-weak{font-size:12.5px;color:#b91c1c;}
+  .lib-card .lc-btns{display:flex;gap:8px;margin-top:auto;padding-top:6px;}
+  .lib-btn{cursor:pointer;flex:1;border:1px solid #10b981;background:#fff;color:#047857;border-radius:8px;padding:6px 10px;font-size:13.5px;font-weight:600;text-align:center;text-decoration:none;}
+  .lib-btn:hover{background:#d1fae5;}
+  .lib-btn.lib-btn-open{border-color:#c4b5fd;color:#6d28d9;}
+  .lib-btn.lib-btn-open:hover{background:#f5f3ff;}
+  .lib-start{font-size:12.5px;color:#9ca3af;font-style:italic;}
+  /* 轻刷会话 */
+  .lib-session{background:#fff;border:1px solid var(--accent-border);border-radius:14px;padding:20px 24px;margin-top:6px;}
+  .lib-session .ls-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:12px;}
+  .lib-session .ls-head h2{font-size:19px;color:#4c1d95;margin:0;}
+  .ls-back{cursor:pointer;border:1px solid #c4b5fd;background:#fff;color:#6d28d9;border-radius:8px;padding:4px 12px;font-size:13px;font-weight:600;}
+  .ls-back:hover{background:#f5f3ff;}
+  .ls-stage{font-size:12.5px;color:#6d28d9;background:var(--accent-bg);border-radius:999px;padding:2px 12px;font-weight:600;}
+  .ls-para{display:inline-block;font-size:13px;font-weight:700;color:#92400e;background:#fde68a;border-radius:8px;padding:2px 10px;margin:10px 0 4px;}
+  .ls-step{border:1px dashed var(--accent-border);border-radius:10px;padding:8px 12px;margin:8px 0;}
+  .ls-step .ls-hook{display:flex;align-items:center;gap:8px;flex-wrap:wrap;cursor:pointer;}
+  .ls-hook .ls-no{font-size:11px;font-weight:700;color:#fff;background:#a78bfa;border-radius:8px;padding:1px 7px;flex:0 0 auto;}
+  .ls-hook .ls-hw{font-weight:700;color:#6d28d9;}
+  .ls-hook .ls-bridge{font-size:12px;color:#fff;background:#f59e0b;border-radius:10px;padding:1px 8px;}
+  .ls-hook .ls-see{margin-left:auto;font-size:12px;color:#9ca3af;}
+  .ls-en{display:none;font-family:Georgia,"Times New Roman",serif;font-size:15.5px;margin-top:8px;padding-top:8px;border-top:1px solid var(--line);color:#1f2937;}
+  .ls-step.open .ls-en{display:block;}
+  .ls-step .ls-anchor{font-family:Consolas,'Courier New',monospace;font-size:12.5px;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:0 6px;margin-left:6px;}
+  .ls-mark{cursor:pointer;margin-left:auto;border:1px solid #fca5a5;background:#fff;color:#b91c1c;border-radius:6px;font-size:11.5px;padding:1px 8px;flex:0 0 auto;}
+  .ls-mark.on{background:#ef4444;border-color:#ef4444;color:#fff;}
+  .ls-actions{display:flex;gap:10px;margin-top:14px;flex-wrap:wrap;}
+  .ls-next{cursor:pointer;border:1px solid #10b981;background:#ecfdf5;color:#047857;border-radius:10px;padding:8px 18px;font-size:14.5px;font-weight:700;}
+  .ls-next:hover{background:#d1fae5;}
+  .ls-hint{font-size:12.5px;color:var(--muted);margin-top:10px;}
+  /* 轻刷挖空（复用方案组件同名视觉） */
+  .ls-clz-item{margin:12px 0;padding:10px 14px;background:#f8fafc;border:1px solid var(--line);border-radius:10px;font-size:15px;}
+  .emm-clz{border:none;border-bottom:2px solid #94a3b8;outline:none;font-weight:600;text-align:center;font-family:inherit;background:transparent;padding:0 2px;margin:0 2px;font-size:15px;}
+  .emm-clz:focus{border-bottom-color:#7c3aed;background:#f5f3ff;}
+  .emm-clz.emm-clz-ok{color:#047857;border-bottom-color:#10b981;}
+  .emm-clz.emm-clz-bad{color:#b91c1c;border-bottom-color:#ef4444;background:#fef2f2;}
+  .emm-clz-mark{font-size:12px;font-weight:700;margin-left:2px;}
+  .emm-clz-mark.ok{color:#059669;}
+  .emm-clz-mark.bad{color:#b91c1c;}
+  /* 结算 */
+  .ls-sum{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:12px 16px;font-size:13.5px;color:#065f46;margin:10px 0;}
+  .ls-miss{background:#fef2f2;border:1px solid #fecaca;border-radius:10px;padding:10px 14px;margin:8px 0;font-size:13.5px;color:#7f1d1d;}
+  .ls-miss b{color:#b91c1c;}
+  .ls-miss .ls-anchor{font-family:Consolas,'Courier New',monospace;font-size:12px;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:0 6px;}
+  /* 空库 / 自检 */
+  .lib-empty{background:#fff;border:1px dashed #c4b5fd;border-radius:14px;padding:40px 24px;text-align:center;color:var(--muted);}
+  .lib-empty b{color:#6d28d9;}
+  .emm-check-rpt{background:#f8fafc;border:1px solid #cbd5e1;border-left:4px solid #64748b;border-radius:10px;padding:12px 16px;margin:12px 0;font-size:13.5px;font-family:Consolas,'Courier New',monospace;white-space:pre-wrap;line-height:1.9;}
+  footer{margin-top:44px;color:var(--muted);font-size:13px;text-align:center;}
+  @media (max-width:720px){
+    .wrap{padding:18px 12px 48px;}
+    header{padding:20px 16px;border-radius:12px;}
+    header h1{font-size:21px;}
+    .lib-shelf{grid-template-columns:1fr;}
+    .lib-session{padding:14px;}
+    .lib-btn{padding:9px 10px;}
+  }
+  @media print{
+    .lib-search,.lc-btns,.lib-session,.emm-check-rpt{display:none !important;}
+    header{background:#5b21b6 !important;-webkit-print-color-adjust:exact;}
+    .lib-shelf{grid-template-columns:1fr 1fr;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+<!-- ① 头部与书架容器（无需改动，数字由组件运行时计算） -->
+<header>
+  <h1>🧠 我的记忆库</h1>
+  <p class="lib-sub"></p>
+  <input type="text" class="lib-search" placeholder="🔍 搜索：标题 / 钩子 / 句子关键词…">
+</header>
+<div class="lib-shelf" id="emm-lib-shelf"></div>
+<div class="lib-empty" id="emm-lib-empty" hidden>
+  <p><b>记忆库还是空的。</b></p>
+  <p>先用背诵法生成第一篇方案（<b>&lt;topic&gt;-memorization-plan.html</b>），</p>
+  <p>然后对 AI 说「<b>更新记忆库</b>」，它会把所有方案汇进这里。</p>
+</div>
+<!-- ② 轻刷会话面板（组件运行时填充，无需手写） -->
+<div class="lib-session" id="emm-lib-session" hidden></div>
+<!-- ③ 自检报告容器（?check=1 时由组件注入） -->
+<footer>English teacher · 个人记忆库 · 进度实时读取自本机浏览器 · 打卡与薄弱清单以原方案为准</footer>
+</div>
+
+<script>
+/* ===== EMM_LIBRARY_V217: personal memory library (self-contained; no deps) ===== */
+(function(){
+  "use strict";
+
+  /* ① 文章数据：由 AI 生成记忆库时填充。schema 见文末注释。 */
+  var LIB = {
+    generated: '{{DATE}}',
+    articles: [
+{{ARTICLES}}
+    ]
+  };
+
+  /* —— 工具 —— */
+  function esc(s){
+    return String(s == null ? '' : s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  }
+  function norm(s){
+    s = (s || '').toLowerCase().replace(/['’]/g, "'").replace(/[^a-z0-9' ]/g, ' ').replace(/\s+/g, ' ').trim();
+    var exp = { "it's":'it is', "don't":'do not', "can't":'cannot', "won't":'will not', "isn't":'is not', "aren't":'are not', "doesn't":'does not', "didn't":'did not', "i'm":'i am', "you're":'you are', "they're":'they are', "we're":'we are', "there's":'there is', "that's":'that is', "let's":'let us', "i'd":'i would', "i'll":'i will', "we'd":'we would', "he's":'he is', "she's":'she is' };
+    return s.split(' ').map(function(w){ return exp[w] || w; });
+  }
+  function normJoin(s){ return norm(s).join(' '); }
+  function todayKey(){
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function diffDateDays(dstr){
+    var m = /^(\d{4})-(\d{1,2})-(\d{1,2})/.exec(dstr || '');
+    if(!m) return null;
+    return Math.round((new Date() - new Date(+m[1], +m[2]-1, +m[3])) / 86400000);
+  }
+  /* 与方案组件 keyOf() 约定一致：emm-progress:<方案 h1 文本前 40 字> */
+  function progKey(article){ return 'emm-progress:' + (article.key || '').slice(0, 40); }
+  function readProgress(article){
+    try { return JSON.parse(localStorage.getItem(progKey(article)) || 'null'); }
+    catch(e){ return null; }
+  }
+  function progStats(article){
+    var s = readProgress(article);
+    if(!s) return null;
+    var total = article.sents || 0;
+    var weak = Object.keys(s.weak || {}).length;
+    var rounds = (s.rounds || []).length;
+    var pct = total ? Math.round(weak ? ((total - weak) / total * 100) : 100) : 0;
+    var last = '';
+    (s.rounds || []).forEach(function(r){ if(r && r.date && r.date > last) last = r.date; });
+    Object.keys(s.ladder || {}).forEach(function(k){
+      var d = (s.ladder[k] || {}).date; if(d && d > last) last = d;
+    });
+    Object.keys(s.log || {}).forEach(function(k){
+      var d = k.split('|')[0]; if(d && d > last) last = d;
+    });
+    return { pct: pct, weak: weak, rounds: rounds, last: last };
+  }
+  function badgeClass(type){
+    if(/演讲/.test(type)) return 'lib-badge lt-speech';
+    if(/长文/.test(type)) return 'lib-badge lt-long';
+    return 'lib-badge';
+  }
+
+  /* —— 书架 —— */
+  var shelf, emptyBox, sessionBox, searchBox;
+
+  function cardHtml(a, st){
+    var meta = [];
+    if(a.date) meta.push(a.date);
+    if(a.sents) meta.push(a.sents + ' 句');
+    if(a.words) meta.push('~' + a.words + ' 词');
+    var html = '<div class="lc-top"><span class="lc-title">' + esc(a.title) + '</span>'
+      + '<span class="' + badgeClass(a.type) + '">' + esc(a.type || '普通') + '</span></div>';
+    html += '<div class="lc-meta">' + meta.join(' · ') + '</div>';
+    if(st){
+      html += '<div class="lc-prog">' + (st.rounds ? '已打卡 ' + st.rounds + ' 轮' : '已开始') + ' · 薄弱 ' + st.weak + ' 句 · ' + st.pct + '%</div>'
+        + '<div class="lib-bar"><i class="' + (st.weak ? 'hasweak' : '') + '" style="width:' + st.pct + '%"></i></div>';
+      if(st.weak) html += '<div class="lc-weak">🎯 ' + st.weak + ' 个薄弱句待连顺 2 轮毕业</div>';
+      var ago = diffDateDays(st.last);
+      if(st.last && ago != null && ago >= 14) html += '<span class="lib-flag">⏰ ' + ago + ' 天未复习，建议回温</span>';
+    } else {
+      html += '<div class="lib-start">尚未打开方案打卡——进度从打卡数据实时读取</div>';
+    }
+    html += '<div class="lc-btns">'
+      + '<button type="button" class="lib-btn" data-drill="' + esc(a.key) + '">⚡ 轻刷</button>'
+      + '<a class="lib-btn lib-btn-open" href="' + esc(a.file || '') + '">📖 打开原方案</a></div>';
+    return html;
+  }
+
+  function renderShelf(){
+    var q = normLike(searchBox.value || '');
+    var n = LIB.articles.length, totalSents = 0, started = 0, shown = 0;
+    var html = '';
+    LIB.articles.forEach(function(a, i){
+      totalSents += a.sents || 0;
+      var st = progStats(a);
+      if(st) started++;
+      if(q){
+        var hay = normLike([a.title, a.topic, a.type, a.file].concat(chainText(a)).join(' '));
+        if(hay.indexOf(q) < 0) return;
+      }
+      shown++;
+      html += '<div class="lib-card" data-idx="' + i + '">' + cardHtml(a, st) + '</div>';
+    });
+    shelf.innerHTML = html;
+    emptyBox.hidden = !(n === 0 || (q && !shown));
+    emptyBox.innerHTML = n === 0
+      ? '<p><b>记忆库还是空的。</b></p><p>先用背诵法生成第一篇方案（<b>&lt;topic&gt;-memorization-plan.html</b>），</p><p>然后对 AI 说「<b>更新记忆库</b>」，它会把所有方案汇进这里。</p>'
+      : '<p>没有匹配「' + esc(searchBox.value) + '」的文章。</p>';
+    var sub = headerSub();
+    if(sub) sub.textContent = '已收录 ' + n + ' 篇 · 共 ' + totalSents + ' 句 · ' + (started ? started + ' 篇已有打卡进度' : '暂无打卡记录') + ' · 汇总于 ' + (LIB.generated || '?');
+    shelf.querySelectorAll('[data-drill]').forEach(function(b){
+      b.addEventListener('click', function(){
+        var key = b.getAttribute('data-drill');
+        for(var i = 0; i < LIB.articles.length; i++){ if(LIB.articles[i].key === key){ openSession(i); return; } }
+      });
+    });
+  }
+  function headerSub(){ return document.querySelector('header .lib-sub'); }
+  function chainText(a){
+    var out = [];
+    (a.chain || []).forEach(function(c){
+      if(c.para) out.push(c.para);
+      (c.steps || []).forEach(function(s){ out.push(s.h, s.a, s.en); });
+    });
+    return out;
+  }
+  function normLike(s){
+    return String(s || '').toLowerCase().replace(/\s+/g, ' ').trim();
+  }
+
+  /* —— 轻刷会话（结果不落盘） —— */
+  var cur = null; /* { a, mi (链回忆卡壳 sidx 集合), ci (挖空错空计数), clzTotal } */
+
+  function openSession(idx){
+    var a = LIB.articles[idx];
+    cur = { a: a, mi: {}, clzBad: {}, clzTotal: 0 };
+    renderChain();
+    sessionBox.hidden = false;
+    shelf.hidden = true; /* shelf is a div; hide while drilling */
+    emptyBox.hidden = true;
+    sessionBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  function closeSession(){
+    cur = null;
+    sessionBox.hidden = true;
+    sessionBox.innerHTML = '';
+    shelf.hidden = false;
+    renderShelf();
+  }
+
+  function renderChain(){
+    var a = cur.a;
+    var nSteps = 0;
+    (a.chain || []).forEach(function(c){ nSteps += (c.steps || []).length; });
+    var html = '<div class="ls-head"><button type="button" class="ls-back">← 返回书架</button>'
+      + '<h2>⚡ 轻刷《' + esc(a.title) + '》</h2><span class="ls-stage">① 链回忆</span></div>'
+      + '<p class="ls-hint">盖住答案：看着钩子把那句英文说出来，再点开核对。卡住的句子点「卡了」标记。</p>';
+    (a.chain || []).forEach(function(c){
+      html += '<div><span class="ls-para">' + esc(c.para || '段') + '</span></div>';
+      (c.steps || []).forEach(function(s, k){
+        html += '<div class="ls-step"><div class="ls-hook">'
+          + '<span class="ls-no">' + (s.sidx || '?') + '</span>'
+          + '<span class="ls-hw">' + esc(s.h) + '</span>'
+          + (s.b ? '<span class="ls-bridge">' + esc(s.b) + '</span>' : '')
+          + (s.a ? '<span class="ls-anchor">[' + esc(s.a) + ']</span>' : '')
+          + '<span class="ls-see">点看原句</span>'
+          + '<button type="button" class="ls-mark" data-mi="' + esc(s.sidx || '') + '">卡了</button></div>'
+          + '<div class="ls-en">' + esc(s.en || ('（缺原句数据：' + esc(s.h) + '）')) + '</div></div>';
+      });
+    });
+    html += '<div class="ls-actions"><button type="button" class="ls-next" id="emm-lib-toclz">下一步：挖空挑战 ▶</button></div>'
+      + '<p class="ls-hint">共 ' + nSteps + ' 句。轻刷结果不落盘——要进薄弱清单，回原方案打卡。</p>';
+    sessionBox.innerHTML = html;
+    sessionBox.querySelector('.ls-back').addEventListener('click', closeSession);
+    sessionBox.querySelectorAll('.ls-step').forEach(function(row){
+      row.querySelector('.ls-hook').addEventListener('click', function(e){
+        if(e.target.closest('.ls-mark')) return;
+        row.classList.toggle('open');
+      });
+    });
+    sessionBox.querySelectorAll('.ls-mark').forEach(function(b){
+      b.addEventListener('click', function(){
+        b.classList.toggle('on');
+        var sid = b.getAttribute('data-mi');
+        if(b.classList.contains('on')) cur.mi[sid] = true; else delete cur.mi[sid];
+      });
+    });
+    sessionBox.querySelector('#emm-lib-toclz').addEventListener('click', renderCloze);
+  }
+
+  function renderCloze(){
+    var a = cur.a;
+    var html = '<div class="ls-head"><button type="button" class="ls-back">← 返回书架</button>'
+      + '<h2>⚡ 轻刷《' + esc(a.title) + '》</h2><span class="ls-stage">② 挖空挑战</span></div>'
+      + '<p class="ls-hint">填空后回车自动批改（大小写/标点/缩写不敏感）。卡壳就凭记忆填——错空正是要回炉的地方。</p>';
+    var items = a.cloze || [];
+    if(!items.length){
+      html += '<p class="ls-hint">本篇没有挖空数据（旧方案可能未收录）。</p>';
+    }
+    items.forEach(function(it, i){
+      html += '<div class="ls-clz-item" data-clz="' + i + '">' + clozeHtml(it) + '</div>';
+    });
+    html += '<div class="ls-actions"><button type="button" class="ls-next" id="emm-lib-tosum">查看结算 ▶</button></div>';
+    sessionBox.innerHTML = html;
+    sessionBox.querySelector('.ls-back').addEventListener('click', closeSession);
+    cur.clzTotal = 0; cur.clzBad = {};
+    items.forEach(function(it, i){
+      var box = sessionBox.querySelector('[data-clz="' + i + '"]');
+      box.querySelectorAll('input.emm-clz').forEach(function(inp){
+        cur.clzTotal++;
+        wireClz(inp, inp.nextSibling, inp.getAttribute('data-ans'));
+      });
+    });
+    var toSum = sessionBox.querySelector('#emm-lib-tosum');
+    if(toSum) toSum.addEventListener('click', renderSummary);
+  }
+  function clozeHtml(it){
+    var bi = 0;
+    return esc(it.q).replace(/_{3,}/g, function(){
+      var ans = (it.a || [])[bi++] || '';
+      return '<input type="text" class="emm-clz" autocomplete="off" spellcheck="false" data-ans="' + esc(ans) + '" style="width:' + Math.max(6, ans.length + 2) + 'ch" aria-label="第' + bi + '空"><span class="emm-clz-mark"></span>';
+    });
+  }
+  function wireClz(inp, mk, ans){
+    function grade(){
+      var v = normJoin(inp.value), a = normJoin(ans);
+      if(!v){
+        inp.classList.remove('emm-clz-ok', 'emm-clz-bad');
+        mk.textContent = ''; mk.className = 'emm-clz-mark';
+        if(cur) delete cur.clzBad[ans];
+        return;
+      }
+      if(v === a){
+        inp.classList.add('emm-clz-ok'); inp.classList.remove('emm-clz-bad');
+        mk.textContent = '✓'; mk.className = 'emm-clz-mark ok';
+        if(cur) delete cur.clzBad[ans];
+      } else {
+        inp.classList.add('emm-clz-bad'); inp.classList.remove('emm-clz-ok');
+        mk.textContent = '✗'; mk.className = 'emm-clz-mark bad';
+        if(cur && ans) cur.clzBad[ans] = true;
+      }
+    }
+    inp.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); grade(); } });
+    inp.addEventListener('blur', grade);
+    inp.addEventListener('input', function(){
+      inp.classList.remove('emm-clz-ok', 'emm-clz-bad');
+      mk.textContent = ''; mk.className = 'emm-clz-mark';
+    });
+  }
+
+  function renderSummary(){
+    var a = cur.a;
+    var nMi = Object.keys(cur.mi).length;
+    var badKeys = Object.keys(cur.clzBad || {});
+    var html = '<div class="ls-head"><button type="button" class="ls-back">← 返回书架</button>'
+      + '<h2>⚡ 轻刷《' + esc(a.title) + '》</h2><span class="ls-stage">③ 结算</span></div>';
+    html += '<div class="ls-sum">🔁 链回忆：自判卡壳 <b>' + nMi + '</b> 句 · ✍️ 挖空：错 <b>' + badKeys.length + '</b> / ' + cur.clzTotal + ' 空'
+      + ((nMi + badKeys.length) ? '' : ' —— 全部顺畅，记忆保持得很好 🎉') + '</div>';
+    if(nMi || badKeys.length){
+      html += '<div class="ls-miss"><b>建议回原方案补打卡的句子</b>（轻刷不落盘，打卡/薄弱清单以原方案为准）：<br>';
+      Object.keys(cur.mi).forEach(function(sid){
+        html += '· 第 ' + esc(sid) + ' 句<br>';
+      });
+      badKeys.forEach(function(w){
+        html += '· 错空词「' + esc(w) + '」<br>';
+      });
+      html += '</div>';
+    }
+    html += '<div class="ls-actions">'
+      + '<a class="lib-btn lib-btn-open" style="flex:0 1 auto;padding:8px 18px;" href="' + esc(a.file || '') + '">📖 打开原方案（打卡进薄弱清单）</a>'
+      + '<button type="button" class="ls-back" id="emm-lib-done">完成</button></div>';
+    sessionBox.innerHTML = html;
+    sessionBox.querySelector('.ls-back').addEventListener('click', closeSession);
+    sessionBox.querySelector('#emm-lib-done').addEventListener('click', closeSession);
+  }
+
+  /* —— ?check=1 数据体检 —— */
+  function selfCheck(){
+    if(!/[?&]check/.test(location.search)) return;
+    var L = ['EMM 记忆库自检报告（v2.17.0 · ?check=1）', '─ 文章数据'];
+    if(!LIB.articles.length) L.push('⚠ 文章数为 0——记忆库未填充');
+    LIB.articles.forEach(function(a, i){
+      var name = a.title || a.topic || ('#' + (i + 1));
+      L.push('《' + name + '》');
+      if(!a.key) L.push('  ⚠ 缺 key（进度键=方案 h1 前 40 字，缺失则进度永远读不到）');
+      if(!a.file) L.push('  ⚠ 缺 file（打开原方案链接不可用）');
+      var nSteps = 0;
+      (a.chain || []).forEach(function(c){ nSteps += (c.steps || []).length; });
+      if(!nSteps) L.push('  ⚠ 链回忆无数据（chain 为空）');
+      else if(a.sents && nSteps !== a.sents) L.push('  ⚠ 链回忆句数 ' + nSteps + ' ≠ 方案句数 ' + a.sents);
+      else L.push('  ✅ 链回忆 ' + nSteps + ' 句');
+      (a.cloze || []).forEach(function(it, k){
+        var blanks = (String(it.q || '').match(/_{3,}/g) || []).length;
+        var ans = (it.a || []).length;
+        L.push(blanks && blanks === ans ? '  ✅ 挖空#' + (k + 1) + '：空数 ' + blanks + ' == 答案数 ' + ans : '  ⚠ 挖空#' + (k + 1) + '：空数 ' + blanks + ' ≠ 答案数 ' + ans);
+      });
+    });
+    var rpt = document.createElement('div');
+    rpt.className = 'emm-check-rpt';
+    rpt.textContent = L.join('\n');
+    var w = document.querySelector('.wrap') || document.body;
+    w.insertBefore(rpt, w.firstChild);
+  }
+
+  function init(){
+    shelf = document.getElementById('emm-lib-shelf');
+    emptyBox = document.getElementById('emm-lib-empty');
+    sessionBox = document.getElementById('emm-lib-session');
+    searchBox = document.querySelector('.lib-search');
+    if(!shelf) return;
+    var timer = null;
+    searchBox.addEventListener('input', function(){
+      clearTimeout(timer);
+      timer = setTimeout(renderShelf, 150);
+    });
+    renderShelf();
+    selfCheck();
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+
+/* ② 文章数据 schema（AI 填充 {{ARTICLES}} 时按此结构,逗号分隔多个对象）：
+{
+  topic: 'success',                          // 文章主题英文（同方案命名）
+  file: 'success-memorization-plan.html',    // 方案文件名（同目录相对路径）
+  key: 'Success背诵方案',                     // 进度键：逐字复制方案 <h1> 文本去首尾空白后的前 40 字
+  title: 'Success',                          // 展示标题
+  type: '议论文',                            // 议论文 / 说明文 / 叙事文 / 演讲稿 / 长文
+  sents: 11,                                 // 全文句数（.sent 块数）
+  words: 320,                                // 全文词数（约）
+  days: 16,                                  // 计划天数（单篇/演讲 16,长文按段另计）
+  date: '2026-10-01',                        // 方案生成日期
+  chain: [                                   // 与方案第 13/15 节三层钩子链逐字一致,每段一条
+    { para: '段钩', steps: [
+      { h: '句钩', b: '⇒', a: 'anchor words', sidx: 1, en: '原句英文全文' }
+    ] }
+  ],
+  cloze: [                                   // 1~3 条,优先复用方案第 11 节挖空自测（q 含 ______,a 与空一一对应）
+    { q: 'This has ______ blanks.', a: ['words'] }
+  ]
+}
+填充分隔用逗号；字符串内不得出现连续的 <\/（闭合脚本）,如有需写成 <\\\/。
+*/
+</script>
+
+</body>
+</html>
