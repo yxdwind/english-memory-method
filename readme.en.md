@@ -13,7 +13,7 @@ sentence-by-sentence linking marks, hooks welded into question chains, a retelli
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Standard](https://img.shields.io/badge/Agent_Skills-standard-red)
 
-[Install](#-quick-start) · [Features](#-features) · [How it works](#-how-it-works151617-section-loop-by-article-type) · [Platforms](#-platform-support) · [中文](readme.md)
+[Install](#-quick-start) · [Features](#-features) · [How it works](#-how-it-works151617-section-loop-by-article-type) · [Memory library](#-personal-memory-library) · [Platforms](#-platform-support) · [中文](readme.md)
 
 </div>
 
@@ -77,6 +77,7 @@ npx english-memory-method
 > If jsdelivr lags, switch to the official source: `irm https://raw.githubusercontent.com/yxdwind/english-memory-method/main/install.ps1 | iex`
 
 **Trigger**: paste an English article + ask for a memorization plan. No restart needed.
+After a few articles, say "**update my library**" and all your plans merge into a browsable, searchable, drillable [memory library](#-personal-memory-library).
 
 ---
 
@@ -155,6 +156,23 @@ Sample: the [Declaration of Independence condensed edition](declaration-memoriza
 
 **Core idea**: isolated hooks = broken points — you memorize the hooks, the order, AND the mapping. Triple burden.
 v2 welds hooks into chains: each link is *inferred* from the previous one — **whatever can be logically derived doesn't need memorizing**.
+
+---
+
+## 🗄 Personal Memory Library
+
+Finished articles shouldn't rot in scattered plan files. Tell the AI "**update my library**" and it scans every `*-memorization-plan.html` in the workspace, merging them into one self-contained `memory-library.html` (same folder as the plans, zero external dependencies — transfer it to your phone and it opens as usual).
+
+| Capability | What it does |
+|---|---|
+| 🗂 **Bookshelf** | One card per article: title / type / word count / progress bar / weak-sentence count / last activity; articles idle for 14+ days get a "⏰ suggest refresh" badge |
+| 📡 **Live progress** | Reuses the plan component's `emm-progress:<title>` storage convention (same-origin localStorage) — **zero sync code, zero setup**: open the library and see real check-in rounds & weak sentences for every article; articles without progress degrade gracefully |
+| 🔍 **Search** | Instant filtering by title / hooks / sentence keywords |
+| ⚡ **Quick drill** | A three-step short session: **chain recall** (tap a hook to reveal the sentence, flag "stuck") → **cloze challenge** (auto-graded on Enter, case/punctuation/contraction tolerant) → **recap** (lists stuck sentence numbers & missed blanks, one tap back to the plan for real check-ins) |
+
+**One source of truth for progress**: drill results are **never persisted** (session-only), and the plan's check-ins & weak list stay authoritative — sentences you flag "stuck" while drilling get properly recorded only via the plan's check-in flow. The library drills fine on your phone too; if the phone's browser denies storage to local files, the progress area degrades gracefully while drills keep working.
+
+**Health check**: open `memory-library.html?check=1` for a data check-up report (progress-key consistency / chain-vs-sentence alignment / cloze blank-answer pairing).
 
 ---
 
