@@ -4,16 +4,16 @@
 
 **Turn "memorizing English articles" from rote grinding into a path you can actually walk.**
 
-Paste any English article, and it produces a complete memorization plan (15 sections for regular articles · 16 for speeches with skeleton · 17 for longform with segment dashboard — self-contained HTML):
-sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, today's schedule & self-test mode, memory palace & dictation — all in one file; finished plans can be merged into a **personal memory library** (bookshelf / search / quick drill).
+Paste any English article, and it produces a **17-section longform plan (15 basic / 16 speech / 17 longform) (speeches: 16 sections incl. skeleton)** (self-contained HTML):
+sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.17.0-blue)
+![Version](https://img.shields.io/badge/version-2.28.0-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-13-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Standard](https://img.shields.io/badge/Agent_Skills-standard-red)
 
-[Install](#-quick-start) · [Features](#-features) · [How it works](#-how-it-works151617-section-loop-by-article-type) · [Memory library](#-personal-memory-library) · [Platforms](#-platform-support) · [中文](readme.md)
+[Install](#-quick-start) · [Features](#-features) · [How it works](#-how-it-works151617-section-loop-by-article-type) · [Platforms](#-platform-support) · [中文](readme.md)
 
 </div>
 
@@ -27,21 +27,14 @@ sentence-by-sentence linking marks, hooks welded into question chains, a retelli
 | 📖 | **Close reading** | Chinese translation + full connected-speech marking (⌒ linking / weak forms / flap t / h-dropping) + term highlighting |
 | 📚 | **Terminology tables** | Word-formation breakdown (roots & affixes) + IPA + memory hooks — know the root, and new words become familiar ones |
 | 💬 | **Life examples for phrases** | Every collocation gets a plain-English daily sentence, **ready to mimic** (no translation — think in English) |
-| 🗂 | **15-section closed loop** | Strategy → close reading → hooks & chains → retelling ladder → three-pass → review → self-test → accumulation |
+| 🗂 | **14-section closed loop** | Strategy → close reading → hooks & chains → retelling ladder → three-pass → review → self-test → accumulation |
 | 🔁 | **Review loop** | Sentence-level OK/stuck check-in → weak-sentence list (click to jump) → graduate after 2 clean rounds; progress persists in your browser |
-| 📅 | **Today schedule** | Start date + per-segment Ebbinghaus auto-computes "what to memorize today"; tick off per segment, export the whole schedule as a calendar (.ics) |
-| 🙈 | **Self-test mode** | One click hides translations & linking marks for recall practice; click a sentence to reveal — kills "recognition disguised as fluency" |
-| 🪜 | **Ladder tracking** | Per-segment L1~L5 retelling level recorded as you climb; skipping levels = fake fluency |
-| ✍️ | **Make-it-yours blanks** | Per-segment mainline & palace images are editable (generation effect); blank lines stay printable for handwriting |
-| ⚡ | **Weak-sentence drill** | One click shows only your weak sentences — a 5-minute round; cloze blanks auto-grade and misses flow into the weak list |
 | 🏛 | **Memory palace** | 25-station daily-life route, one sentence per station — weak stations auto-marked red on check-in, cleared on graduation |
 | 🎧 | **Dictation check** | TTS reads each sentence → type what you hear → word-level diff; mistakes flow into the weak list |
 | 💎 | **Golden Patterns** | 5–9 transferable patterns per article (bold replaceable part + swappable template) — straight into your writing/speeches |
 | 🎤 | **Speech mode** | Detects the three-act skeleton (hook / argument / crescendo) with delivery guidance; question chain & ladder retooled for speeches |
-| 🔒 | **Interactive self-tests** | Fill the blanks and get auto-grading on Enter (case/punctuation/contraction tolerant); misses flow into the weak list; answers stay collapsed, hidden when printing |
+| 🔒 | **Collapsed self-tests** | Fill the blanks first; answers hide behind "▶ 查看本段答案" toggles, auto-hidden when printing |
 | 🖥 | **16+ platforms, one command** | Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi / MiniMax… |
-| 📱 | **Mobile adaptation** | Narrow screens: tables scroll horizontally, Today card stacks, review toolbar sticks — phone review fully usable |
-| 🗄 | **Personal memory library** | All finished plans merge into one HTML: bookshelf / search / quick drill (chain recall → cloze → recap) + live progress |
 | 📄 | **Self-contained single file** | Each plan is one HTML: inline SVG, collapsible, print-friendly, zero external dependencies |
 
 ---
@@ -77,7 +70,6 @@ npx english-memory-method
 > If jsdelivr lags, switch to the official source: `irm https://raw.githubusercontent.com/yxdwind/english-memory-method/main/install.ps1 | iex`
 
 **Trigger**: paste an English article + ask for a memorization plan. No restart needed.
-After a few articles, say "**update my library**" and all your plans merge into a browsable, searchable, drillable [memory library](#-personal-memory-library).
 
 ---
 
@@ -152,27 +144,8 @@ Sample: the [Declaration of Independence condensed edition](declaration-memoriza
 
 
 
-**📚 Personal memory library (v2.17.0)**: say "update my library" and it merges every `*-memorization-plan.html` in the workspace into one self-contained `memory-library.html` — bookshelf cards (title / type / word count / progress bar / weak-sentence count) read your real check-in progress live from local storage (same-origin file:// localStorage, zero sync code), with title & content search; each article opens a "quick drill": walk the hook chain (reveal sentence per hook) → key-sentence cloze → recap that points you back to the plan for real check-ins. Drill results are never persisted — the plan's check-ins and weak list remain the single source of truth.
-
 **Core idea**: isolated hooks = broken points — you memorize the hooks, the order, AND the mapping. Triple burden.
 v2 welds hooks into chains: each link is *inferred* from the previous one — **whatever can be logically derived doesn't need memorizing**.
-
----
-
-## 🗄 Personal Memory Library
-
-Finished articles shouldn't rot in scattered plan files. Tell the AI "**update my library**" and it scans every `*-memorization-plan.html` in the workspace, merging them into one self-contained `memory-library.html` (same folder as the plans, zero external dependencies — transfer it to your phone and it opens as usual).
-
-| Capability | What it does |
-|---|---|
-| 🗂 **Bookshelf** | One card per article: title / type / word count / progress bar / weak-sentence count / last activity; articles idle for 14+ days get a "⏰ suggest refresh" badge |
-| 📡 **Live progress** | Reuses the plan component's `emm-progress:<title>` storage convention (same-origin localStorage) — **zero sync code, zero setup**: open the library and see real check-in rounds & weak sentences for every article; articles without progress degrade gracefully |
-| 🔍 **Search** | Instant filtering by title / hooks / sentence keywords |
-| ⚡ **Quick drill** | A three-step short session: **chain recall** (tap a hook to reveal the sentence, flag "stuck") → **cloze challenge** (auto-graded on Enter, case/punctuation/contraction tolerant) → **recap** (lists stuck sentence numbers & missed blanks, one tap back to the plan for real check-ins) |
-
-**One source of truth for progress**: drill results are **never persisted** (session-only), and the plan's check-ins & weak list stay authoritative — sentences you flag "stuck" while drilling get properly recorded only via the plan's check-in flow. The library drills fine on your phone too; if the phone's browser denies storage to local files, the progress area degrades gracefully while drills keep working.
-
-**Health check**: open `memory-library.html?check=1` for a data check-up report (progress-key consistency / chain-vs-sentence alignment / cloze blank-answer pairing).
 
 ---
 
@@ -191,7 +164,7 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 ## 📜 Version History
 
 <details>
-<summary><b>Expand: all changes from v2.1 → v2.17.0</b></summary>
+<summary><b>Expand: all changes from v2.1 → v2.12.0</b></summary>
 
 **v2.1**: sentence-by-sentence close reading — per-sentence translation (any language) + full connected-speech marking (⌒ linking / weak forms / flap t / h-dropping) with American IPA.
 
@@ -222,16 +195,22 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 **v2.11.0**: Speech mode — feed it a speech and it produces a 16-section plan with a new Section 3 "Speech Skeleton" (three-act stations: opening hook / argument / crescendo, each with its rhetorical function and a transferable technique, plus breathing groups and intonation guidance); the question chain becomes audience-viewpoint self-QA and ladder L3 becomes "retell from the skeleton". Sample plan: the Gettysburg Address.
 
 **v2.12.0**: Longform mode — articles of 500–2000 words (or 12+ sentences) automatically produce a 17-section plan: new Section 3 "Segment Dashboard" (per-segment row: name / schedule / 🔒▶✅ state driven by check-ins / weak count), sections 4.1–4.N per-segment units (each with its own close reading + keywords + question chain + hook chain), per-segment staggered Ebbinghaus schedules plus a full-text assembly day, a cross-segment master chain to learn first, and a continuous 21-station palace. Sample: the Declaration of Independence condensed edition (5 segments / 21 sentences).
-
-**v2.13.0**: Self-test & schedule suite (built into the component, zero generation cost) — ① a "📅 Today" card: set a start date and per-segment Ebbinghaus auto-computes "which segment to learn today, which to review", tickable per segment, one-click .ics calendar export for system-level reminders; ② a three-state "🙈 Self-test" toggle: hide translations & linking marks while retelling, click a sentence to reveal, full-hide also flattens inline marking styles — killing recognition-style fake fluency; ③ retelling-ladder tracking: per-segment L1~L5 levels recorded with dates; ④ make-it-yours blanks: per-segment "✍️ my mainline" and per-station "🎨 my image" editable fields, printed as blank lines for handwriting; ⑤ a `?check=1` structural self-check report (palace stops & numbering, hook counts, bridges, anchor coverage, blanks vs answers), paired with six generation-side content checks and a "when in doubt, don't mark" precision policy in SKILL.md.
-
-**v2.14.0**: Weak-sentence drill & interactive cloze — ① "⚡ Drill weak (N)": one click hides all non-weak sentences so a check-in round covers only your stuck ones in ~5 minutes; composes with self-test mode (drill × hidden translations = a high-intensity short session); empty weak list bounces you to the dashboard instead; ② interactive cloze: `______` runs convert to inputs at load, auto-graded on Enter/blur (case/punctuation/contraction tolerant); a miss maps "answer word → its sentence" and flows straight into the weak list (shared with check-ins, palace red stations, dictation); paragraphs whose blank count mismatches answers stay static (fail-safe); ③ today-card deep links: "learn today" → segment, "next-day self-test" → cloze section, "day-3 wrong-only" → weak list.
-
-**v2.15.0**: Robustness patch — ① **progress content fingerprint**: state stores a fingerprint of the article's sentences; when a plan is regenerated, a changed fingerprint prompts "reset progress (keep blanks & start date) / keep as-is", so old progress no longer misaligns by sentence index; ② **palace data-sents annotations**: every station card declares the sentence numbers it carries, making weak-station highlighting and the `?check=1` report exact for 25+ sentence articles (legacy plans fall back to 1:1 station order); ③ **scheduling owned solely by the "📅 Today" card**: plans no longer hard-code dates, removing the double-source conflict; ④ **smoke tests in-repo**: `npm test` (tests/smoke.test.js, 102 jsdom assertions).
-
-**v2.16.0**: Mobile adaptation (≤720px) — content tables get horizontal scroll, the Today card stacks into labeled rows, the check-in/drill/quiz toolbar sticks to the top while active, spacing & type tightened; **desktop and print layouts unchanged**. Commute/bedtime phone review goes from "tables overflow, unusable" to fully usable.
-
-**v2.17.0**: **Personal memory library** — new template `assets/library-template.html`; saying "update my library" merges every plan in the workspace into one self-contained `memory-library.html`: ① Bookshelf — one card per article (title / type / word count / progress bar / weak count / last activity), articles idle for 14+ days get a "suggest refresh" badge; ② Live progress — reuses the plan component's `emm-progress:<title>` storage convention (same-origin file:// localStorage), so real check-in rounds and weak-sentence counts show on the shelf with **zero sync code**, degrading gracefully when progress is absent; ③ Search — filters by title / hooks / sentence keywords; ④ Quick-drill session — chain recall (tap a hook to reveal the sentence, flag "stuck") → key-sentence cloze (reuses the plan component's grading: case/punctuation/contraction tolerant) → recap listing stuck sentence numbers & missed blanks with a pointer back to the plan — **drill results are never persisted**, the plan's check-ins and weak list stay authoritative; ⑤ `?check=1` data check-up (progress key / chain-vs-sentence alignment / cloze blank-vs-answer pairing, per-article ✅/⚠). Ships with a new SKILL.md "Personal memory library" section (triggers / extraction spec / five delivery checks) and 32 new smoke assertions (144 total).
+**v2.13.0**: Self-test modes "🙈" three-way cycle (off → hide translation → hide all); "📅 Today card" computing today's work via per-segment Ebbinghaus.
+**v2.14.0**: Weak drill "⚡ only weak(N)"; interactive cloze — blanks become inputs at load, auto-graded, misses feed the weak list.
+**v2.15.0**: Progress content fingerprint — regenerated plans detected, no more stale misalignment; palace `data-sents` precise weak-station mapping.
+**v2.16.0**: Narrow-screen (≤720px) adaptation — horizontal-scroll tables, stacked task cards, sticky toolbars.
+**v2.17.0**: **Personal memory library** `memory-library.html` — bookshelf / search / quick-drill / live progress.
+**v2.18.0**: First-screen folding (h2 ≥9 collapsed by default) + first-visit onboarding card.
+**v2.19.0**: Shadowing — TTS → MediaRecorder recording → comparison scoring; wrong words auto-feed the weak list.
+**v2.20.0**: **SM-2 scheduler** (Wozniak 1990) replaces the fixed graduation threshold; light/standard modes.
+**v2.21.0**: Progress export/import (💾/📥); longform "📌 set as today's new" reshuffle.
+**v2.22.0**: git tag automation `bin/tag.mjs`; .ics timezone fixes.
+**v2.23.0**: Step 0 genre detection (short/longform/speech) in the workflow; per-segment stats table.
+**v2.24.0**: Quick-drill "🎯 back-to-plan check-in" jump; library status filter chips.
+**v2.25.0**: 📝 60-second cloze challenge countdown; 🎯 configurable graduation threshold (2/3/4/5 streak).
+**v2.26.0**: fixture sync tool `bin/sync-fixtures.mjs` + CI-friendly `--check` mode.
+**v2.27.0**: Cross-browser API static scanner (43 APIs × 4 browsers) + `docs/CROSS-BROWSER.md`.
+**v2.28.0**: **End-to-end session driver** — jsdom runs the full 35-step user flow (`bin/e2e-flow.mjs`, --strict); fixed the endRound persistence bug; total tests 472.
 
 </details>
 
