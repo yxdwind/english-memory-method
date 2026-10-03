@@ -165,10 +165,43 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 ---
 
-## 📜 Version History
+## 📜 ## 📜 Version History
+
+### v2.13 → v2.28 · Engineering & UX era
+
+**Learning loop** (v2.13–v2.15)
+
+**v2.13.0**: Self-test modes "🙈" three-way cycle (off → hide translation → hide all); "📅 Today card" computing today's work via per-segment Ebbinghaus.
+**v2.14.0**: Weak drill "⚡ only weak(N)"; interactive cloze — blanks become inputs at load, auto-graded, misses feed the weak list.
+**v2.15.0**: Progress content fingerprint — regenerated plans detected, no more stale misalignment; palace `data-sents` precise weak-station mapping.
+
+**Platform & library** (v2.16–v2.18)
+
+**v2.16.0**: Narrow-screen (≤720px) adaptation — horizontal-scroll tables, stacked task cards, sticky toolbars.
+**v2.17.0**: **Personal memory library** `memory-library.html` — bookshelf / search / quick-drill / live progress.
+**v2.18.0**: First-screen folding (h2 ≥9 collapsed by default) + first-visit onboarding card.
+
+**Scheduling & portability** (v2.19–v2.22)
+
+**v2.19.0**: Shadowing — TTS → MediaRecorder recording → comparison scoring; wrong words auto-feed the weak list.
+**v2.20.0**: **SM-2 scheduler** (Wozniak 1990) replaces the fixed graduation threshold; light/standard modes.
+**v2.21.0**: Progress export/import (💾/📥); longform "📌 set as today's new" reshuffle.
+**v2.22.0**: git tag automation `bin/tag.mjs`; .ics timezone fixes.
+
+**Polish & self-test** (v2.23–v2.25)
+
+**v2.23.0**: Step 0 genre detection (short/longform/speech) in the workflow; per-segment stats table.
+**v2.24.0**: Quick-drill "🎯 back-to-plan check-in" jump; library status filter chips.
+**v2.25.0**: 📝 60-second cloze challenge countdown; 🎯 configurable graduation threshold (2/3/4/5 streak).
+
+**Testing infrastructure** (v2.26–v2.28)
+
+**v2.26.0**: fixture sync tool `bin/sync-fixtures.mjs` + CI-friendly `--check` mode.
+**v2.27.0**: Cross-browser API static scanner (43 APIs × 4 browsers) + `docs/CROSS-BROWSER.md`.
+**v2.28.0**: **End-to-end session driver** — jsdom runs the full 35-step user flow (`bin/e2e-flow.mjs`, --strict); fixed the endRound persistence bug; total tests 472.
 
 <details>
-<summary><b>Expand: all changes from v2.1 → v2.12.0</b></summary>
+<summary><b>Expand: all changes from v2.1 → v2.12.0 (early versions)</b></summary>
 
 **v2.1**: sentence-by-sentence close reading — per-sentence translation (any language) + full connected-speech marking (⌒ linking / weak forms / flap t / h-dropping) with American IPA.
 
@@ -199,22 +232,6 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 **v2.11.0**: Speech mode — feed it a speech and it produces a 16-section plan with a new Section 3 "Speech Skeleton" (three-act stations: opening hook / argument / crescendo, each with its rhetorical function and a transferable technique, plus breathing groups and intonation guidance); the question chain becomes audience-viewpoint self-QA and ladder L3 becomes "retell from the skeleton". Sample plan: the Gettysburg Address.
 
 **v2.12.0**: Longform mode — articles of 500–2000 words (or 12+ sentences) automatically produce a 17-section plan: new Section 3 "Segment Dashboard" (per-segment row: name / schedule / 🔒▶✅ state driven by check-ins / weak count), sections 4.1–4.N per-segment units (each with its own close reading + keywords + question chain + hook chain), per-segment staggered Ebbinghaus schedules plus a full-text assembly day, a cross-segment master chain to learn first, and a continuous 21-station palace. Sample: the Declaration of Independence condensed edition (5 segments / 21 sentences).
-**v2.13.0**: Self-test modes "🙈" three-way cycle (off → hide translation → hide all); "📅 Today card" computing today's work via per-segment Ebbinghaus.
-**v2.14.0**: Weak drill "⚡ only weak(N)"; interactive cloze — blanks become inputs at load, auto-graded, misses feed the weak list.
-**v2.15.0**: Progress content fingerprint — regenerated plans detected, no more stale misalignment; palace `data-sents` precise weak-station mapping.
-**v2.16.0**: Narrow-screen (≤720px) adaptation — horizontal-scroll tables, stacked task cards, sticky toolbars.
-**v2.17.0**: **Personal memory library** `memory-library.html` — bookshelf / search / quick-drill / live progress.
-**v2.18.0**: First-screen folding (h2 ≥9 collapsed by default) + first-visit onboarding card.
-**v2.19.0**: Shadowing — TTS → MediaRecorder recording → comparison scoring; wrong words auto-feed the weak list.
-**v2.20.0**: **SM-2 scheduler** (Wozniak 1990) replaces the fixed graduation threshold; light/standard modes.
-**v2.21.0**: Progress export/import (💾/📥); longform "📌 set as today's new" reshuffle.
-**v2.22.0**: git tag automation `bin/tag.mjs`; .ics timezone fixes.
-**v2.23.0**: Step 0 genre detection (short/longform/speech) in the workflow; per-segment stats table.
-**v2.24.0**: Quick-drill "🎯 back-to-plan check-in" jump; library status filter chips.
-**v2.25.0**: 📝 60-second cloze challenge countdown; 🎯 configurable graduation threshold (2/3/4/5 streak).
-**v2.26.0**: fixture sync tool `bin/sync-fixtures.mjs` + CI-friendly `--check` mode.
-**v2.27.0**: Cross-browser API static scanner (43 APIs × 4 browsers) + `docs/CROSS-BROWSER.md`.
-**v2.28.0**: **End-to-end session driver** — jsdom runs the full 35-step user flow (`bin/e2e-flow.mjs`, --strict); fixed the endRound persistence bug; total tests 472.
 
 </details>
 
