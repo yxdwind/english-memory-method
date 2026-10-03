@@ -144,6 +144,10 @@ Sample: the [Declaration of Independence condensed edition](declaration-memoriza
 
 
 
+
+**Quality gates**: every generated plan runs **6 mandatory content checks** (sentence completeness / annotation precision / palace alignment / station numbering / cloze consistency / term & pattern provenance) via `bin/verify-plan.mjs` — each rule reports error/warning, and a failing plan doesn't ship.
+
+**Memory-friendly**: the whole flow is designed for weaker memorizers — pictographic hooks (the weirder the better), blanks-before-learning, first-screen folding (core 4 sections only), a first-visit onboarding card, and SM-2's "light mode" as the default (ignore the algorithm, keep the old behavior).
 **Core idea**: isolated hooks = broken points — you memorize the hooks, the order, AND the mapping. Triple burden.
 v2 welds hooks into chains: each link is *inferred* from the previous one — **whatever can be logically derived doesn't need memorizing**.
 
