@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  English Memory Method · 背诵方案模板（plan-template.html · v2.28.0 当前生效）
+  English Memory Method · 背诵方案模板（plan-template.html · v2.27.0 当前生效）
   用法：复制本文件为 <topic>-memorization-plan.html，按下方 <!-- ① ... --> 注释逐节替换内容。
   所有样式已内联，不依赖外部资源；结构图引用相对路径 assets/<topic>-structure.svg。
   v2.13.0 组件新增：今日任务排期（含 .ics 导出）、自测模式（遮译文/全遮）、复述阶梯追踪、
@@ -23,13 +23,12 @@
   v2.25.0 组件新增：📊 评估优化——①「📝 段落测试」按钮（60 秒挖空挑战 + 自动批改给 0-100 分，写入 state.segTest.last）②毕业阈值配置「🎯 连顺 N 轮」（默认 3，点切换 2/3/4/5，state.streakToGoal）。
   v2.26.0 组件新增：🧪 工程卫生——`bin/sync-fixtures.mjs` 把 `tests/samples/` 下真实生成方案同步到 `tests/fixtures/fixture-success.html`，fixture 现已反映"真实生成结果"而非手写字符串。CI 用 `npm run sync-fixtures -- --check` 检测漂移。
   v2.27.0 组件新增：🌐 跨浏览器测试矩阵——`bin/check-browser-compat.mjs` 静态扫描模板用到的 43 个 Web API，对照 Chrome/Firefox/Safari/Edge 兼容性矩阵给出 ⚠/✅ 报告（`--strict` 模式有 ⚠ 时退出码 1）。配档 `docs/CROSS-BROWSER.md` 列 4 大浏览器差异 + 已知 bug 根因 + Playwright 集成样板。零运行时副作用。
-  v2.28.0 组件新增：🚀 端到端测试——`bin/e2e-flow.mjs` 在 jsdom 里完整跑 35 步用户流（冷启动 → 评卡 → 结束 → 导出 → 重置 → 导入 → 跨页面），揭示并修复 2 个 bug：① `endRound()` `state = loadState()` 覆盖本轮 mutations 导致 rounds/weak/mode 丢失（修复：loadState 后再 apply mutations）② `build-samples.mjs` 只命中 1 个 .sent 占位导致样本只有 1 句（修复：占位替换为 N 句 join）。配档 `docs/E2E.md` 列 35 步全链路 + 已知边界。
 -->
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>{{TITLE}}背诵方案</title>
+<title>AI 与教育背诵方案</title>
 <style>
   :root{--accent:#7c3aed;--accent-bg:#f5f3ff;--accent-border:#ddd6fe;--ink:#1f2937;--muted:#6b7280;--line:#e5e7eb;}
   *{box-sizing:border-box;margin:0;padding:0;}
@@ -183,8 +182,8 @@ body.emm-folded .emm-advanced{display:none!important;}
 <div class="wrap">
 <!-- ① 头部：标题、统计信息、段落徽章（可增删） -->
 <header>
-  <h1>{{TITLE}}背诵方案</h1>
-  <p>{{SUBTITLE：结构类型 · 句数 · 目标天数}}</p>
+  <h1>AI 与教育背诵方案</h1>
+  <p>议论文 · 5 段 10 句 · 16 天</p>
   <span class="badge">第1段 · {{逻辑角色}}</span>
   <span class="badge">第2段 · {{逻辑角色}}</span>
 </header>
@@ -200,8 +199,8 @@ body.emm-folded .emm-advanced{display:none!important;}
 <!-- ③ 结构图：替换图片路径与说明文字 -->
 <h2>2. 文章结构图（背诵地图）</h2>
 <figure>
-  <img src="assets/{{topic}}-structure.svg" alt="{{TITLE}}结构图">
-  <figcaption>{{对结构图的一句话导读}}</figcaption>
+  <img src="assets/{{topic}}-structure.svg" alt="AI 与教育结构图">
+  <figcaption>提出议题（AI 改变学习）→ 列举益处 → 揭示风险 → 辩证分析 → 收束结论</figcaption>
 </figure>
 
 <!-- ②c 分段进度仪表（v2.12.0 · 仅长文启用）：段名/排期/状态/打卡入口/段薄弱句，状态随打卡自动流转 -->
@@ -237,9 +236,54 @@ body.emm-folded .emm-advanced{display:none!important;}
 <h2>4.x 段落单元</h2>
 <div class="legend"><span><b style="color:#d97706">⌒</b> 连读</span><span><i style="color:#9ca3af">灰色斜体</i> 弱读</span><span><b style="color:#b91c1c">t</b> flap t / 失爆</span><span><mark style="background:#fef3c7;border-bottom:2px solid #f59e0b;padding:0 2px">专业词汇</mark></span><span><u style="text-decoration:underline dashed #9ca3af">h</u> h 击穿</span><span>翻译默认中文 · 需要其他语言在对话里说一声</span></div>
 <div class="sent">
-  <div class="sent-en">{{英文原句，行内语音标记：连读词对加 tie⌒，弱读词加 wk，flap t/失爆的 t 加 ft，被击穿的 h 加 hk；不替换原词}}</div>
-  <div class="sent-zh">{{中文翻译，默认中文；用户传参可换语种}}</div>
-  <div class="pron"><span class="lbl">连读 · 弱读 · 读法</span>{{注解：片段 音标 · 现象（读法要点），≤6 条，美式 IPA}}</div>
+  <div class="sent-en">Artificial intelligence is rapidly transforming how students learn.</div>
+  <div class="sent-zh">人工智能正在快速改变学生的学习方式。</div>
+  <div class="pron"><span class="lbl">弱读</span>is rapidly · /ɪz ˈræpɪdli/ · be 动词弱读</div>
+</div>
+<div class="sent">
+  <div class="sent-en">From adaptive tutoring systems to automated grading,</div>
+  <div class="sent-zh">从自适应辅导系统到自动评分，</div>
+  <div class="pron"><span class="lbl">连读</span>tutoring systems · /ˈtuːtərɪŋ ˈsɪstəmz/ · 词间连读</div>
+</div>
+<div class="sent">
+  <div class="sent-en">AI offers unprecedented personalization at scale.</div>
+  <div class="sent-zh">人工智能提供了规模化的前所未有的个性化。</div>
+  <div class="pron"><span class="lbl">弱读</span>at scale · /ət skeɪl/ · 介词短语弱读</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Students who struggled in traditional classrooms</div>
+  <div class="sent-zh">在传统课堂上挣扎的学生</div>
+  <div class="pron"><span class="lbl">连读</span>who struggled · /huː ˈstrʌɡəld/ · 词间连读</div>
+</div>
+<div class="sent">
+  <div class="sent-en">can now learn at their own pace with AI tutors.</div>
+  <div class="sent-zh">现在可以借助 AI 导师按自己的节奏学习。</div>
+  <div class="pron"><span class="lbl">弱读</span>at their · /ət ðɛər/ · 介词弱读</div>
+</div>
+<div class="sent">
+  <div class="sent-en">However, this technological shift raises critical questions.</div>
+  <div class="sent-zh">然而，这一技术转变提出了关键问题。</div>
+  <div class="pron"><span class="lbl">弱读</span>this technological · /ðɪs tɛknəˈlɑdʒɪkəl/ · 指示代词弱读</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Does personalized learning risk reducing students to data points?</div>
+  <div class="sent-zh">个性化学习是否会把学生简化为数据点？</div>
+  <div class="pron"><span class="lbl">连读</span>risk reducing · /rɪsk rɪˈdjuːsɪŋ/ · 词间连读</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Educators must ensure that technology serves pedagogy, not the reverse.</div>
+  <div class="sent-zh">教育者必须确保技术服务教学法，而非反过来。</div>
+  <div class="pron"><span class="lbl">弱读</span>not the · /nɑt ðə/ · 否定小品词弱读</div>
+</div>
+<div class="sent">
+  <div class="sent-en">The future of education depends on how wisely we wield these tools.</div>
+  <div class="sent-zh">教育的未来取决于我们多明智地使用这些工具。</div>
+  <div class="pron"><span class="lbl">连读</span>how wisely · /haʊ ˈwaɪzli/ · 副词连读</div>
+</div>
+<div class="sent">
+  <div class="sent-en">AI is a powerful ally, but the human teacher remains irreplaceable.</div>
+  <div class="sent-zh">AI 是一个强大的盟友，但人类教师仍然不可替代。</div>
+  <div class="pron"><span class="lbl">弱读</span>but the · /bət ðə/ · 连词弱读</div>
 </div>
 
 <!-- ④ 关键词表：每段一张表，三列 原句|关键词钩子|中文提示 -->
@@ -786,7 +830,7 @@ body.emm-folded .emm-advanced{display:none!important;}
   }
 
   function endRound(){
-    // v2.28 修复：把本轮 mutations（mode/rounds/weak/streak）放在 loadState 之后，
+    // v2.28 EMM_E2E_V228 修复：把本轮 mutations（mode/rounds/weak/streak）放在 loadState 之后，
     // 避免 `state = loadState()` 覆盖本轮新写入的字段
     var d = new Date();
     var round = { date: d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'), ok: 0, bad: 0 };
@@ -2029,12 +2073,6 @@ body.emm-folded .emm-advanced{display:none!important;}
 /* ===== v2.27 EMM_BROWSER_V227: 跨浏览器测试矩阵 =====
    设计：bin/check-browser-compat.mjs（独立工具）静态扫描模板用到的 Web API，
    对照 Chrome/Firefox/Safari/Edge 兼容性矩阵。docs/CROSS-BROWSER.md 配档。
-   本节仅作为锚点标记，不引入新代码。 */
-
-/* ===== v2.28 EMM_E2E_V228: 端到端测试 =====
-   设计：bin/e2e-flow.mjs（独立工具）在 jsdom 里完整跑 35 步用户流。
-   顺带修复 endRound() 持久化 bug + build-samples.mjs 多句插入 bug。
-   配档 docs/E2E.md。
    本节仅作为锚点标记，不引入新代码。 */
 </script>
 

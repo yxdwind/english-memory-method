@@ -1,0 +1,281 @@
+{
+  "version": "0.1.0",
+  "schema_version": "0.1.0",
+  "study_title": "English Memory Method vs Traditional Shadowing",
+  "study_short": "EMM-pilot-2026",
+  "created_at": "2026-10-01T00:00:00Z",
+  "pi": { "name_redacted": true, "irb_id_pending": true },
+
+  "design": {
+    "type": "randomized_controlled_pilot",
+    "n_total": 20,
+    "n_per_group": 10,
+    "groups": ["experimental", "control"],
+    "pairing": { "by": ["english_level", "gender"], "n_pairs": 10 },
+    "blinding": "single_blinded_analysis",
+    "duration_days": 14
+  },
+
+  "material": {
+    "source": "scientific_journalism",
+    "candidates": ["New Scientist", "Scientific American", "The Atlantic"],
+    "word_count": 200,
+    "word_count_tolerance": 10,
+    "flesch_reading_ease": { "min": 60, "max": 70 },
+    "flesch_kincaid_grade": { "min": 10, "max": 12 },
+    "vocabulary_band": "COCA_4001_7000",
+    "sentence_count": { "min": 8, "max": 12 },
+    "avg_sentence_length": { "min": 18, "max": 22 },
+    "translation_lang": "zh-CN",
+    "audio": {
+      "source": "BBC/VOA",
+      "wpm": { "min": 130, "max": 150 },
+      "format": "mp3",
+      "suggested_repetitions": { "min": 30, "max": 50 }
+    }
+  },
+
+  "inclusion": {
+    "age_range": [18, 35],
+    "english_level": {
+      "CET-6_min": 425,
+      "IELTS_min": 6.5,
+      "TEM-4_min": 60
+    },
+    "consent_required": true,
+    "device_required": ["desktop", "laptop", "tablet"],
+    "browser_required": ["chrome >= 110", "edge >= 110", "safari >= 16"]
+  },
+
+  "exclusion": {
+    "professional_memory_training_months": 6,
+    "english_native_or_bilingual": true,
+    "irregular_schedule_days": 14
+  },
+
+  "screening": {
+    "phq9_threshold": 10,
+    "gad7_threshold": 10
+  },
+
+  "timeline": {
+    "D0": "baseline + consent",
+    "D1_D3": "training",
+    "D4_D7": "retention",
+    "D7": "test"
+  },
+
+  "measures": {
+    "primary": {
+      "id": "M1",
+      "name": "d7_recall_accuracy",
+      "type": "per_sentence_4point",
+      "scale": {
+        "4": "fully correct (case/punct insensitive)",
+        "3": "1-2 word errors",
+        "2": "3-5 word errors",
+        "1": ">5 errors or missing sentence",
+        "0": "blank or irrelevant"
+      },
+      "total_formula": "sum(scores) / (n_sentences * 4) * 100",
+      "unit": "percent"
+    },
+    "secondary": [
+      { "id": "S1", "name": "training_total_minutes", "days": ["D1", "D2", "D3"], "type": "duration_sum" },
+      { "id": "S2", "name": "subjective_difficulty", "scale": "likert_1_5", "reverse_scored": true },
+      { "id": "S3", "name": "retest_speed_sec", "phase": "D7" },
+      { "id": "S4", "name": "abandonment_days", "days": ["D1", "D2", "D3"] }
+    ],
+    "exploratory": [
+      { "id": "E1", "name": "weak_rate", "formula": "bad_judges / total_judges" },
+      { "id": "E2", "name": "sm2_ef_decay_slope", "group_only": "experimental" },
+      { "id": "E3", "name": "error_by_word_frequency_band", "method": "ANOVA" }
+    ]
+  },
+
+  "statistics": {
+    "primary_tests": [
+      { "hypothesis": "H1", "test": "Welch_t", "alpha": 0.05, "tail": "one" },
+      { "hypothesis": "H2", "test": "Mann_Whitney_U", "alpha": 0.05, "tail": "one" },
+      { "hypothesis": "H3", "test": "paired_t", "alpha": 0.05, "tail": "two" }
+    ],
+    "effect_size": { "metric": "Cohen_d", "thresholds": { "trivial": 0.2, "small": 0.5, "medium": 0.8, "large": 1.2 } },
+    "confidence_interval": 0.95,
+    "multiple_comparison": { "exploratory_only": "Benjamini_Hochberg_FDR_q_0.05" },
+    "power_analysis_for_followup": {
+      "expected_d": [0.5, 0.8],
+      "alpha": 0.05,
+      "power": 0.8,
+      "two_sided": true
+    }
+  },
+
+  "compensation": {
+    "amount_cny": 50,
+    "condition": "complete_all_14_days",
+    "currency": "CNY"
+  },
+
+  "data_retention": {
+    "years": 5,
+    "anonymization": "subject_id_only",
+    "identifier_separate": "consent_form_encrypted",
+    "deletion_on_request": true
+  },
+
+  "ethics": {
+    "irb_required": true,
+    "informed_consent_required": true,
+    "exit_right": "anytime_no_penalty",
+    "data_use": "research_only_not_commercialized"
+  },
+
+  "data_schema": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "object",
+    "required": ["subject_id", "group", "enrolled_at", "consent_signed"],
+    "properties": {
+      "subject_id": {
+        "type": "string",
+        "pattern": "^P[0-9]{2}$",
+        "description": "Padded subject id, e.g. P01-P20"
+      },
+      "group": {
+        "type": "string",
+        "enum": ["experimental", "control"]
+      },
+      "enrolled_at": { "type": "string", "format": "date-time" },
+      "consent_signed": { "type": "boolean" },
+      "baseline": {
+        "type": "object",
+        "properties": {
+          "english_score": { "type": "number", "minimum": 0, "maximum": 990 },
+          "english_test": { "type": "string", "enum": ["CET-6", "IELTS", "TEM-4"] },
+          "vark": {
+            "type": "object",
+            "properties": {
+              "v": { "type": "integer", "minimum": 0, "maximum": 16 },
+              "a": { "type": "integer", "minimum": 0, "maximum": 16 },
+              "r": { "type": "integer", "minimum": 0, "maximum": 16 },
+              "k": { "type": "integer", "minimum": 0, "maximum": 16 }
+            }
+          },
+          "phq9": { "type": "integer", "minimum": 0, "maximum": 27 },
+          "gad7": { "type": "integer", "minimum": 0, "maximum": 21 }
+        }
+      },
+      "training_log": {
+        "type": "array",
+        "items": {
+          "type": "object",
+          "required": ["day", "minutes"],
+          "properties": {
+            "day": { "type": "integer", "minimum": 1, "maximum": 3 },
+            "minutes": { "type": "number", "minimum": 0, "maximum": 600 },
+            "weak_sentences": { "type": "array", "items": { "type": "integer" } },
+            "shadow_used": { "type": "boolean" },
+            "abandoned": { "type": "boolean" }
+          }
+        }
+      },
+      "d7_recall": {
+        "type": "object",
+        "required": ["transcript", "score_per_sentence", "total_pct"],
+        "properties": {
+          "transcript": { "type": "string" },
+          "score_per_sentence": {
+            "type": "array",
+            "items": { "type": "integer", "minimum": 0, "maximum": 4 }
+          },
+          "total_pct": { "type": "number", "minimum": 0, "maximum": 100 }
+        }
+      },
+      "subjective": {
+        "type": "object",
+        "properties": {
+          "difficulty": { "type": "integer", "minimum": 1, "maximum": 5 },
+          "enjoyment": { "type": "integer", "minimum": 1, "maximum": 5 }
+        }
+      },
+      "retest_speed_sec": { "type": "number", "minimum": 0 },
+      "exploratory": {
+        "type": "object",
+        "properties": {
+          "weak_rate": { "type": "number", "minimum": 0, "maximum": 1 },
+          "sm2_ef_slope": { "type": "number" }
+        }
+      }
+    }
+  },
+
+  "example_subject_experimental": {
+    "subject_id": "P01",
+    "group": "experimental",
+    "enrolled_at": "2026-11-16T10:00:00Z",
+    "consent_signed": true,
+    "baseline": {
+      "english_score": 510,
+      "english_test": "CET-6",
+      "vark": { "v": 4, "a": 5, "r": 3, "k": 2 },
+      "phq9": 2,
+      "gad7": 1
+    },
+    "training_log": [
+      { "day": 1, "minutes": 72, "weak_sentences": [3, 5], "shadow_used": false },
+      { "day": 2, "minutes": 65, "weak_sentences": [3], "shadow_used": true },
+      { "day": 3, "minutes": 58, "weak_sentences": [], "shadow_used": false }
+    ],
+    "d7_recall": {
+      "transcript": "...",
+      "score_per_sentence": [4, 4, 3, 4, 4, 3, 4, 4, 4, 4],
+      "total_pct": 90.0
+    },
+    "subjective": { "difficulty": 2, "enjoyment": 4 },
+    "retest_speed_sec": 220,
+    "exploratory": { "weak_rate": 0.13, "sm2_ef_slope": -0.02 }
+  },
+
+  "example_subject_control": {
+    "subject_id": "P11",
+    "group": "control",
+    "enrolled_at": "2026-11-16T10:00:00Z",
+    "consent_signed": true,
+    "baseline": {
+      "english_score": 505,
+      "english_test": "CET-6",
+      "vark": { "v": 3, "a": 6, "r": 4, "k": 3 },
+      "phq9": 1,
+      "gad7": 2
+    },
+    "training_log": [
+      { "day": 1, "minutes": 80, "weak_sentences": [4, 7], "shadow_used": true, "shadow_reps": 12 },
+      { "day": 2, "minutes": 75, "weak_sentences": [4], "shadow_used": true, "shadow_reps": 15 },
+      { "day": 3, "minutes": 70, "weak_sentences": [], "shadow_used": true, "shadow_reps": 13 }
+    ],
+    "d7_recall": {
+      "transcript": "...",
+      "score_per_sentence": [3, 3, 2, 3, 3, 2, 3, 4, 3, 3],
+      "total_pct": 67.5
+    },
+    "subjective": { "difficulty": 4, "enjoyment": 2 },
+    "retest_speed_sec": 380,
+    "exploratory": { "weak_rate": null, "sm2_ef_slope": null }
+  },
+
+  "report_template": {
+    "title": "英语篇章背诵法 vs 传统影子跟读法的背诵效果对比：一项 N=20 的随机对照可行性研究",
+    "abstract_outline": {
+      "background_words": 200,
+      "methods_words": 150,
+      "results_words": 100,
+      "discussion_words": 50
+    },
+    "key_tables": ["baseline_table", "primary_outcome_table", "secondary_outcome_table"],
+    "key_figures": [
+      "d7_recall_boxplot_with_ci",
+      "training_minutes_barplot",
+      "subjective_difficulty_barplot",
+      "sm2_ef_decay_curves"
+    ]
+  }
+}

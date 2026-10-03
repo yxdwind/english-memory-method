@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="zh-CN"><head><meta charset="UTF-8"><title>Fixture Broken</title></head>
+<body><div class="wrap">
+<header><h1>Fixture Broken 背诵方案</h1></header>
+
+<h2>1. 整体策略</h2><div class="card">故意制造多处错误的样例.</div>
+
+<!-- 故意：第 2 句与原文不一致（rule 1 fail） -->
+<h2>4.1 第1段</h2>
+<div class="sent"><div class="sent-en">The cat sat on the mat.</div>
+  <div class="sent-zh">猫坐在垫子上。</div>
+  <div class="pron"><span class="lbl">连读</span>· · · · · · · · ·</div></div> <!-- rule 2 warn: 7+ 条注解 -->
+<div class="sent"><div class="sent-en">It was a cloudy day.</div> <!-- 故意改 sunny → cloudy -->
+  <div class="sent-zh">这是个阴天。</div>
+  <div class="pron"><span class="lbl">音标</span>/云状物/</div></div> <!-- rule 2 warn: 音标中含中文"云状物" -->
+
+<!-- 钩子链：故意只 1 个句钩（rule 4 fail） -->
+<h2>15. 记忆钩子</h2>
+<div class="hook-chain"><span class="para-hook">段钩起点</span>
+  <span class="seg">钩A</span>   <!-- 只 1 句钩，应为 2 -->
+  <span class="anchor">[cat mat]</span></div>
+
+<!-- 宫殿：故意 3 站但只 2 句；站号错；锚词不在原文（rule 3 fail） -->
+<h2>17. 记忆宫殿</h2>
+<div class="palace-route">
+<div class="palace-stop" data-sents="1">
+  <span class="st-no">站 1</span><div class="st-name">门垫</div>
+  <span class="st-anchor">[cat]</span></div>
+<div class="palace-stop" data-sents="2">
+  <span class="st-no">站 2</span><div class="st-name">阳台</div>
+  <span class="st-anchor">[cloudy]</span></div>
+<div class="palace-stop" data-sents="3">
+  <span class="st-no">站 5</span> <!-- 故意站号 5（应连续 1..3） -->
+  <div class="st-name">第三站</div>
+  <span class="st-anchor">[qqqqq]</span></div> <!-- 锚词不在原文中 -->
+</div>
+
+<!-- 挖空：故意 1 空 / 答案数 3（rule 5 fail） -->
+<h2>11. 挖空自测</h2>
+<p class="sec-label">第 1 段</p>
+<p>The ______ sat on the mat.</p>
+<details class="answer-toggle"><summary>▶ 查看本段答案</summary>
+<div class="answer">答案：cat / dog / bird</div></details>
+
+<!-- 术语：故意放个原文中不存在的词（rule 6 fail） -->
+<h2>13. 专业词汇梳理</h2>
+<table><thead><tr><th>术语</th><th>构词拆解</th><th>音标</th><th>中文</th><th>记忆钩子</th></tr></thead>
+<tbody>
+<tr><td>cat</td><td>无</td><td>/kæt/</td><td>猫</td><td>cat = 猫</td></tr>
+<tr><td>quuxnoxxtu</td><td>无</td><td>/kw/</td><td>不存在词</td><td>—</td></tr>
+</tbody></table>
+
+<!-- 金句：故意放段不在原文的引文（rule 6 fail） -->
+<h2>14. 金句句型库</h2>
+<table><thead><tr><th>句型</th><th>中文释义</th><th>可替换模板</th><th>使用场景</th></tr></thead>
+<tbody>
+<tr><td>The dog jumped over the lazy fox.</td><td>狗跳过懒狐狸。</td><td>The cat jumped.</td><td>描写跳跃</td></tr>
+</tbody></table>
+
+</div></body></html>
