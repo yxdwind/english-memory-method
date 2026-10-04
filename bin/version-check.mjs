@@ -7,6 +7,9 @@
 //   3. package.json 版本号 ≥ 所有锚点版本号（防止"v2.18.0 模板里却写着 v2.7.0 锚点"漂移）
 //   4. SKILL.md 与 plan-template.html 的 title 行包含当前版本号
 //   5. CHANGELOG.md 最新条目版本号与 package.json 一致
+//   6. .claude-plugin/plugin.json 版本与 package.json 一致
+//   7. 主副本一致性：assets/ 两个模板与 skills/ 副本逐字节一致（CRLF 归一后）、
+//      根 SKILL.md 与 skills/ 副本一致（v2.28.1 起，防双源真相分叉）
 //
 // 用法：
 //   node bin/version-check.mjs            # 默认检查
@@ -144,6 +147,44 @@ function checkChangelogLatest(pkgVer) {
   return [{ ok: true, msg: `CHANGELOG.md 最新条目 v${found.join(".")} ✓` }];
 }
 
+function checkPluginVersion(pkgVer) {
+  const p = join(PKG_ROOT, ".claude-plugin", "plugin.json");
+  if (!existsSync(p)) return [{ ok: false, msg: `.claude-plugin/plugin.json 不存在` }];
+  let ver = null;
+  try { ver = JSON.parse(readFileSync(p, "utf8")).version; } catch (e) {
+    return [{ ok: false, msg: `.claude-plugin/plugin.json 解析失败：${e.message}` }];
+  }
+  if (ver !== pkgVer) {
+    return [{ ok: false, msg: `.claude-plugin/plugin.json v${ver} ≠ package.json v${pkgVer}（v2.28.0 时曾漏更到 2.17.0）` }];
+  }
+  return [{ ok: true, msg: `.claude-plugin/plugin.json v${ver} ✓` }];
+}
+
+// CRLF/LF 归一后逐字节比较——行尾差异不视为分叉
+function sameFileNorm(a, b) {
+  return readFileSync(a, "utf8").replace(/\r\n/g, "\n") === readFileSync(b, "utf8").replace(/\r\n/g, "\n");
+}
+
+function checkCopyIdentity() {
+  const PAIRS = [
+    ["assets/plan-template.html", "skills/english-memory-method/assets/plan-template.html"],
+    ["assets/library-template.html", "skills/english-memory-method/assets/library-template.html"],
+    ["SKILL.md", "skills/english-memory-method/SKILL.md"],
+  ];
+  const out = [];
+  for (const [main, copy] of PAIRS) {
+    const pMain = join(PKG_ROOT, main), pCopy = join(PKG_ROOT, copy);
+    if (!existsSync(pMain)) { out.push({ ok: false, msg: `${main} 不存在` }); continue; }
+    if (!existsSync(pCopy)) { out.push({ ok: false, msg: `${copy} 不存在` }); continue; }
+    if (sameFileNorm(pMain, pCopy)) {
+      out.push({ ok: true, msg: `${main} ≡ ${copy}` });
+    } else {
+      out.push({ ok: false, msg: `${main} 与 ${copy} 内容分叉（v2.28.0 曾因此让 npm 用户拿到旧组件）——重新同步两份副本` });
+    }
+  }
+  return out;
+}
+
 // ── 主流程 ───────────────────────────────────────────────────────────────
 function main() {
   console.log(paint("bold", "english-memory-method · 版本一致性校验"));
@@ -159,6 +200,8 @@ function main() {
     { name: "plan-template 头部版本",            fn: () => checkTitleFileContains("skills/english-memory-method/assets/plan-template.html", "plan-template.html", pkgVer) },
     { name: "library-template 头部版本",         fn: () => checkTitleFileContains("skills/english-memory-method/assets/library-template.html", "library-template.html", pkgVer) },
     { name: "CHANGELOG.md 最新条目版本",        fn: () => checkChangelogLatest(pkgVer) },
+    { name: "plugin.json 版本与 package.json",   fn: () => checkPluginVersion(pkgVer) },
+    { name: "主副本一致性（assets ≡ skills）",   fn: () => checkCopyIdentity() },
   ];
 
   let totalFail = 0, totalWarn = 0;

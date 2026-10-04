@@ -25,7 +25,8 @@ function quietConsole() {
 }
 
 const template = fs.readFileSync(path.join(__dirname, '..', 'assets', 'plan-template.html'), 'utf8');
-const js = template.match(/<script>([\s\S]*)<\/script>/)[1];
+// v2.18 起模板含多个 <script> 块：非贪婪逐块提取后拼接（与 sr-runtime/e2e 等新套件同一模式）
+const js = [...template.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]).join('\n;\n');
 
 function sent(i) {
   return `<div class="sent">
@@ -135,10 +136,17 @@ async function run(name, withSegments, query) {
   ok(card.querySelector('.emm-dayline').textContent.includes('第 2 天'), '日期改为昨天→第 2 天');
   ok(card.querySelector('.emm-rows tr').textContent.includes('次日自测'), '第1段进入「次日自测」复习到期');
 
-  // v2.13 复述阶梯
+  // v2.13 复述阶梯（v2.22 起渐进引导：未定级时锁 L2~L5，先 L1 解锁）
+  const lv3locked = card.querySelector('.emm-lv[data-seg="0"][data-lv="3"]');
+  ok(lv3locked.disabled === true, '未定级时 L3 锁定（v2.22 渐进引导）');
+  const lv1 = card.querySelector('.emm-lv[data-seg="0"][data-lv="1"]');
+  ok(lv1.disabled === false, 'L1 默认可用');
+  lv1.click();
+  ok(!!card.querySelector('.emm-lv[data-seg="0"][data-lv="1"].emm-lv-on'), '点 L1 后点亮并落档');
   const lv3 = card.querySelector('.emm-lv[data-seg="0"][data-lv="3"]');
+  ok(lv3.disabled === false, 'L1 完成后 L3 解锁');
   lv3.click();
-  ok(!!card.querySelector('.emm-lv[data-seg="0"][data-lv="3"].emm-lv-on'), '点 L3 后 L1~L3 点亮');
+  ok(!!card.querySelector('.emm-lv[data-seg="0"][data-lv="3"].emm-lv-on'), '解锁后点 L3，L1~L3 点亮');
   ok(stateOf().ladder['0'] && stateOf().ladder['0'].lv === 3, '阶梯等级已存 localStorage');
 
   // 勾选完成
@@ -376,7 +384,7 @@ function fillLib(articles) {
 
 async function bootLib(articles, opts = {}) {
   const html = fillLib(articles);
-  const js = html.match(/<script>([\s\S]*)<\/script>/)[1];
+  const js = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map((m) => m[1]).join('\n;\n');
   const dom = new JSDOM(html, {
     runScripts: 'outside-only',
     url: 'http://localhost/memory-library.html' + (opts.query || ''),
@@ -486,5 +494,16 @@ async function runLibrary() {
     ok(t.includes('《Success》') && t.includes('✅ 链回忆 3 句'), '自检：A 链句数对齐判 ✅');
     ok(t.includes('✅ 挖空#1：空数 1 == 答案数 1'), '自检：A 挖空配对判 ✅');
     ok(t.includes('《Dream》') && t.includes('⚠ 挖空#1：空数 2 ≠ 答案数 1'), '自检：B 挖空失配判 ⚠');
+  }
+
+  console.log('== v2.28.1 记忆库：</script 截断防护 ==');
+  {
+    // 根因（审计 v2.28.1）：{{ARTICLES}} 填进 <script> 内，数据若含 </script 会让 HTML 解析器
+    // 在字符串内部提前闭合脚本 → 整页 JS 静默挂掉，而 node --check 与 JS 提取都查不出来。
+    // 交付校验 = 填充后全文 </script 计数必须为 1（SKILL.md 校验第 5 条）。这里锁死三件事：
+    ok((libTemplate.match(/<\/script/g) || []).length === 1, '模板本身 </script 恰好 1 次');
+    ok((fillLib([libA]).match(/<\/script/g) || []).length === 1, '正常数据填充后仍恰好 1 次');
+    const hostileC = Object.assign({}, libB, { title: 'Dream</script>' });
+    ok((fillLib([hostileC]).match(/<\/script/g) || []).length === 2, '含闭合序列的数据填充后计数变 2 → 交付校验可捕获');
   }
 }

@@ -7,7 +7,7 @@
 丢给它任何一篇英语文章，它还你一份完整背诵方案（普通文章 15 节 · 演讲稿 16 节含骨架 · 长文 17 节含分段仪表，自包含 HTML）：
 逐句连读标注、钩子焊成问题链、复述五级阶梯、专业词汇梳理、折叠自测——全在一份文件里。
 
-![Version](https://img.shields.io/badge/version-2.28.0-blue)
+![Version](https://img.shields.io/badge/version-2.28.1-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-13-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -174,9 +174,13 @@ v2 把钩子焊成链：每一环由上一环"推"出来，**能被逻辑推出�
 
 > 从新到旧排列，最早版本见底部折叠区。
 
+**审计修复**（v2.28.1）
+
+**v2.28.1**：**副本分叉 + 截断防护**——修复 v2.18→v2.28 批量更新造成的双源真相破裂（`assets/` 停在 v2.16/v2.17、`plugin.json` 漏更，npm 用户拿到旧组件；version-check 新增 plugin.json 与主副本一致性 2 组检查，现 9 组）；修复记忆库 `</script` 截断隐患（SKILL.md 硬性校验 + 3 项冒烟防护：含闭合序列的数据会让解析器提前闭合脚本、整页 JS 静默挂掉）；按段统计表补进横滚容器；轻刷结算句号缺省补「?」；文章卡显示计划天数；测试数改动态比对 CHANGELOG。总测试数 **468**。
+
 **测试基建**（v2.26.0–v2.28.0）
 
-**v2.28.0**：**端到端 session driver**——jsdom 完整跑 35 步用户流（`bin/e2e-flow.mjs`，--strict 严格模式）；修复 endRound 持久化覆盖 bug；总测试数 472。
+**v2.28.0**：**端到端 session driver**——jsdom 完整跑 35 步用户流（`bin/e2e-flow.mjs`，--strict 严格模式）；修复 endRound 持久化覆盖 bug；总测试数 455。
 
 **v2.27.0**：跨浏览器 API 静态扫描器（43 API × 4 浏览器矩阵）+ `docs/CROSS-BROWSER.md`。
 

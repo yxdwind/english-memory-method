@@ -7,7 +7,7 @@
 Paste any English article, and it produces a **17-section longform plan (15 basic / 16 speech / 17 longform) (speeches: 16 sections incl. skeleton)** (self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.28.0-blue)
+![Version](https://img.shields.io/badge/version-2.28.1-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-13-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -169,9 +169,13 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 > Newest first; earliest versions in the collapsed section at the bottom.
 
+**Audit fixes** (v2.28.1)
+
+**v2.28.1**: **Copy divergence + truncation guard** — fixed the dual-source-of-truth break caused by the v2.18→v2.28 batch update (`assets/` stuck at v2.16/v2.17, `plugin.json` missed, npm users got stale components; version-check gains 2 new groups for plugin.json & copy identity, now 9); fixed the library `</script` truncation hazard (hard SKILL.md check + 3 smoke guards: a closing-sequence in data makes the parser terminate the script early and the whole page silently dies); segment-stats table wrapped for mobile scroll; drill recap shows "?" for missing sentence numbers; plan cards show the planned days; test version assertion now compares CHANGELOG dynamically. Total tests **468**.
+
 **Testing infrastructure** (v2.28.0–v2.26.0)
 
-**v2.28.0**: **End-to-end session driver** — jsdom runs the full 35-step user flow (`bin/e2e-flow.mjs`, --strict); fixed the endRound persistence bug; total tests 472.
+**v2.28.0**: **End-to-end session driver** — jsdom runs the full 35-step user flow (`bin/e2e-flow.mjs`, --strict); fixed the endRound persistence bug; total tests 455.
 
 **v2.27.0**: Cross-browser API static scanner (43 APIs × 4 browsers) + `docs/CROSS-BROWSER.md`.
 

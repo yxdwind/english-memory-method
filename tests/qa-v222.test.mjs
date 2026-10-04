@@ -8,6 +8,7 @@
  *   d. init() 备份提醒：上次 >30 天未打开时弹 confirm（mock window.confirm）
  *   e. 渐进引导：state.ladder 空时 L2-L5 disabled，L1 之后解锁
  *   f. .ics 时区字段：X-WR-TIMEZONE 存在、DTSTAMP UTC 格式、DTEND 等于 DTSTART +1 天
+ *   g. v2.28.1 内容校验门：正向 fixture 全绿、fixture-broken 必须红（负向用例）
  *
  * 跑：node tests/qa-v222.test.mjs
  */
@@ -207,6 +208,19 @@ console.log('\n== v2.22 EMM_QA_V222 工程卫生大礼包 运行时验证 ==');
     })();
     ok(d2 === next, `DTEND = DTSTART + 1 day（${d2} = ${next}）`);
   }
+}
+
+// g. v2.28.1 内容校验门：verify-plan 对正向 fixture 全绿、对故意造坏的 fixture 必须红
+//    （fixture-broken.html 此前无任何测试引用，却让 verify:fixture 旧脚本整目录扫描永远红）
+{
+  const run = (file) => {
+    try {
+      execSync(`node bin/verify-plan.mjs ${file} --no-color`, { cwd: ROOT, stdio: 'pipe' });
+      return 0;
+    } catch (e) { return e.status; }
+  };
+  ok(run('tests/fixtures/fixture-success.html') === 0, 'verify-plan：正向 fixture（getty 真实生成）6 条硬规则全绿');
+  ok(run('tests/fixtures/fixture-broken.html') === 1, 'verify-plan：故意造坏的 fixture 必须判失败（负向用例）');
 }
 
 console.log('\n结果: ' + passed + ' 通过, ' + failed + ' 失败');

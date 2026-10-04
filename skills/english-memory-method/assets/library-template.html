@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <!--
-  English Memory Method · 个人记忆库模板 (v2.24.0 · EMM_UX_V224)
+  English Memory Method · 个人记忆库模板 (v2.24.0 · EMM_UX_V224 · v2.28.1 微修)
+  v2.28.1 微修：文章卡显示计划天数（days 原为死数据）；轻刷结算句号缺省补「?」；
+  新增脚本截断交付校验（SKILL.md 校验第 5 条：填充后全文「脚本闭合标签」计数必须为 1——
+  数据里的闭合序列一律写成 <\/ 转义形式，否则解析器提前闭合脚本、整页 JS 静默挂掉）。
   用法：复制本文件为 memory-library.html（与各 *-memorization-plan.html 同目录），
   按下方 <!-- ① ... --> 注释填充 var LIB 数据后交付。
   数据来源：扫描工作区全部 *-memorization-plan.html，逐篇提取元数据与轻刷数据；
@@ -191,6 +194,7 @@
     if(a.date) meta.push(a.date);
     if(a.sents) meta.push(a.sents + ' 句');
     if(a.words) meta.push('~' + a.words + ' 词');
+    if(a.days) meta.push(a.days + ' 天计划');
     var html = '<div class="lc-top"><span class="lc-title">' + esc(a.title) + '</span>'
       + '<span class="' + badgeClass(a.type) + '">' + esc(a.type || '普通') + '</span></div>';
     html += '<div class="lc-meta">' + meta.join(' · ') + '</div>';
@@ -404,7 +408,7 @@
       html += '<div class="ls-miss"><b>建议回原方案补打卡的句子</b>（轻刷不落盘，打卡/薄弱清单以原方案为准）：<br>';
       var missSidx = Object.keys(cur.mi);
       missSidx.forEach(function(sid){
-        html += '· 第 ' + esc(sid) + ' 句<br>';
+        html += '· 第 ' + esc(sid || '?') + ' 句<br>';
       });
       badKeys.forEach(function(w){
         html += '· 错空词「' + esc(w) + '」<br>';

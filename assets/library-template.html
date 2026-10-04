@@ -1,6 +1,9 @@
 <!DOCTYPE html>
 <!--
-  English Memory Method · 个人记忆库模板 (v2.17.0)
+  English Memory Method · 个人记忆库模板 (v2.24.0 · EMM_UX_V224 · v2.28.1 微修)
+  v2.28.1 微修：文章卡显示计划天数（days 原为死数据）；轻刷结算句号缺省补「?」；
+  新增脚本截断交付校验（SKILL.md 校验第 5 条：填充后全文「脚本闭合标签」计数必须为 1——
+  数据里的闭合序列一律写成 <\/ 转义形式，否则解析器提前闭合脚本、整页 JS 静默挂掉）。
   用法：复制本文件为 memory-library.html（与各 *-memorization-plan.html 同目录），
   按下方 <!-- ① ... --> 注释填充 var LIB 数据后交付。
   数据来源：扫描工作区全部 *-memorization-plan.html，逐篇提取元数据与轻刷数据；
@@ -191,6 +194,7 @@
     if(a.date) meta.push(a.date);
     if(a.sents) meta.push(a.sents + ' 句');
     if(a.words) meta.push('~' + a.words + ' 词');
+    if(a.days) meta.push(a.days + ' 天计划');
     var html = '<div class="lc-top"><span class="lc-title">' + esc(a.title) + '</span>'
       + '<span class="' + badgeClass(a.type) + '">' + esc(a.type || '普通') + '</span></div>';
     html += '<div class="lc-meta">' + meta.join(' · ') + '</div>';
@@ -209,6 +213,26 @@
     return html;
   }
 
+  var statusFilter = 'all';  // v2.24：状态筛选 — 'all' | 'started' | 'weakest' | 'stale'
+  function todayDateStr(){ var x = new Date(); return x.getFullYear() + '-' + String(x.getMonth()+1).padStart(2,'0') + '-' + String(x.getDate()).padStart(2,'0'); }
+  function dayDiff(d){ if(!d) return Infinity; var t = todayDateStr(); var a = new Date(t), b = new Date(d); return Math.round((a - b) / 86400000); }
+  function matchesStatus(article){
+    if(statusFilter === 'all') return true;
+    var st = progStats(article);
+    if(statusFilter === 'started') return !!st;
+    if(statusFilter === 'weakest'){
+      if(!st) return false;
+      var total = article.sents || 0;
+      var weak = st.weak || 0;
+      return total && (weak / total) >= 0.3;  // 薄弱 ≥ 30%
+    }
+    if(statusFilter === 'stale'){
+      if(!st || !st.last) return false;
+      return dayDiff(st.last) >= 14;
+    }
+    return true;
+  }
+
   function renderShelf(){
     var q = normLike(searchBox.value || '');
     var n = LIB.articles.length, totalSents = 0, started = 0, shown = 0;
@@ -217,6 +241,7 @@
       totalSents += a.sents || 0;
       var st = progStats(a);
       if(st) started++;
+      if(!matchesStatus(a)) return;
       if(q){
         var hay = normLike([a.title, a.topic, a.type, a.file].concat(chainText(a)).join(' '));
         if(hay.indexOf(q) < 0) return;
@@ -381,13 +406,19 @@
       + ((nMi + badKeys.length) ? '' : ' —— 全部顺畅，记忆保持得很好 🎉') + '</div>';
     if(nMi || badKeys.length){
       html += '<div class="ls-miss"><b>建议回原方案补打卡的句子</b>（轻刷不落盘，打卡/薄弱清单以原方案为准）：<br>';
-      Object.keys(cur.mi).forEach(function(sid){
-        html += '· 第 ' + esc(sid) + ' 句<br>';
+      var missSidx = Object.keys(cur.mi);
+      missSidx.forEach(function(sid){
+        html += '· 第 ' + esc(sid || '?') + ' 句<br>';
       });
       badKeys.forEach(function(w){
         html += '· 错空词「' + esc(w) + '」<br>';
       });
       html += '</div>';
+      // v2.24：一键回原方案补打卡（带 ?jump= 参数让方案页自动定位）
+      if(a.file && missSidx.length){
+        var jumpParam = missSidx.slice(0, 5).join(',');  // 最多前 5 句避免 URL 超长
+        html += '<div class="ls-actions"><a class="lib-btn" style="flex:0 1 auto;padding:8px 18px;background:#f59e0b;color:#fff;border-color:#f59e0b;" href="' + esc(a.file) + '?jump=' + encodeURIComponent(jumpParam) + '">🎯 一键回原方案补打卡</a></div>';
+      }
     }
     html += '<div class="ls-actions">'
       + '<a class="lib-btn lib-btn-open" style="flex:0 1 auto;padding:8px 18px;" href="' + esc(a.file || '') + '">📖 打开原方案（打卡进薄弱清单）</a>'
@@ -431,6 +462,38 @@
     sessionBox = document.getElementById('emm-lib-session');
     searchBox = document.querySelector('.lib-search');
     if(!shelf) return;
+    // v2.24：状态筛选 chip 行
+    var chipBar = document.createElement('div');
+    chipBar.className = 'lib-chipbar';
+    chipBar.style.cssText = 'margin:8px 0;display:flex;flex-wrap:wrap;gap:6px;align-items:center;';
+    var chips = [
+      { id: 'all',     label: '全部',       hint: '显示所有文章' },
+      { id: 'started', label: '有进度',     hint: '已开始打过卡的文章' },
+      { id: 'weakest', label: '薄弱最多',   hint: '薄弱率 ≥ 30%' },
+      { id: 'stale',   label: '超 14 天未复习', hint: '超过 14 天没打卡/阶梯/勾选' }
+    ];
+    chips.forEach(function(c){
+      var b = document.createElement('button');
+      b.type = 'button';
+      b.className = 'lib-chip';
+      b.setAttribute('data-status', c.id);
+      b.title = c.hint;
+      b.textContent = c.label;
+      b.style.cssText = 'padding:3px 10px;font-size:12.5px;border:1px solid var(--accent-border);background:#fff;color:#7c4a00;border-radius:14px;cursor:pointer;';
+      b.addEventListener('click', function(){
+        statusFilter = c.id;
+        chipBar.querySelectorAll('.lib-chip').forEach(function(x){ x.style.background = '#fff'; x.style.color = '#7c4a00'; x.style.borderColor = 'var(--accent-border)'; });
+        b.style.background = '#f59e0b'; b.style.color = '#fff'; b.style.borderColor = '#f59e0b';
+        renderShelf();
+      });
+      chipBar.appendChild(b);
+    });
+    // 默认激活「全部」
+    chipBar.firstChild.style.background = '#f59e0b';
+    chipBar.firstChild.style.color = '#fff';
+    chipBar.firstChild.style.borderColor = '#f59e0b';
+    // 插到搜索框后面（chipBar 作为 searchBox 的下一个 sibling）
+    if(searchBox.parentNode) searchBox.parentNode.insertBefore(chipBar, searchBox.nextSibling);
     var timer = null;
     searchBox.addEventListener('input', function(){
       clearTimeout(timer);

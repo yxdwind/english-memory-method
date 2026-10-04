@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  English Memory Method · 背诵方案模板（plan-template.html · v2.28.0 当前生效）
+  English Memory Method · 背诵方案模板（plan-template.html · v2.28.1 当前生效）
   用法：复制本文件为 <topic>-memorization-plan.html，按下方 <!-- ① ... --> 注释逐节替换内容。
   所有样式已内联，不依赖外部资源；结构图引用相对路径 assets/<topic>-structure.svg。
   v2.13.0 组件新增：今日任务排期（含 .ics 导出）、自测模式（遮译文/全遮）、复述阶梯追踪、
@@ -24,6 +24,7 @@
   v2.26.0 组件新增：🧪 工程卫生——`bin/sync-fixtures.mjs` 把 `tests/samples/` 下真实生成方案同步到 `tests/fixtures/fixture-success.html`，fixture 现已反映"真实生成结果"而非手写字符串。CI 用 `npm run sync-fixtures -- --check` 检测漂移。
   v2.27.0 组件新增：🌐 跨浏览器测试矩阵——`bin/check-browser-compat.mjs` 静态扫描模板用到的 43 个 Web API，对照 Chrome/Firefox/Safari/Edge 兼容性矩阵给出 ⚠/✅ 报告（`--strict` 模式有 ⚠ 时退出码 1）。配档 `docs/CROSS-BROWSER.md` 列 4 大浏览器差异 + 已知 bug 根因 + Playwright 集成样板。零运行时副作用。
   v2.28.0 组件新增：🚀 端到端测试——`bin/e2e-flow.mjs` 在 jsdom 里完整跑 35 步用户流（冷启动 → 评卡 → 结束 → 导出 → 重置 → 导入 → 跨页面），揭示并修复 2 个 bug：① `endRound()` `state = loadState()` 覆盖本轮 mutations 导致 rounds/weak/mode 丢失（修复：loadState 后再 apply mutations）② `build-samples.mjs` 只命中 1 个 .sent 占位导致样本只有 1 句（修复：占位替换为 N 句 join）。配档 `docs/E2E.md` 列 35 步全链路 + 已知边界。
+  v2.28.1 组件修复：📊 按段统计表（多段文章仪表盘，renderDash 动态建表）包进 .emm-tblwrap 横滚容器——此前绕过了 v2.16「全部表格横滚」约定，窄屏溢出。
 -->
 <html lang="zh-CN">
 <head>
@@ -900,8 +901,8 @@ body.emm-folded .emm-advanced{display:none!important;}
         return '<tr><td data-l="段">' + s.name + '</td><td data-l="句数">' + sentTotal + '</td><td data-l="薄弱"><span style="color:' + rateColor + '">' + weakRate + '%</span></td><td data-l="耗时">' + (minutes !== null ? minutes + ' 分钟' : '—') + '</td></tr>';
       }).join('');
       html += '<div style="margin-top:10px;"><b>📊 按段统计</b>（段名 / 句数 / 薄弱率 / 耗时）：<br>'
-        + '<table style="font-size:13px;border-collapse:collapse;margin-top:4px;"><thead><tr><th style="text-align:left;padding:2px 8px;">段</th><th style="padding:2px 8px;">句</th><th style="padding:2px 8px;">薄弱</th><th style="padding:2px 8px;">耗时</th></tr></thead>'
-        + '<tbody>' + segRows + '</tbody></table></div>';
+        + '<div class="emm-tblwrap"><table style="font-size:13px;border-collapse:collapse;margin-top:4px;"><thead><tr><th style="text-align:left;padding:2px 8px;">段</th><th style="padding:2px 8px;">句</th><th style="padding:2px 8px;">薄弱</th><th style="padding:2px 8px;">耗时</th></tr></thead>'
+        + '<tbody>' + segRows + '</tbody></table></div></div>';
     }
     // v2.20：标准模式下显示 SM-2 间隔详情
     if(isStd && Object.keys(state.sr).length){

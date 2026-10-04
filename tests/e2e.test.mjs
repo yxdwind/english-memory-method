@@ -9,7 +9,7 @@
  *   e. EMM_E2E_V228 锚点在 plan-template.html
  *   f. docs/E2E.md 存在且含 6 节
  *   g. plan-template.html 含 EMM_E2E_V228 锚点
- *   h. package.json v2.28.0 + npm script 注册
+ *   h. package.json version = CHANGELOG 最新条目 + npm script 注册
  *   i. bin/build-samples.mjs 多句插入修复（getty 含 10 个 .sent）
  *
  * 跑：node tests/e2e.test.mjs
@@ -88,10 +88,12 @@ ok(/EMM_E2E_V228/.test(planTpl), 'plan-template.html 含 EMM_E2E_V228 锚点');
   }
 }
 
-// G. package.json v2.28.0 + npm script
+// G. package.json 版本与 CHANGELOG 最新条目一致 + npm script
 {
   const pkg = JSON.parse(fs.readFileSync(path.join(ROOT, 'package.json'), 'utf8'));
-  ok(pkg.version === '2.28.0', `package.json version = 2.28.0（actual ${pkg.version}）`);
+  const cl = fs.readFileSync(path.join(ROOT, 'CHANGELOG.md'), 'utf8');
+  const latest = /^##\s*\[(\d+\.\d+\.\d+)\]/m.exec(cl);
+  ok(!!latest && pkg.version === latest[1], `package.json version = CHANGELOG 最新条目 ${latest ? latest[1] : '?'}（actual ${pkg.version}）`);
   ok(pkg.scripts['e2e'] === 'node bin/e2e-flow.mjs',
     'npm script e2e 注册');
 }

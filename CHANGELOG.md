@@ -6,6 +6,26 @@
 
 ---
 
+## [2.28.1] · 2026-10 · 审计修复：副本分叉 + 截断防护
+
+### 修复（源起：对 v2.18→v2.28 批量更新的审计）
+
+- **🔴 双源真相破裂（P0）**：v2.18→v2.28 的 11 个版本只更新了 `skills/` 发行副本，`assets/` 主目录停留在 v2.16/v2.17 状态，而 `package.json` 的发布清单同时包含两者——npm 用户拿到「旧组件 + 新 SKILL.md」混搭。`smoke.test.js`（读 assets/）与其余 311 项断言（读 skills/）各测各的副本，455 全绿掩盖了分叉。本版：① `skills/` 两个模板回同步到 `assets/`、根 SKILL.md 同步到 `skills/` 副本；② `plugin.json` 从漏更的 2.17.0 补齐；③ `version-check` 新增 2 组检查（现 9 组）——`.claude-plugin/plugin.json` 与 package.json 一致、主副本逐字节一致（CRLF 归一），此类事故从此直接红灯。
+- **🟠 记忆库 `</script` 截断（P1，实测复现）**：填充 `{{ARTICLES}}` 的数据若含 `</script`（如文章标题），HTML 解析器会在字符串内部提前闭合脚本，整页 JS 静默挂掉（书架空白），而 `node --check` 与 JS 提取都查不出来。本版：SKILL.md 记忆库校验新增硬性第 5 条（填充后全文 `</script` 计数必须为 1，附 node 一行校验命令），冒烟测试加 3 项防护断言（模板本身/正常填充/敌意数据计数变 2 可捕获）。
+- **🟡 按段统计表绕过横滚约定（P2）**：v2.23 的「📊 按段统计」表在 `renderDash` 动态 innerHTML 建表，绕过 v2.16「全部表格横滚」约定（仅多段文章触发，故 smoke 单篇用例未暴露）。修复：建表时包进 `.emm-tblwrap`。
+- **🟡 轻刷结算句号缺省（P2）**：句钩缺 `sidx` 时结算显示「· 第 句」，现缺省补「?」。
+- **🟡 死数据（P2）**：library 数据模型的 `days` 字段此前嵌入了但从不渲染，现文章卡显示「N 天计划」。
+- **🟡 测试硬编码版本号（P2）**：`tests/e2e.test.mjs` 把 `package.json version === '2.28.0'` 写死，每次发版必改；改为动态读 CHANGELOG 最新条目比对。
+- **🟡 内容校验门永久红（P2）**：`verify:fixture` 旧脚本扫描整个 `tests/fixtures/` 目录，把故意造坏的 `fixture-broken.html` 也算进去，门从未通过过；且正向 fixture 本身带着未填充的模板占位符（`build-samples.mjs` 从未填充挖空节，`{{答案词，斜杠分隔}}` 原样入库）。本版：① 两个样本补上真实挖空段并重跑 `sync-fixtures`；② `verify:fixture` 只扫正向 fixture——**首次全绿**；③ `fixture-broken.html` 转正为负向测试（qa-v222 g 组：verifier 对坏方案必须 exit 1）。
+- 文档：SKILL.md 记忆库「进度机制」补**同名陷阱**说明（两篇文章 h1 前 40 字相同会共享进度键）；readme v2.28.0 条目的测试总数 472 更正为实际值。
+
+### 工程
+
+- `tests/smoke.test.js` 提取逻辑改为非贪婪逐块 `<script>` 拼接（v2.18 起模板含 5 个 script 块，原贪婪单块提取在副本同步后直接 SyntaxError）；阶梯断言按 v2.22 渐进引导语义重写（未定级锁 L2~L5，先 L1 解锁再点 L3），新增 4 项。
+- version-check 9/9 组全绿；`verify:fixture` 首次全绿；总测试数 468（455 → 468）。
+
+---
+
 ## [2.28.0] · 2026-10 · 端到端测试
 
 ### 新增

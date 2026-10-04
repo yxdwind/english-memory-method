@@ -1,6 +1,6 @@
 {
   "name": "english-memory-method",
-  "version": "2.28.0",
+  "version": "2.28.1",
   "description": "English passage memorization method - AI agent skill (multi-platform). Turns any English article into a structured, chained-retelling study plan. 英语篇章背诵法。",
   "bin": {
     "english-memory-method": "bin/install.mjs"
@@ -8,7 +8,7 @@
   "scripts": {
     "test": "node tests/smoke.test.js && node tests/fold-runtime.test.mjs && node tests/shadow-runtime.test.mjs && node tests/sr-runtime.test.mjs && node tests/research-schema.test.mjs && node tests/today-segment.test.mjs && node tests/export-import.test.mjs && node tests/qa-v222.test.mjs && node tests/qa-v223.test.mjs && node tests/qa-v224.test.mjs && node tests/qa-v225.test.mjs && node tests/qa-v226.test.mjs && node tests/browser-compat.test.mjs && node tests/e2e.test.mjs",
     "verify": "node bin/verify-plan.mjs",
-    "verify:fixture": "node bin/verify-plan.mjs tests/fixtures --all --no-color",
+    "verify:fixture": "node bin/verify-plan.mjs tests/fixtures/fixture-success.html --no-color",
     "version-check": "node bin/version-check.mjs",
     "tag": "node bin/tag.mjs",
     "build-samples": "node bin/build-samples.mjs",
