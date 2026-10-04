@@ -19,6 +19,15 @@ sentence-by-sentence linking marks, hooks welded into question chains, a retelli
 
 ---
 
+> **🚀 v2.28.0 · End-to-end testing baseline**
+> - `bin/e2e-flow.mjs` runs the full **35-step user flow** in jsdom (cold start → check-in → end round → export → reset → import → cross-page)
+> - Discovered and fixed 2 real bugs: `endRound()` persistence overwrite + `build-samples.mjs` single-sentence insertion
+> - New cross-browser API static scanner (43 APIs × 4 browsers)
+> - **455 tests all green, zero regression** (smoke + runtime + e2e + compat matrix)
+> - 16 version anchors + 7/7 consistency checks green
+
+---
+
 ## ✨ Features
 
 | | Feature | In one line |
