@@ -506,4 +506,12 @@ async function runLibrary() {
     const hostileC = Object.assign({}, libB, { title: 'Dream</script>' });
     ok((fillLib([hostileC]).match(/<\/script/g) || []).length === 2, '含闭合序列的数据填充后计数变 2 → 交付校验可捕获');
   }
+
+  console.log('== v2.28.2 记忆库：同名 key 检测 ==');
+  {
+    const dupB = Object.assign({}, libB, { key: libA.key });
+    const { doc } = await bootLib([libA, dupB], { query: '?check=1' });
+    const t = doc.querySelector('.emm-check-rpt').textContent;
+    ok(t.includes('key 与第 1 篇重复'), '自检：重复 key 判 ⚠（同名陷阱会共享进度键）');
+  }
 }

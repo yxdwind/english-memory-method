@@ -7,7 +7,7 @@
 丢给它任何一篇英语文章，它还你一份完整背诵方案（普通文章 15 节 · 演讲稿 16 节含骨架 · 长文 17 节含分段仪表，自包含 HTML）：
 逐句连读标注、钩子焊成问题链、复述五级阶梯、专业词汇梳理、折叠自测——全在一份文件里。
 
-![Version](https://img.shields.io/badge/version-2.28.1-blue)
+![Version](https://img.shields.io/badge/version-2.28.2-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-13-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -173,6 +173,10 @@ v2 把钩子焊成链：每一环由上一环"推"出来，**能被逻辑推出�
 ## 📜 版本历史
 
 > 从新到旧排列，最早版本见底部折叠区。
+
+**工程收尾**（v2.28.2）
+
+**v2.28.2**：审计遗留五项——`build-samples` 填充挖空节并锁死幂等（重跑不再回退占位符）；version-check 锚点表 `EMM_UX_V224` 重映射到 library；记忆库 `?check=1` 新增重复 key（同名陷阱）运行时检测；verify-plan 锚点期望按文件类型区分；新增 `.gitattributes` 统一行尾。总测试数 **472**。
 
 **审计修复**（v2.28.1）
 

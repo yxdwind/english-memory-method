@@ -199,8 +199,13 @@ function extractTitle(html) {
   const h1 = matchOne(/<h1[^>]*>([\s\S]*?)<\/h1>/, html);
   return h1 ? norm(stripTags(h1)) : "(无标题)";
 }
-function extractVersionMarkers(html) {
-  const ids = ["EMM_LIBRARY_V217", "EMM_V215_STABLE", "EMM_MOBILE_V216", "EMM_DRILL_CLOZE_V214", "EMM_TODAY_V213"];
+function extractVersionMarkers(html, filePath) {
+  // v2.28.2：按文件类型区分锚点期望——library 锚点只对记忆库文件有意义,
+  // 方案文件此前被误报「EMM_LIBRARY_V217 出现 0 次」
+  const isLibrary = /library/i.test(filePath || '');
+  const ids = isLibrary
+    ? ["EMM_LIBRARY_V217"]
+    : ["EMM_V215_STABLE", "EMM_MOBILE_V216", "EMM_DRILL_CLOZE_V214", "EMM_TODAY_V213"];
   return ids.map(id => ({ id, count: (html.match(new RegExp(id, "g")) || []).length }));
 }
 
@@ -417,7 +422,7 @@ function verifyFile(filePath, sourceText, opts = {}) {
   const sentCount = extractSentCount(html);
   const zhCount = extractSentZh(html).length;
   console.log(paint("dim", `  句数=${sentCount}  / 翻译行=${zhCount}  / 文件=${(html.length / 1024).toFixed(1)} KB`));
-  const markers = extractVersionMarkers(html);
+  const markers = extractVersionMarkers(html, filePath);
   markers.forEach(m => {
     if (m.count !== 1) {
       const sev = m.count === 0 ? "warn" : "fail";

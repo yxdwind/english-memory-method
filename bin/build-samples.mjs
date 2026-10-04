@@ -60,7 +60,21 @@ const aiSents = [
 // 3. 替换 .sent 块（多次匹配 → 第一个替换为示例段 1 第一个 .sent，第二个替换为示例段 1 第二个 .sent，依此类推）
 //    简化：模板里有占位 .sent 块 1 个，我们只替换第一个，剩下的保留占位。
 
-function build(title, subtitle, structureHint, sents, fillFirstN, outFile){
+// ── Sample 挖空自测数据（v2.28.2）────────────────────────────
+// 此前 build-samples 从不填充第 11 节挖空自测，模板占位符 {{答案词，斜杠分隔}}
+// 原样入库 → verify:fixture 规则 5 必挂，且重跑会用占位符覆盖手工修复。
+const gettyCloze = {
+  secLabel: '第 1 段 · 开场与立意',
+  text: 'Four score and ______ years ago our fathers brought forth on this continent, a ______ nation, conceived in ______, and dedicated to the proposition that all men are created ______.',
+  answers: 'seven / new / liberty / equal',
+};
+const aiCloze = {
+  secLabel: '第 1 段 · 现象引入',
+  text: 'Artificial intelligence is rapidly transforming how students ______. From adaptive ______ systems to automated ______, AI offers unprecedented personalization at scale.',
+  answers: 'learn / tutoring / grading',
+};
+
+function build(title, subtitle, structureHint, sents, fillFirstN, outFile, cloze){
   let html = tpl;
   html = html.replace(/\{\{TITLE\}\}/g, title);
   html = html.replace(/<title>\{\{TITLE\}\}背诵方案<\/title>/, '<title>' + title + '背诵方案</title>');
@@ -77,6 +91,13 @@ function build(title, subtitle, structureHint, sents, fillFirstN, outFile){
     html = html.replace(sentBlockRe, replacement);
   }
 
+  // v2.28.2：填充第 11 节挖空自测（与样本中手工内容逐字一致，保证重跑幂等）
+  if (cloze){
+    html = html.replace('<p class="sec-label">第 1 段 · {{逻辑角色}}</p>', '<p class="sec-label">' + cloze.secLabel + '</p>');
+    html = html.replace('{{挖空后的段落原文，空用 ______ 表示}}', cloze.text);
+    html = html.replace('{{答案词，斜杠分隔}}', cloze.answers);
+  }
+
   fs.writeFileSync(path.join(OUT_DIR, outFile), html, 'utf8');
   console.log('  ✅ ' + outFile + ' (' + (html.length / 1024).toFixed(1) + ' KB)');
 }
@@ -87,7 +108,8 @@ build(
   '三段叙事：起源（国家诞生）→ 命题（当前危机）→ 召唤（战场祭奠）',
   gettySents,
   10,
-  'getty-memorialization-plan.html'
+  'getty-memorialization-plan.html',
+  gettyCloze
 );
 
 build(
@@ -96,7 +118,8 @@ build(
   '提出议题（AI 改变学习）→ 列举益处 → 揭示风险 → 辩证分析 → 收束结论',
   aiSents,
   10,
-  'ai-education-plan.html'
+  'ai-education-plan.html',
+  aiCloze
 );
 
 console.log('\n用法：npm run preview → 浏览器打开 http://localhost:4173/tests/samples/');

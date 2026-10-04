@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <!--
-  English Memory Method · 个人记忆库模板 (v2.24.0 · EMM_UX_V224 · v2.28.1 微修)
+  English Memory Method · 个人记忆库模板 (v2.24.0 · EMM_UX_V224 · v2.28.1/v2.28.2 微修)
   v2.28.1 微修：文章卡显示计划天数（days 原为死数据）；轻刷结算句号缺省补「?」；
   新增脚本截断交付校验（SKILL.md 校验第 5 条：填充后全文「脚本闭合标签」计数必须为 1——
   数据里的闭合序列一律写成 <\/ 转义形式，否则解析器提前闭合脚本、整页 JS 静默挂掉）。
+  v2.28.2 微修：?check=1 自检新增重复 key 检测（同名陷阱——两篇文章 h1 前 40 字相同会共享进度键）。
   用法：复制本文件为 memory-library.html（与各 *-memorization-plan.html 同目录），
   按下方 <!-- ① ... --> 注释填充 var LIB 数据后交付。
   数据来源：扫描工作区全部 *-memorization-plan.html，逐篇提取元数据与轻刷数据；
@@ -431,12 +432,15 @@
   /* —— ?check=1 数据体检 —— */
   function selfCheck(){
     if(!/[?&]check/.test(location.search)) return;
-    var L = ['EMM 记忆库自检报告（v2.17.0 · ?check=1）', '─ 文章数据'];
+    var L = ['EMM 记忆库自检报告（v2.28.2 · ?check=1）', '─ 文章数据'];
     if(!LIB.articles.length) L.push('⚠ 文章数为 0——记忆库未填充');
+    var seenKeys = {};
     LIB.articles.forEach(function(a, i){
       var name = a.title || a.topic || ('#' + (i + 1));
       L.push('《' + name + '》');
       if(!a.key) L.push('  ⚠ 缺 key（进度键=方案 h1 前 40 字，缺失则进度永远读不到）');
+      else if(seenKeys[a.key]) L.push('  ⚠ key 与第 ' + seenKeys[a.key] + ' 篇重复：两篇共享进度键，打卡进度会互相串——改方案 h1 以区分（v2.28.2 同名陷阱检测）');
+      else seenKeys[a.key] = i + 1;
       if(!a.file) L.push('  ⚠ 缺 file（打开原方案链接不可用）');
       var nSteps = 0;
       (a.chain || []).forEach(function(c){ nSteps += (c.steps || []).length; });

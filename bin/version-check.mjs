@@ -65,7 +65,7 @@ const ANCHOR_TABLE = [
   { id: "EMM_PROGRESS_V221",    version: [2, 21, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "进度导出/导入 + 段间切换 + 样例方案" },
   { id: "EMM_QA_V222",          version: [2, 22, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "工程卫生：ics 时区修复 + 备份提醒 + 章节精简 + 渐进引导" },
   { id: "EMM_QUALITY_V223",     version: [2, 23, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "内容质量：按段统计 + ?check=1 内容可疑项 + IPA 校验 + 模式向导" },
-  { id: "EMM_UX_V224",          version: [2, 24, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "学习路径优化：轻刷一键回补、状态筛选 chip、今天先做这个按钮" },
+  { id: "EMM_UX_V224",          version: [2, 24, 0], file: "skills/english-memory-method/assets/library-template.html", desc: "学习路径优化：轻刷一键回补、状态筛选 chip、今天先做这个按钮（v2.28.2 修正映射：改动在 library-template,此前误挂 plan-template）" },
   { id: "EMM_ASSESS_V225",      version: [2, 25, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "评估优化：段落测试 60s + 毕业阈值配置" },
   { id: "EMM_FIXTURE_V226",     version: [2, 26, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "工程卫生：fixture 从真实生成反推（bin/sync-fixtures.mjs）" },
   { id: "EMM_BROWSER_V227",     version: [2, 27, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "跨浏览器测试矩阵：bin/check-browser-compat.mjs 静态扫描 + docs/CROSS-BROWSER.md" },

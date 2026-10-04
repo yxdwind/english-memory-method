@@ -1,0 +1,15 @@
+# 行尾规范（v2.28.2）：仓库统一 LF，消除 Windows checkout 的 CRLF 往返与满屏警告
+* text=auto eol=lf
+
+# Windows 专属脚本保留 CRLF
+*.ps1 text eol=crlf
+*.bat text eol=crlf
+*.cmd text eol=crlf
+
+# 二进制
+*.png binary
+*.jpg binary
+*.gif binary
+*.ico binary
+*.woff binary
+*.woff2 binary

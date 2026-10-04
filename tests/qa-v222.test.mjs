@@ -9,6 +9,7 @@
  *   e. 渐进引导：state.ladder 空时 L2-L5 disabled，L1 之后解锁
  *   f. .ics 时区字段：X-WR-TIMEZONE 存在、DTSTAMP UTC 格式、DTEND 等于 DTSTART +1 天
  *   g. v2.28.1 内容校验门：正向 fixture 全绿、fixture-broken 必须红（负向用例）
+ *   h. v2.28.2 build-samples 幂等：连跑两次输出稳定、无占位符残留、fixture 同步不漂移
  *
  * 跑：node tests/qa-v222.test.mjs
  */
@@ -221,6 +222,26 @@ console.log('\n== v2.22 EMM_QA_V222 工程卫生大礼包 运行时验证 ==');
   };
   ok(run('tests/fixtures/fixture-success.html') === 0, 'verify-plan：正向 fixture（getty 真实生成）6 条硬规则全绿');
   ok(run('tests/fixtures/fixture-broken.html') === 1, 'verify-plan：故意造坏的 fixture 必须判失败（负向用例）');
+}
+
+// h. v2.28.2 build-samples 幂等：挖空节由脚本真实填充，重跑不再回退模板占位符
+{
+  execSync('node bin/build-samples.mjs', { cwd: ROOT, stdio: 'pipe' });
+  const snap = {};
+  for (const f of ['getty-memorialization-plan.html', 'ai-education-plan.html']) {
+    snap[f] = fs.readFileSync(path.join(ROOT, 'tests', 'samples', f), 'utf8').replace(/\r\n/g, '\n');
+  }
+  execSync('node bin/build-samples.mjs', { cwd: ROOT, stdio: 'pipe' });
+  let stable = true;
+  for (const f of Object.keys(snap)) {
+    if (fs.readFileSync(path.join(ROOT, 'tests', 'samples', f), 'utf8').replace(/\r\n/g, '\n') !== snap[f]) stable = false;
+  }
+  ok(stable, 'build-samples 连跑两次输出逐字稳定');
+  const getty = fs.readFileSync(path.join(ROOT, 'tests', 'samples', 'getty-memorialization-plan.html'), 'utf8');
+  ok(!/{{答案词|{{挖空后的段落原文/.test(getty) && /<div class="answer">答案：seven \//.test(getty), '样本挖空节已真实填充（无挖空专属占位符残留;徽章/关键词表的装饰性占位符不在 build-samples 职责内）');
+  let syncChk = 0;
+  try { execSync('node bin/sync-fixtures.mjs --check', { cwd: ROOT, stdio: 'pipe' }); } catch (e) { syncChk = e.status; }
+  ok(syncChk === 0, 'sync-fixtures --check：fixture 与样本保持一致');
 }
 
 console.log('\n结果: ' + passed + ' 通过, ' + failed + ' 失败');
