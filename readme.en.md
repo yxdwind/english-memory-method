@@ -198,7 +198,7 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 **v2.26.0**: fixture sync tool `bin/sync-fixtures.mjs` + CI-friendly `--check` mode.
 **v2.27.0**: Cross-browser API static scanner (43 APIs × 4 browsers) + `docs/CROSS-BROWSER.md`.
-**v2.28.0**: **End-to-end session driver** — jsdom runs the full 35-step user flow (`bin/e2e-flow.mjs`, --strict); fixed the endRound persistence bug; total tests 472.
+**v2.28.0**: **End-to-end session driver** — jsdom runs the full 35-step user flow (`bin/e2e-flow.mjs`, --strict); fixed the endRound persistence bug; total tests 455.
 
 <details>
 <summary><b>Expand: all changes from v2.1 → v2.12.0 (early versions)</b></summary>

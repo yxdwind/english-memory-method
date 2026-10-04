@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  English Memory Method · 背诵方案模板（plan-template.html · v2.27.0 当前生效）
+  English Memory Method · 背诵方案模板（plan-template.html · v2.28.0 当前生效）
   用法：复制本文件为 <topic>-memorization-plan.html，按下方 <!-- ① ... --> 注释逐节替换内容。
   所有样式已内联，不依赖外部资源；结构图引用相对路径 assets/<topic>-structure.svg。
   v2.13.0 组件新增：今日任务排期（含 .ics 导出）、自测模式（遮译文/全遮）、复述阶梯追踪、
@@ -23,6 +23,7 @@
   v2.25.0 组件新增：📊 评估优化——①「📝 段落测试」按钮（60 秒挖空挑战 + 自动批改给 0-100 分，写入 state.segTest.last）②毕业阈值配置「🎯 连顺 N 轮」（默认 3，点切换 2/3/4/5，state.streakToGoal）。
   v2.26.0 组件新增：🧪 工程卫生——`bin/sync-fixtures.mjs` 把 `tests/samples/` 下真实生成方案同步到 `tests/fixtures/fixture-success.html`，fixture 现已反映"真实生成结果"而非手写字符串。CI 用 `npm run sync-fixtures -- --check` 检测漂移。
   v2.27.0 组件新增：🌐 跨浏览器测试矩阵——`bin/check-browser-compat.mjs` 静态扫描模板用到的 43 个 Web API，对照 Chrome/Firefox/Safari/Edge 兼容性矩阵给出 ⚠/✅ 报告（`--strict` 模式有 ⚠ 时退出码 1）。配档 `docs/CROSS-BROWSER.md` 列 4 大浏览器差异 + 已知 bug 根因 + Playwright 集成样板。零运行时副作用。
+  v2.28.0 组件新增：🚀 端到端测试——`bin/e2e-flow.mjs` 在 jsdom 里完整跑 35 步用户流（冷启动 → 评卡 → 结束 → 导出 → 重置 → 导入 → 跨页面），揭示并修复 2 个 bug：① `endRound()` `state = loadState()` 覆盖本轮 mutations 导致 rounds/weak/mode 丢失（修复：loadState 后再 apply mutations）② `build-samples.mjs` 只命中 1 个 .sent 占位导致样本只有 1 句（修复：占位替换为 N 句 join）。配档 `docs/E2E.md` 列 35 步全链路 + 已知边界。
 -->
 <html lang="zh-CN">
 <head>
@@ -830,7 +831,7 @@ body.emm-folded .emm-advanced{display:none!important;}
   }
 
   function endRound(){
-    // v2.28 EMM_E2E_V228 修复：把本轮 mutations（mode/rounds/weak/streak）放在 loadState 之后，
+    // v2.28 修复：把本轮 mutations（mode/rounds/weak/streak）放在 loadState 之后，
     // 避免 `state = loadState()` 覆盖本轮新写入的字段
     var d = new Date();
     var round = { date: d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'), ok: 0, bad: 0 };
@@ -2073,6 +2074,12 @@ body.emm-folded .emm-advanced{display:none!important;}
 /* ===== v2.27 EMM_BROWSER_V227: 跨浏览器测试矩阵 =====
    设计：bin/check-browser-compat.mjs（独立工具）静态扫描模板用到的 Web API，
    对照 Chrome/Firefox/Safari/Edge 兼容性矩阵。docs/CROSS-BROWSER.md 配档。
+   本节仅作为锚点标记，不引入新代码。 */
+
+/* ===== v2.28 EMM_E2E_V228: 端到端测试 =====
+   设计：bin/e2e-flow.mjs（独立工具）在 jsdom 里完整跑 35 步用户流。
+   顺带修复 endRound() 持久化 bug + build-samples.mjs 多句插入 bug。
+   配档 docs/E2E.md。
    本节仅作为锚点标记，不引入新代码。 */
 </script>
 

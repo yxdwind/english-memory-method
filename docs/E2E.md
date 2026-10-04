@@ -192,8 +192,8 @@ if (placeholderMatch){
 | `tests/export-import.test.mjs` | 导出/导入单步 | 20 |
 | `tests/qa-v222.test.mjs` ... `qa-v226.test.mjs` | 各版本功能验证 | 23+17+9+18+8 = 75 |
 | `tests/browser-compat.test.mjs` | 浏览器 API 矩阵 | 37 |
-| **`tests/e2e.test.mjs`** | **完整用户流（35 步）** | **35** |
-| **合计** | | **472** |
+| **`tests/e2e.test.mjs`** | **完整用户流（35 步）** | **18** |
+| **合计** | | **455** |
 
 e2e 是唯一跑「多步交互序列」的测试，能在 PR 阶段发现 unit 测试漏掉的"按钮链式触发"型 bug（如 §3.1）。
 

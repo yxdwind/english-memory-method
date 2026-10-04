@@ -94,7 +94,9 @@ console.log('\n== v2.22 EMM_QA_V222 工程卫生大礼包 运行时验证 ==');
     ok(false, 'tag.mjs --dry-run 退出码 = 0（actual ' + e.status + '）');
   }
   ok(/v2\.\d+\.\d+/.test(stdout), 'tag.mjs --dry-run 输出含版本号 v2.X.X');
-  ok(/git tag/.test(stdout) && /-a/.test(stdout), 'tag.mjs --dry-run 输出 git tag -a 命令');
+  // tag 已存在时输出 "tag 已存在，跳过"；新建时输出 "git tag -a"。两者都算 OK。
+  ok((/git tag/.test(stdout) && /-a/.test(stdout)) || /跳过/.test(stdout),
+    'tag.mjs --dry-run 输出 git tag -a 命令（或 tag 已存在提示）');
 }
 
 // ── B. bin/tag.mjs 幂等性：跑两次，第二次应报告"已存在" ────────────
