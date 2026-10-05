@@ -176,7 +176,7 @@ v2 把钩子焊成链：每一环由上一环"推"出来，**能被逻辑推出�
 
 **工程收尾**（v2.28.2）
 
-**v2.28.2**：审计遗留五项——`build-samples` 填充挖空节并锁死幂等（重跑不再回退占位符）；version-check 锚点表 `EMM_UX_V224` 重映射到 library；记忆库 `?check=1` 新增重复 key（同名陷阱）运行时检测；verify-plan 锚点期望按文件类型区分；新增 `.gitattributes` 统一行尾。总测试数 **472**。
+**v2.28.2**：审计遗留五项——`build-samples` 填充挖空节并锁死幂等（重跑不再回退占位符）；version-check 锚点表 `EMM_UX_V224` 重映射到 library；记忆库 `?check=1` 新增重复 key（同名陷阱）运行时检测；verify-plan 锚点期望按文件类型区分；新增 `.gitattributes` 统一行尾。总测试数 **472**。同批新增 **npm 发布链路**：GitHub Actions Trusted Publishing（OIDC 零 token，tag 即自动发布，免疫 npm 2026-08/2027-01 bypass-token 收紧），首版 `npx english-memory-method` 随首次发布上线。
 
 **审计修复**（v2.28.1）
 
