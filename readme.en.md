@@ -71,6 +71,17 @@ npx english-memory-method
 
 **Trigger**: paste an English article + ask for a memorization plan. No restart needed.
 
+### 🔒 Auditable / offline install (security-sensitive environments)
+
+If your org forbids remote execution (`irm | iex` / `curl | bash`), use the auditable path instead:
+
+1. **Download, review, then run**: manually fetch `install.ps1` / `install.sh`, read it through, then run locally.
+2. **Checksum verification**: release bundles ship a `SHA256SUMS`; verify with `sha256sum -c SHA256SUMS` before installing.
+3. **Offline bundle**: `git clone` or download the repo tarball, copy to the target machine, and run the installer fully offline — no jsDelivr / raw.githubusercontent dependency.
+4. **npm alternative**: `npx english-memory-method` (uses the npm registry; can point at a private enterprise registry).
+
+Release consistency rules: see [RELEASE-CHECKLIST.md](RELEASE-CHECKLIST.md).
+
 ---
 
 ## 📖 How it works (15/16/17-section loop by article type)

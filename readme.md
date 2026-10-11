@@ -80,6 +80,17 @@ npx english-memory-method
 
 **触发**：丢一篇英语文章 + 一句"出背诵方案"（或"出记忆技巧"）。装完无需重启。
 
+### 🔒 可审计 / 离线安装（安全敏感环境）
+
+若所在组织禁止 `irm | iex` / `curl | bash` 等远程执行，可改用可审计路径：
+
+1. **先下载、后审阅、再运行**：手动下载 `install.ps1` / `install.sh`，通读确认无异常后再本地执行；
+2. **校验和核对**：发布包附带 `SHA256SUMS`，安装前 `sha256sum -c SHA256SUMS` 验证完整性与来源；
+3. **离线包**：`git clone` 或下载仓库 tarball 后，直接拷至目标机离线运行安装脚本，全程不依赖 jsDelivr / raw.githubusercontent；
+4. **npm 替代**：`npx english-memory-method`（走 npm 官方源，可配合企业私有 registry）。
+
+发版一致性要求见 [RELEASE-CHECKLIST.md](RELEASE-CHECKLIST.md)。
+
 ---
 
 ## 📖 工作原理（15/16/17 节按文体）
