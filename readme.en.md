@@ -83,15 +83,15 @@ npx english-memory-method
 | 4 | Keyword table | 1–2 hook words per sentence + Chinese cues |
 | 5 | Question chain | Weld hooks into 4–7 signpost questions — self-QA when retelling |
 | 6 | Retelling ladder | L1 hooks → L2 chain → L3 titles → L4 bare hands → L5 tell someone |
-| 7 | Three-pass method | Read ×3 → retell with hooks → retell with the chain |
-| 8 | Spaced review | 5 min → tonight → next day → day 3 → day 7/15 |
-| 9 | Fill-in-blank test | 2–5 blanks per paragraph; answers collapsed |
-| 10 | Phrase list | 8–15 collocations + corpus-style examples, ready to reuse |
-| 11 | Terminology | Word-formation breakdown + IPA + memory hooks |
-| 12 | Golden Patterns | Four-column transferable patterns: pattern / meaning / swappable template / usage scene |
-| 13 | Memory hooks | In-text hooks + **three-layer hook chain**: paragraph hook → sentence-hook chain (logic bridges) → English anchors |
-| 14 | Retelling toolkit | 10 techniques: stall recovery / delivery / practice tips |
-| 15 | Palace map | 25-station daily-life route, one sentence per station — spatial backup for lost sentences |
+| 9 | Three-pass method | Read ×3 → retell with hooks → retell with the chain |
+| 10 | Spaced review | 5 min → tonight → next day → day 3 → day 7/15 |
+| 11 | Fill-in-blank test | 2–5 blanks per paragraph; answers collapsed |
+| 12 | Phrase list | 8–15 collocations + corpus-style examples, ready to reuse |
+| 13 | Terminology | Word-formation breakdown + IPA + memory hooks |
+| 14 | Golden Patterns | Four-column transferable patterns: pattern / meaning / swappable template / usage scene |
+| 15 | Memory hooks | In-text hooks + **three-layer hook chain**: paragraph hook → sentence-hook chain (logic bridges) → English anchors |
+| 16 | Retelling toolkit | 10 techniques: stall recovery / delivery / practice tips |
+| 17 | Palace map | 25-station daily-life route, one sentence per station — spatial backup for lost sentences |
 
 <details>
 <summary><b>🎤 Speech-mode section table (16 sections)</b></summary>
@@ -168,6 +168,8 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 ## 📜 Version History
 
 > Newest first; earliest versions in the collapsed section at the bottom.
+
+> Full version history (including historical bug fixes and CI self-check anchors `EMM_*`) has been moved to [CHANGELOG.md](CHANGELOG.md).
 
 **Audit fixes** (v2.28.1)
 
@@ -261,6 +263,50 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 CET-4/6, Kaoyan, IELTS/TOEFL intensive listening & recitation, adult self-study, AI-assisted language learning.
 Companion methods (same series): the 5-step intensive-listening diagnosis, and the 4-step linked-speech breakdown.
+
+## ⚠️ Known Limitations & Boundaries
+
+> For transparency, here is where the experience gets reduced. Full capabilities are listed above.
+
+### Platform experience varies (L1 / L2 / L3)
+- **L1 native platforms** (Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi / MiniMax / Qwen Work / Windsurf / Continue / Roo Code, etc.): full experience — SVG map + self-contained HTML plan + sentence linking + in-browser interactive check-in / dictation / shadowing.
+- **L2 rule-injection platforms** (Cursor / GitHub Copilot / Gemini CLI / Cline / Aider / Roo project-level): injected as Markdown rules, output is a **Markdown plan without the SVG map or interactive HTML components** (browser-dependent interactions like check-in, dictation, shadowing are unavailable). For the full experience, prefer an L1 platform.
+- **L3 manual**: paste `SKILL.md` into custom instructions; quality depends on how well the platform supports long instructions.
+
+### Browser & device dependencies
+Self-test, dictation, and shadowing rely on `speechSynthesis` / `MediaRecorder` / `getUserMedia`:
+- Firefox's TTS voice list may be empty → dictation / playback may be silent (degrades silently to manual).
+- iOS < 14.1 lacks `MediaRecorder` → shadowing recording unavailable (degrades to manual self-judging).
+- Safari opening a local plan via `file://` requires HTTPS for `getUserMedia` (except localhost) → recording unavailable (degrades).
+
+Progress is saved in the browser `localStorage`: Safari / iOS have smaller quotas and may fail to write when many plans accumulate (handled with `try/catch`; export backups regularly). **Recommended: desktop Chrome / Edge / Firefox for the full experience; mobile is limited.**
+
+### Install & network
+- One-line install executes a remote script (`irm | iex` / `curl | bash`). In security-sensitive environments, **download and review the script first**, or use `npx` / the plugin marketplace.
+- Install sources default to `raw.githubusercontent.com` and jsDelivr; if your network is unreliable, use a reachable mirror or an offline package.
+
+### Output quality depends on the host model
+Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 472 tests cover the **template and runtime**, not the quality of any specific model's generated content.
+
+### Who this is NOT for
+- Absolute beginners who want a 5-minute quick-memorize flow (this method is methodology-heavy with a higher onboarding cost).
+- Learners entirely unfamiliar with IPA / phonetics who won't first learn "how to read the plan" (linking notation uses specialist symbols).
+- People wanting an Anki-style SRS app with accounts / multi-device cloud sync (this is a single-file HTML with local-only progress).
+- Users confined to mobile who cannot run a modern desktop browser.
+- Organizations whose security policy forbids remote script execution (use an auditable install path instead).
+
+### FAQ
+**Q: Why don't I see the SVG map or check-in buttons in Cursor / Copilot?**
+A: Those are L2 platforms; output is a Markdown plan without interactive HTML components. Use an L1 platform for the full experience.
+
+**Q: Playback / recording does nothing when I open a plan?**
+A: Check browser API support (see "Browser & device dependencies"). Firefox may be silent, older iOS can't record, and Safari on `file://` can't record — all degrade automatically to manual mode.
+
+**Q: Will I lose my progress?**
+A: Progress lives in browser `localStorage`; clearing cache, switching browsers, or incognito loses it. Export (JSON) backups regularly, and avoid piling up too many plans under Safari / iOS's small quota.
+
+**Q: Do I need to restart after install?**
+A: No. Just drop in an English article and say "make a memorization plan."
 
 ## 📄 License
 
