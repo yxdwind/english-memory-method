@@ -4,7 +4,7 @@
 > `SKILL.md` 正文已于 v2.28.2 后"剥离变更日志"——只保留行为规则,版本噪音迁出至此,以减少生成上下文占用。
 > 章节编号以 `assets/plan-template.html` 的 h2 顺序为唯一真相源(记忆钩子=15 / 复述技巧包=16 / 记忆宫殿=17)。
 
-## [2.29.0] (入门减负 + L2/L3 兜底 · unreleased)
+## [2.29.0] (入门减负 + L2/L3 兜底 · 2026-10-12)
 - **3 步快背入口（EMM_QUICK3_V229）**：HTML 方案首屏（header 之后）自动注入「🚀 3 步快背」卡——听读 3 遍 → 钩子链过 2 轮 → 复述打卡毕业，每步带跳转按钮；回应评估 B.2「17 节认知门槛吓退新手」。
 - **能力探测横幅（EMM_CAP_V229）**：加载时检测 speechSynthesis / MediaRecorder / getUserMedia / 安全上下文 / localStorage，不可用项以橙色横幅显式列出「受影响功能 + 替代做法」（听写→自读+挖空验证；影子跟读→手机录音+第 16 节录音自查法；存储→导出/导入 JSON），可按设备持久化关闭；取代此前的静默 try/catch 降级。
 - **Anki/CSV 导出（EMM_ANKI_V229）**：复习条新增「🗂 Anki」按钮，导出挖空卡（带空句→答案）+ 复述卡（中文提示→英文原句）为带 Anki 头（#separator:Tab / #notetype:Basic）的 CSV；`buildCloze` 给输入框加 `data-ans` 属性供导出读取。
