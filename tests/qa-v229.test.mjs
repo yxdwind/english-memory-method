@@ -57,6 +57,14 @@ const fakeArticle = `
 <details class="answer-toggle"><summary>▶ 查看本段答案</summary><div class="answer">答案：simple / memory</div></details>
 <h2>15. 记忆钩子（跨段总链）</h2>
 <div class="hook-chain"><span class="seg">段钩</span><span class="bridge">⇒</span><span class="seg">句钩</span><span class="anchor">[anchor]</span></div>
+<h2>17. 记忆宫殿映射</h2>
+<div class="card">
+<div class="palace-route">
+  <div class="palace-stop"><span class="st-no">1</span><div class="st-name">站1·家门</div><div class="st-hook">钩子A</div></div>
+  <div class="palace-stop"><span class="st-no">2</span><div class="st-name">站2·鞋柜</div><div class="st-hook">钩子B</div></div>
+  <div class="palace-stop"><span class="st-no">3</span><div class="st-name">站3·沙发</div><div class="st-hook">钩子C</div></div>
+</div>
+</div>
 <footer>测试页脚</footer>
 `;
 
@@ -177,6 +185,41 @@ ok(/⇒/.test(template) && /↔/.test(template) && /→/.test(template), '图例
   const last = alerts[alerts.length - 1] || '';
   ok(/已导出 \d+ 张卡片/.test(last), `点击导出弹卡片数提示（actual: ${last.slice(0, 40)}）`);
   ok(downloads.length >= 1 && /-emm-anki-\d{4}-\d{2}-\d{2}\.csv$/.test(downloads[downloads.length - 1].name), '下载文件名为 <篇名>-emm-anki-<日期>.csv');
+}
+
+// ── D. 记忆宫殿路线引导 ──
+{
+  const { doc, w } = await boot({});
+  ok((template.match(/EMM_PALACE_V229/g) || []).length === 1, 'EMM_PALACE_V229 锚点恰好 1 次');
+  const onboard = doc.getElementById('emm-palace-onboard');
+  ok(!!onboard, '首次访问（无路线）显示宫殿引导条');
+  ok(!!doc.querySelector('.emm-palace-manage'), '宫殿区有常驻「重新定义路线」入口');
+  onboard.querySelector('.emm-palace-go').click();
+  const ed = doc.getElementById('emm-palace-editor');
+  ok(!!ed, '点击「定义我的路线」打开编辑器');
+  const ta = ed && ed.querySelector('.emm-palace-ta');
+  ok(!!ta && /家门/.test(ta.value), '编辑器预填当前站点名');
+  ta.value = '玄关\n沙发\n书桌';
+  ed.querySelector('.emm-palace-save').click();
+  const saved = JSON.parse(w.localStorage.getItem('emm-palace-route') || '[]');
+  ok(saved.length === 3 && saved[0] === '玄关', '保存后路线写入 localStorage');
+  const names = Array.from(doc.querySelectorAll('.palace-stop .st-name')).map(n => n.textContent);
+  ok(names[0] === '玄关' && names[1] === '沙发' && names[2] === '书桌', '保存后站点名立即套用');
+  ok(!doc.getElementById('emm-palace-onboard'), '保存路线后引导条消失');
+}
+{
+  // 预置路线：打开即自动套用 + 不弹引导
+  const { doc } = await boot({ preload: { 'emm-palace-route': '["玄关","沙发","书桌"]' } });
+  const names = Array.from(doc.querySelectorAll('.palace-stop .st-name')).map(n => n.textContent);
+  ok(names[0] === '玄关', '预置路线时打开即自动套用站点名');
+  ok(!doc.getElementById('emm-palace-onboard'), '已有路线时不弹引导条');
+}
+{
+  // 跳过引导：持久化不再显示
+  const { doc, w } = await boot({});
+  doc.getElementById('emm-palace-onboard').querySelector('.emm-palace-skip').click();
+  ok(!doc.getElementById('emm-palace-onboard'), '「先用默认路线」移除引导条');
+  ok(w.localStorage.getItem('emm-palace-onboard-dismissed') === '1', '跳过状态写入 localStorage');
 }
 
 console.log(`\n结果: ${passed} 通过, ${failed} 失败`);
