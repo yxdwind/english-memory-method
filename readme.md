@@ -93,7 +93,7 @@ npx english-memory-method
    sha256sum -c SHA256SUMS                                  # 校验 zip
    unzip english-memory-method-vX.Y.Z.zip
    cd english-memory-method-vX.Y.Z
-   sha256sum -c SHA256SUMS                                  # 校验包内 40 个文件
+   sha256sum -c SHA256SUMS                                  # 校验包内全部文件
    ./install.sh                                             # 自动本地模式：从包内拷贝
    ```
 

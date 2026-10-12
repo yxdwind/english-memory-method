@@ -76,7 +76,7 @@ npx english-memory-method
 If your org forbids remote execution (`irm | iex` / `curl | bash`), use the auditable path instead:
 
 1. **Download, review, then run**: manually fetch `install.ps1` / `install.sh`, read it through, then run locally.
-2. **Checksum verification**: every release ships `english-memory-method-vX.Y.Z.zip` + `SHA256SUMS`. Run `sha256sum -c SHA256SUMS` to verify the zip itself; after unzipping, a second `SHA256SUMS` inside the bundle covers all ~40 files.
+2. **Checksum verification**: every release ships `english-memory-method-vX.Y.Z.zip` + `SHA256SUMS`. Run `sha256sum -c SHA256SUMS` to verify the zip itself; after unzipping, a second `SHA256SUMS` inside the bundle covers every bundled file.
 3. **Offline bundle install** (fully air-gapped — intranet / GFW / compliance friendly):
 
    ```bash
