@@ -4,9 +4,11 @@ english-memory-method 遵循开放的 Agent Skills 标准（`skills/<name>/SKILL
 
 ## 支持等级
 
-- **L1 · Skill 直装**：平台原生支持 `skills/<name>/SKILL.md`，安装器一键装入，功能完整（SVG 结构图 + 自包含 HTML 方案 + 逐句连读标注）
-- **L2 · 规则注入**：平台无 skills 机制，使用 `platforms/` 下的适配文件把方法注入规则/上下文，输出 Markdown 版方案
+- **L1 · Skill 直装**：平台原生支持 `skills/<name>/SKILL.md`，安装器一键装入，功能完整（SVG 结构图 + 自包含 HTML 方案 + 逐句连读标注 + 听写/影子跟读/打卡/SM-2 全部交互组件）
+- **L2 · 规则注入**：平台无 skills 机制，使用 `platforms/` 下的适配文件把方法注入规则/上下文，输出 **Markdown 精简版**方案
 - **L3 · 文档说明**：见下方表格内说明
+
+> ⚠️ **L2/L3 能力差异声明（v2.29.0 起）**：L2 平台（Cursor / Copilot / Gemini CLI / Cline / Aider / Roo 项目级）只能交付 Markdown，**拿不到** HTML 专属交互——SVG 结构图（退化为文字骨架）、听写/影子跟读/复习打卡/SM-2 进度（退化为"自己录音 + 纸笔自测"的口头替代法）。为保方法论内核不缩水，SKILL.md 规定 L2/L3 环境统一交付「Markdown 精简版」：3 步快背路径 + 逐句钩子表 + 三层钩子链 + 复述五级阶梯 + 挖空自测 + 三遍法/艾宾浩斯表，一个模块不少。完整交互版可在任意 L1 平台补生成。
 
 ## 矩阵
 

@@ -7,7 +7,7 @@
 Paste any English article, and it produces a **17-section longform plan (15 basic / 16 speech / 17 longform) (speeches: 16 sections incl. skeleton)** (self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.28.2-blue)
+![Version](https://img.shields.io/badge/version-2.29.0-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-13-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -181,6 +181,10 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 > Newest first; earliest versions in the collapsed section at the bottom.
 
 > Full version history (including historical bug fixes and CI self-check anchors `EMM_*`) has been moved to [CHANGELOG.md](CHANGELOG.md).
+
+**Onboarding relief + L2/L3 fallback** (v2.29.0)
+
+**v2.29.0**: 🚀 first-screen "3-Step Quick Memo" entry card (listen → hook chain → retell check-in, with jump links; everything else stays folded); ⚠️ capability banner (when TTS / recording / storage are unavailable, the affected features and workarounds are stated explicitly instead of failing silently); 🗂 Anki/CSV export (cloze cards + retell cards, one click into Anki); L2/L3 platforms now deliver a unified "Markdown Lite" plan (methodology core intact, interactive components replaced by verbal workarounds); legend row gains logic-bridge symbols (⇒↔→＋:); fixed v2.18 fold CSS accidentally nested inside the v2.16 mobile media query (no styles on desktop); template footer auto version stamp; fixed the `skills/` nested SKILL.md copy drift (dual-source fork). 19 anchors.
 
 **Audit fixes** (v2.28.1)
 

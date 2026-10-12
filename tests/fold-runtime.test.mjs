@@ -42,9 +42,10 @@ function ok(cond, label) {
   else      { failed++; console.log('  ❌ ' + label); }
 }
 
-// 提取 plan-template.js 里**最后**那个 <script> 块（即 v2.18 新增的折叠脚本）
+// 提取含 EMM_FOLD_V218 锚点的 <script> 块（即 v2.18 新增的折叠脚本）
+// 注意：不能取"最后一个块"——后续版本（如 v2.29.0）会在文件末尾继续追加脚本块
 const scriptBlocks = [...template.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
-const foldScript = scriptBlocks[scriptBlocks.length - 1];
+const foldScript = scriptBlocks.find(b => /EMM_FOLD_V218/.test(b)) || scriptBlocks[scriptBlocks.length - 1];
 
 async function boot(opts = {}) {
   const dom = new JSDOM(template, {

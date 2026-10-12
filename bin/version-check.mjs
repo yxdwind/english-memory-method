@@ -70,6 +70,9 @@ const ANCHOR_TABLE = [
   { id: "EMM_FIXTURE_V226",     version: [2, 26, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "工程卫生：fixture 从真实生成反推（bin/sync-fixtures.mjs）" },
   { id: "EMM_BROWSER_V227",     version: [2, 27, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "跨浏览器测试矩阵：bin/check-browser-compat.mjs 静态扫描 + docs/CROSS-BROWSER.md" },
   { id: "EMM_E2E_V228",         version: [2, 28, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "端到端测试：bin/e2e-flow.mjs session driver + 修复 endRound 持久化 bug + 修复 build-samples 多句插入" },
+  { id: "EMM_QUICK3_V229",      version: [2, 29, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "入门减负：首屏 3 步快背入口卡（听读→钩子链→复述打卡，带跳转）" },
+  { id: "EMM_CAP_V229",         version: [2, 29, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "能力探测横幅：TTS/录音/存储不可用显式告知 + 替代做法（替代静默降级）" },
+  { id: "EMM_ANKI_V229",        version: [2, 29, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "Anki/CSV 导出：挖空卡 + 复述卡一键导入 Anki（buildCloze data-ans）" },
 ];
 
 // ── 各项检查 ─────────────────────────────────────────────────────────────

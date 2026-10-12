@@ -7,7 +7,7 @@
 丢给它任何一篇英语文章，它还你一份完整背诵方案（普通文章 15 节 · 演讲稿 16 节含骨架 · 长文 17 节含分段仪表，自包含 HTML）：
 逐句连读标注、钩子焊成问题链、复述五级阶梯、专业词汇梳理、折叠自测——全在一份文件里。
 
-![Version](https://img.shields.io/badge/version-2.28.2-blue)
+![Version](https://img.shields.io/badge/version-2.29.0-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-13-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -186,6 +186,10 @@ v2 把钩子焊成链：每一环由上一环"推"出来，**能被逻辑推出�
 > 从新到旧排列，最早版本见底部折叠区。
 
 > 完整版本历史（含历史 bug 修复与 CI 自检锚点 `EMM_*`）已迁出至 [CHANGELOG.md](CHANGELOG.md)。
+
+**入门减负 + L2/L3 兜底**（v2.29.0）
+
+**v2.29.0**：🚀 首屏「3 步快背」极简入口卡（听读→钩子链→复述打卡，带跳转，其余章节折叠）；⚠️ 能力探测横幅（TTS/录音/存储不可用时显式告知 + 替代做法，不再静默降级）；🗂 Anki/CSV 导出（挖空卡 + 复述卡一键进 Anki）；L2/L3 平台统一交付「Markdown 精简版」（方法论内核不缩水，交互组件给口头替代法）；图例条补逻辑桥符号（⇒↔→＋:）；修复 v2.18 折叠样式被误嵌套进移动端媒体查询（桌面端失效）；模板页脚自动版本戳；修复 `skills/` 嵌套 SKILL.md 漏同步造成的双源分叉。锚点 19 组。
 
 **工程收尾**（v2.28.2）
 

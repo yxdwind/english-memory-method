@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  English Memory Method · 背诵方案模板（plan-template.html · v2.28.1 当前生效）
+  English Memory Method · 背诵方案模板（plan-template.html · v2.29.0 当前生效）
   用法：复制本文件为 <topic>-memorization-plan.html，按下方 <!-- ① ... --> 注释逐节替换内容。
   所有样式已内联，不依赖外部资源；结构图引用相对路径 assets/<topic>-structure.svg。
   v2.13.0 组件新增：今日任务排期（含 .ics 导出）、自测模式（遮译文/全遮）、复述阶梯追踪、
@@ -25,6 +25,7 @@
   v2.27.0 组件新增：🌐 跨浏览器测试矩阵——`bin/check-browser-compat.mjs` 静态扫描模板用到的 43 个 Web API，对照 Chrome/Firefox/Safari/Edge 兼容性矩阵给出 ⚠/✅ 报告（`--strict` 模式有 ⚠ 时退出码 1）。配档 `docs/CROSS-BROWSER.md` 列 4 大浏览器差异 + 已知 bug 根因 + Playwright 集成样板。零运行时副作用。
   v2.28.0 组件新增：🚀 端到端测试——`bin/e2e-flow.mjs` 在 jsdom 里完整跑 35 步用户流（冷启动 → 评卡 → 结束 → 导出 → 重置 → 导入 → 跨页面），揭示并修复 2 个 bug：① `endRound()` `state = loadState()` 覆盖本轮 mutations 导致 rounds/weak/mode 丢失（修复：loadState 后再 apply mutations）② `build-samples.mjs` 只命中 1 个 .sent 占位导致样本只有 1 句（修复：占位替换为 N 句 join）。配档 `docs/E2E.md` 列 35 步全链路 + 已知边界。
   v2.28.1 组件修复：📊 按段统计表（多段文章仪表盘，renderDash 动态建表）包进 .emm-tblwrap 横滚容器——此前绕过了 v2.16「全部表格横滚」约定，窄屏溢出。
+  v2.29.0 组件新增：🚀 入门减负三件套——①首屏「3 步快背」极简入口卡（听读→钩子链→复述打卡，可跳转，其余章节折叠）②能力探测横幅（TTS/录音/存储不可用时显式告知+替代做法，替代静默降级）③🗂 Anki/CSV 导出（挖空卡+复述卡一键进 Anki）；图例条补逻辑桥符号（⇒因果/↔转折/→递进/＋并列/:举例）；修复 v2.18 首屏折叠样式被误嵌套进 v2.16 移动端媒体查询（桌面端 on-boarding/折叠按钮此前无样式）。
 -->
 <html lang="zh-CN">
 <head>
@@ -160,6 +161,7 @@
   .emm-today tr{background:#fff;border:1px solid #fcd34d;border-radius:10px;margin:8px 0;padding:4px 10px;}
   .emm-today td{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 10px;border:none;padding:5px 0;background:none!important;}
   .emm-today td::before{content:attr(data-l);flex:0 0 auto;font-size:12px;color:#92400e;font-weight:700;}
+}
 /* v2.18: 首屏折叠 + on-boarding（CSS 部分；锚点见下行 IIFE 注释） */
 .emm-fold-toggle{position:fixed;top:14px;right:14px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--accent);cursor:pointer;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,.06);font-family:inherit;}
 .emm-fold-toggle:hover{background:var(--accent-bg);}
@@ -177,6 +179,24 @@ body.emm-folded .emm-advanced{display:none!important;}
   .emm-fold-toggle{top:8px;right:8px;font-size:12px;padding:5px 10px;}
   .emm-onboarding{font-size:13px;padding:12px 14px;}
 }
+/* v2.29.0 入门减负三件套 CSS（3 步快背卡 / 能力探测横幅 / Anki 导出按钮复用 rv-btn） */
+.emm-quick3{background:linear-gradient(135deg,#ede9fe,#ddd6fe);border:1px solid #8b5cf6;border-left:4px solid #7c3aed;border-radius:12px;padding:14px 18px;margin:0 0 18px 0;font-size:14px;line-height:1.85;}
+.emm-quick3 h3{margin:0 0 8px 0;font-size:16px;color:#5b21b6;}
+.emm-quick3 ol{padding-left:24px;margin:6px 0;}
+.emm-quick3 li{margin:6px 0;}
+.emm-quick3 b{color:#4c1d95;}
+.emm-quick3 .q3-jump{background:#fff;border:1px solid #8b5cf6;border-radius:8px;padding:2px 10px;cursor:pointer;font-size:12px;font-weight:600;color:#6d28d9;margin-left:8px;font-family:inherit;}
+.emm-quick3 .q3-jump:hover{background:#f5f3ff;}
+.emm-quick3 .q3-more{font-size:12.5px;color:#6b7280;margin-top:8px;}
+.emm-cap{background:#fff7ed;border:1px solid #fdba74;border-left:4px solid #f97316;border-radius:12px;padding:12px 16px;margin:0 0 18px 0;font-size:13.5px;line-height:1.8;}
+.emm-cap h3{margin:0 0 6px 0;font-size:15px;color:#9a3412;}
+.emm-cap ul{padding-left:20px;margin:4px 0;}
+.emm-cap .cap-dismiss{background:#fff;border:1px solid #f97316;border-radius:8px;padding:4px 12px;cursor:pointer;font-size:12.5px;font-weight:600;color:#9a3412;margin-top:8px;font-family:inherit;}
+.emm-cap .cap-dismiss:hover{background:#ffedd5;}
+@media print{.emm-quick3,.emm-cap{display:none!important;}}
+@media (max-width:720px){
+  .emm-quick3{font-size:13px;padding:12px 14px;}
+  .emm-cap{font-size:12.5px;padding:10px 14px;}
 }
 </style>
 </head>
@@ -236,7 +256,7 @@ body.emm-folded .emm-advanced{display:none!important;}
 
 <!-- ③b 原文逐句区（v2.1 必需）：每句三层 sent-en（行内语音标记）→ sent-zh（翻译，默认中文，可传参换语种）→ pron（连读注解 ≤6 条） -->
 <h2>4.x 段落单元</h2>
-<div class="legend"><span><b style="color:#d97706">⌒</b> 连读</span><span><i style="color:#9ca3af">灰色斜体</i> 弱读</span><span><b style="color:#b91c1c">t</b> flap t / 失爆</span><span><mark style="background:#fef3c7;border-bottom:2px solid #f59e0b;padding:0 2px">专业词汇</mark></span><span><u style="text-decoration:underline dashed #9ca3af">h</u> h 击穿</span><span>翻译默认中文 · 需要其他语言在对话里说一声</span></div>
+<div class="legend"><span><b style="color:#d97706">⌒</b> 连读</span><span><i style="color:#9ca3af">灰色斜体</i> 弱读</span><span><b style="color:#b91c1c">t</b> flap t / 失爆</span><span><mark style="background:#fef3c7;border-bottom:2px solid #f59e0b;padding:0 2px">专业词汇</mark></span><span><u style="text-decoration:underline dashed #9ca3af">h</u> h 击穿</span><span><b style="color:#b45309">⇒</b> 因果 · <b style="color:#b45309">↔</b> 转折 · <b style="color:#b45309">→</b> 递进 · <b style="color:#b45309">＋</b> 并列 · <b style="color:#b45309">:</b> 举例（钩子链逻辑桥，见第 15 节）</span><span>翻译默认中文 · 需要其他语言在对话里说一声</span></div>
 <div class="sent">
   <div class="sent-en">Four score <span class="rv-tie">and seven</span> years ago,</div>
   <div class="sent-zh">八十七年前，</div>
@@ -598,6 +618,7 @@ body.emm-folded .emm-advanced{display:none!important;}
       + '<button type="button" class="rv-btn rv-goal" title="薄弱句毕业所需的连顺轮次（点切换 2/3/4/5）">🎯 连顺 3 轮</button>'
       + '<span class="rv-stat rv-count"></span>'
       + '<button type="button" class="rv-btn rv-export" title="导出当前进度为 JSON 文件（换浏览器 / 换电脑迁移用）">💾 导出</button>'
+      + '<button type="button" class="rv-btn rv-anki" title="导出挖空卡 + 复述卡为 CSV（Anki / Excel 可直接导入）">🗂 Anki</button>'
       + '<button type="button" class="rv-btn rv-import" title="从 JSON 文件恢复进度">📥 导入</button>'
       + '<input type="file" class="rv-file-input" accept="application/json,.json" style="display:none;">'
       + '<button type="button" class="rv-btn rv-danger rv-reset">重置进度</button>';
@@ -622,6 +643,8 @@ body.emm-folded .emm-advanced{display:none!important;}
       if(typeof __emmDispatch === 'function') __emmDispatch('modeChange');
     });
     bar.querySelector('.rv-export').addEventListener('click', exportProgress);
+    // v2.29.0：Anki 导出按钮接线
+    if(bar.querySelector('.rv-anki')) bar.querySelector('.rv-anki').addEventListener('click', exportAnki);
     bar.querySelector('.rv-import').addEventListener('click', function(){
       bar.querySelector('.rv-file-input').click();
     });
@@ -776,6 +799,55 @@ body.emm-folded .emm-advanced{display:none!important;}
     var roundsN = (s.rounds || []).length;
     var srN = s.sr ? Object.keys(s.sr).length : 0;
     alert('已导出：' + a.download + '\n薄弱 ' + weakN + ' 句 / 已完成 ' + roundsN + ' 轮 / SM-2 记录 ' + srN + ' 句');
+  }
+  // v2.29.0 EMM_ANKI_V229：导出 Anki/CSV（挖空卡 + 复述卡）
+  // 卡片来源：① .sent 块（Front=中文翻译 .sent-zh，Back=英文原句 .sent-en 纯文本）
+  //          ② 挖空输入框 .emm-clz（Front=挖空句上下文，Back=答案词）；静态 ______ 形态一并覆盖
+  function csvCell(s){
+    s = String(s == null ? '' : s);
+    if(/[\t"\n\r]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+  function exportAnki(){
+    var cards = [];
+    // ① 复述卡：中文提示 → 英文原句
+    document.querySelectorAll('.sent').forEach(function(node){
+      var en = node.querySelector('.sent-en'), zh = node.querySelector('.sent-zh');
+      if(!en || !zh) return;
+      var back = en.textContent.replace(/\s+/g, ' ').trim();
+      var front = zh.textContent.replace(/\s+/g, ' ').trim();
+      if(back && front) cards.push([front, back]);
+    });
+    // ② 挖空卡：带空句子 → 答案
+    document.querySelectorAll('.emm-clz').forEach(function(inp){
+      var ans = inp.getAttribute('data-ans') || '';
+      var host = inp.closest('p, div, li');
+      var ctx = host ? host.textContent.replace(/\s+/g, ' ').trim() : '';
+      if(ans && ctx) cards.push([ctx, ans]);
+    });
+    // 静态挖空（______ 未被组件转换时）：从 .answer-toggle 段提取
+    document.querySelectorAll('details.answer-toggle').forEach(function(dt){
+      var ansDiv = dt.querySelector('.answer'); if(!ansDiv) return;
+      var p = dt.previousElementSibling, hops = 0;
+      while(p && hops < 3 && !/_{3,}/.test(p.textContent || '')){ p = p.previousElementSibling; hops++; }
+      if(!p) return;
+      var ctx = p.textContent.replace(/\s+/g, ' ').trim();
+      var ans = ansDiv.textContent.replace(/^答案：?/, '').trim();
+      if(ctx && ans) cards.push([ctx, ans]);
+    });
+    if(!cards.length){ alert('没有可导出的卡片（本篇似乎还没有逐句区或挖空内容）。'); return; }
+    var lines = ['#separator:Tab', '#html:false', '#notetype:Basic', '#columns:Front\tBack', '#deck:英语背诵::' + ((document.querySelector('h1') ? document.querySelector('h1').textContent.trim() : (document.title || 'plan')).slice(0, 30))];
+    cards.forEach(function(c){ lines.push(csvCell(c[0]) + '\t' + csvCell(c[1])); });
+    var blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    var stamp = new Date().toISOString().slice(0, 10);
+    var h1 = (document.querySelector('h1') ? document.querySelector('h1').textContent.trim() : (document.title || 'plan')).slice(0, 40);
+    a.href = url;
+    a.download = h1.replace(/[^\w\u4e00-\u9fa5-]/g, '_') + '-emm-anki-' + stamp + '.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    alert('已导出 ' + cards.length + ' 张卡片：' + a.download + '\n\nAnki 导入：文件 → 导入 → 选择此 CSV（分隔符已设为 Tab，映射第 1 列=Front、第 2 列=Back）。');
   }
   function importProgress(ev){
     var file = ev.target.files && ev.target.files[0];
@@ -1577,6 +1649,8 @@ body.emm-folded .emm-advanced{display:none!important;}
               inp.setAttribute('autocomplete', 'off'); inp.setAttribute('spellcheck', 'false');
               inp.style.width = Math.max(6, ans.length + 2) + 'ch';
               inp.setAttribute('aria-label', '第' + (bi + 1) + '空');
+              // 答案落 DOM 属性，供 Anki 导出读取（批改逻辑仍走闭包 ans，不受影响）
+              inp.setAttribute('data-ans', ans);
               var mk = document.createElement('span'); mk.className = 'emm-clz-mark';
               wireClz(inp, mk, ans);
               frag.appendChild(inp); frag.appendChild(mk);
@@ -2152,6 +2226,100 @@ body.emm-folded .emm-advanced{display:none!important;}
           try { localStorage.setItem('emm-onboarding-shown', '1'); } catch(e){}
           ob.remove();
         });
+      }
+    }
+  } catch(e){}
+})();
+</script>
+
+<script>
+/* ===== v2.29.0 EMM_QUICK3_V229 + EMM_CAP_V229：入门减负——3 步快背入口 + 能力探测横幅 ===== */
+(function(){
+  "use strict";
+  // 页脚版本戳唯一来源；与模板顶部注释保持一致（RELEASE-CHECKLIST：每份生成方案打开即见"我跑的是哪版"）
+  var EMM_VERSION = 'v2.29.0';
+
+  // 1. 页脚版本戳
+  try {
+    var ft = document.querySelector('footer');
+    if(ft && !/v\d+\.\d+\.\d+/.test(ft.textContent)){
+      var vs = document.createElement('span');
+      vs.className = 'emm-ver-stamp';
+      vs.textContent = ' · ' + EMM_VERSION;
+      ft.appendChild(vs);
+    }
+  } catch(e){}
+
+  // 2. 3 步快背入口卡（插在 header 之后、第 1 节之前；折叠态下同样首屏可见）
+  try {
+    var header = document.querySelector('header');
+    var wrap = document.querySelector('.wrap');
+    if(header && wrap && header.parentNode === wrap && !document.getElementById('emm-quick3')){
+      var q3 = document.createElement('div');
+      q3.className = 'emm-quick3';
+      q3.id = 'emm-quick3';
+      q3.innerHTML = '<h3>🚀 3 步快背（只想背完一篇？跟着走）</h3>'
+        + '<ol>'
+        + '<li><b>听读 3 遍</b>——到原文逐句区，看着 .sent-en 逐句跟读，听不懂的回第 13 节查词 <button type="button" class="q3-jump" data-q3="sent">跳到原文</button></li>'
+        + '<li><b>钩子链过 2 轮</b>——看第 15 节三层钩子链：盖住原文，一钩一句往外说，卡壳看 [锚词] <button type="button" class="q3-jump" data-q3="hook">跳到钩子链</button></li>'
+        + '<li><b>复述打卡毕业</b>——点复习条「▶ 开始本轮」评顺/卡，薄弱句连顺 3 轮即毕业 <button type="button" class="q3-jump" data-q3="round">跳到复习条</button></li>'
+        + '</ol>'
+        + '<div class="q3-more">只用这 3 步就能背完一篇；其余章节已折叠，点右上角「≡ 进阶内容」按需展开。卡壳急救技巧见第 16 节复述技巧包。</div>';
+      header.parentNode.insertBefore(q3, header.nextSibling);
+      function jumpTo(sel, fallbackText){
+        var el = document.querySelector(sel);
+        if(!el && fallbackText){
+          var h2s = document.querySelectorAll('h2');
+          for(var i = 0; i < h2s.length; i++){
+            if(h2s[i].textContent.indexOf(fallbackText) >= 0){ el = h2s[i]; break; }
+          }
+        }
+        if(el && typeof el.scrollIntoView === 'function') el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      q3.querySelectorAll('.q3-jump').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var t = btn.getAttribute('data-q3');
+          if(t === 'sent') jumpTo('.sent', '逐句');
+          else if(t === 'hook') jumpTo('.hook-chain', '记忆钩子');
+          else jumpTo('.rv-bar', '');
+        });
+      });
+    }
+  } catch(e){}
+
+  // 3. 能力探测横幅：TTS / 录音 / 存储不可用时显式告知 + 替代做法（替代静默 try/catch 降级）
+  try {
+    var dismissed = false;
+    try { dismissed = localStorage.getItem('emm-cap-dismissed') === '1'; } catch(e){}
+    if(!dismissed){
+      var caps = [];
+      var hasTTS = ('speechSynthesis' in window) && typeof window.speechSynthesis !== 'undefined';
+      var hasRec = typeof window.MediaRecorder !== 'undefined';
+      var hasGum = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+      var secure = (window.isSecureContext !== false); // file:// 在 Safari 下 getUserMedia 失败
+      var hasStore = (function(){ try { localStorage.setItem('emm-cap-probe', '1'); localStorage.removeItem('emm-cap-probe'); return true; } catch(e){ return false; } })();
+      if(!hasTTS) caps.push(['🎧 听写 / 朗读', '当前浏览器不支持语音合成（speechSynthesis），听写模式不发声', '替代：自己朗读 + 对照原文；用第 11 节挖空自测验证记效果。']);
+      if(!hasRec || !hasGum) caps.push(['🎙️ 影子跟读', '当前浏览器不支持录音（MediaRecorder / getUserMedia）', '替代：第 16 节「⑨ 录音自查法」——用手机录音机录背诵回放，对照原文挑 3 个卡壳点专练。']);
+      else if(!secure) caps.push(['🎙️ 影子跟读', '当前页面非安全上下文（本地 file:// 在 Safari 下禁用麦克风）', '替代：用 Chrome/Edge 打开，或起本地服务（如 npm run preview）再开；也可用手机录音机。']);
+      if(!hasStore) caps.push(['💾 进度保存', '当前浏览器不给本页存储（localStorage 被禁或无 file:// 存储权限）', '打卡 / 薄弱清单 / SM-2 进度无法保存：用完点「💾 导出」手动备份 JSON，换环境后「📥 导入」恢复。']);
+      if(caps.length){
+        var wrap2 = document.querySelector('.wrap');
+        if(wrap2){
+          var cap = document.createElement('div');
+          cap.className = 'emm-cap';
+          cap.id = 'emm-cap';
+          var html = '<h3>⚠️ 当前环境能力提示（' + caps.length + ' 项互动不可用）</h3><ul>';
+          caps.forEach(function(c){ html += '<li><b>' + c[0] + '</b>不可用：' + c[1] + '。<b>替代做法</b>：' + c[2] + '</li>'; });
+          html += '</ul><button type="button" class="cap-dismiss">知道了（本设备不再提示）</button>';
+          cap.innerHTML = html;
+          var q3El = document.getElementById('emm-quick3');
+          if(q3El && q3El.parentNode) q3El.parentNode.insertBefore(cap, q3El.nextSibling);
+          else wrap2.insertBefore(cap, wrap2.firstChild);
+          cap.querySelector('.cap-dismiss').addEventListener('click', function(){
+            try { localStorage.setItem('emm-cap-dismissed', '1'); } catch(e){}
+            cap.remove();
+          });
+        }
       }
     }
   } catch(e){}
