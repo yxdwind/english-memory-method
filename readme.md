@@ -85,9 +85,31 @@ npx english-memory-method
 若所在组织禁止 `irm | iex` / `curl | bash` 等远程执行，可改用可审计路径：
 
 1. **先下载、后审阅、再运行**：手动下载 `install.ps1` / `install.sh`，通读确认无异常后再本地执行；
-2. **校验和核对**：发布包附带 `SHA256SUMS`，安装前 `sha256sum -c SHA256SUMS` 验证完整性与来源；
-3. **离线包**：`git clone` 或下载仓库 tarball 后，直接拷至目标机离线运行安装脚本，全程不依赖 jsDelivr / raw.githubusercontent；
+2. **校验和核对**：每个 Release 附带 `english-memory-method-vX.Y.Z.zip` + `SHA256SUMS`，下载后先 `sha256sum -c SHA256SUMS` 验证 zip 本身，解压后包内还有一份 `SHA256SUMS` 可二次校验全部文件；
+3. **离线包安装**（全程不联网，适合内网 / GFW / 合规环境）：
+
+   ```bash
+   # Linux / macOS
+   sha256sum -c SHA256SUMS                                  # 校验 zip
+   unzip english-memory-method-vX.Y.Z.zip
+   cd english-memory-method-vX.Y.Z
+   sha256sum -c SHA256SUMS                                  # 校验包内 40 个文件
+   ./install.sh                                             # 自动本地模式：从包内拷贝
+   ```
+
+   ```powershell
+   # Windows（PowerShell 5.1+）
+   sha256sum -c SHA256SUMS
+   Expand-Archive english-memory-method-vX.Y.Z.zip -DestinationPath .
+   cd english-memory-method-vX.Y.Z
+   sha256sum -c SHA256SUMS
+   .\install.ps1                                            # 自动本地模式
+   ```
+
+   安装器检测到自身位于发布包内（同目录有 `SKILL.md` / `assets/`）即自动走本地拷贝；加 `--remote`（ps1 用 `-Remote`）可强制联网安装；
 4. **npm 替代**：`npx english-memory-method`（走 npm 官方源，可配合企业私有 registry）。
+
+> 维护者：`npm run build:release` 本地产出上述 zip + 双层 SHA256SUMS（内置发布门禁：版本一致性 + 副本同一性，不过则拒绝打包）。
 
 发版一致性要求见 [RELEASE-CHECKLIST.md](RELEASE-CHECKLIST.md)。
 
@@ -189,7 +211,7 @@ v2 把钩子焊成链：每一环由上一环"推"出来，**能被逻辑推出�
 
 **入门减负 + L2/L3 兜底**（v2.29.0）
 
-**v2.29.0**：🚀 首屏「3 步快背」极简入口卡（听读→钩子链→复述打卡，带跳转，其余章节折叠）；⚠️ 能力探测横幅（TTS/录音/存储不可用时显式告知 + 替代做法，不再静默降级）；🗂 Anki/CSV 导出（挖空卡 + 复述卡一键进 Anki）；🏛 记忆宫殿路线引导（首次使用自定义 25 站动线，localStorage 持久化、所有方案通用）；L2/L3 平台统一交付「Markdown 精简版」（方法论内核不缩水，交互组件给口头替代法）；图例条补逻辑桥符号（⇒↔→＋:）；修复 v2.18 折叠样式被误嵌套进移动端媒体查询（桌面端失效）；模板页脚自动版本戳；修复 `skills/` 嵌套 SKILL.md 漏同步造成的双源分叉。锚点 20 组。
+**v2.29.0**：🚀 首屏「3 步快背」极简入口卡（听读→钩子链→复述打卡，带跳转，其余章节折叠）；⚠️ 能力探测横幅（TTS/录音/存储不可用时显式告知 + 替代做法，不再静默降级）；🗂 Anki/CSV 导出（挖空卡 + 复述卡一键进 Anki）；🏛 记忆宫殿路线引导（首次使用自定义 25 站动线，localStorage 持久化、所有方案通用）；L2/L3 平台统一交付「Markdown 精简版」（方法论内核不缩水，交互组件给口头替代法）；📦 离线发布包（`npm run build:release` 产出 zip + 双层 SHA256SUMS，安装器新增本地模式，全程可离线审计安装）；图例条补逻辑桥符号（⇒↔→＋:）；修复 v2.18 折叠样式被误嵌套进移动端媒体查询（桌面端失效）；模板页脚自动版本戳；修复 `skills/` 嵌套 SKILL.md 漏同步造成的双源分叉。锚点 20 组。
 
 **工程收尾**（v2.28.2）
 

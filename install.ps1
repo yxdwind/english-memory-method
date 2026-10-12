@@ -10,6 +10,12 @@
   Install to specific platform(s), comma-separated:
     ./install.ps1 -Target "claude,codex,trae"
 
+  Offline bundle (unzip the release package, then run the installer inside it):
+    Expand-Archive english-memory-method-vX.Y.Z.zip -DestinationPath .
+    cd english-memory-method-vX.Y.Z
+    ./install.ps1                 # auto local mode: copies from the bundle, no network
+    ./install.ps1 -Remote         # force download from GitHub / jsDelivr
+
   Supported platform aliases:
     autoclaw, openclaw, agents, claude, codex, trae, lingma, comate,
     codebuddy, windsurf, continue, roo, kimi, qoder, qwen, workbuddy, minimax
@@ -17,7 +23,7 @@
   Install to a custom directory:
     ./install.ps1 -Target "D:\my-skills"
 #>
-param([string]$Target = "")
+param([string]$Target = "", [switch]$Remote)
 
 $ErrorActionPreference = "Stop"
 try {
@@ -36,7 +42,19 @@ $Sources = @(
   "https://cdn.jsdelivr.net/gh/$Repo@$Branch"
 )
 
+# 本地模式：脚本所在目录即离线发布包根（含 SKILL.md/assets/）→ 直接拷贝，全程不联网
+# （irm | iex 方式运行时 $PSScriptRoot 为空，自动退回联网下载）
+$ScriptDir = $PSScriptRoot
+
 function Fetch-File([string]$rel, [string]$out) {
+  $local = $null
+  if ($ScriptDir) { $local = Join-Path $ScriptDir ($rel -replace "/", "\") }
+  if (-not $Remote -and $local -and (Test-Path $local)) {
+    New-Item -ItemType Directory -Force -Path (Split-Path $out -Parent) | Out-Null
+    Copy-Item -Path $local -Destination $out -Force
+    Write-Host "  [OK] $rel  <- local bundle"
+    return $true
+  }
   foreach ($s in $Sources) {
     try {
       Invoke-WebRequest -Uri "$s/$rel" -OutFile $out -UseBasicParsing -TimeoutSec 25

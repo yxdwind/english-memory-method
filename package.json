@@ -6,9 +6,10 @@
     "english-memory-method": "bin/install.mjs"
   },
   "scripts": {
-    "test": "node tests/smoke.test.js && node tests/fold-runtime.test.mjs && node tests/shadow-runtime.test.mjs && node tests/sr-runtime.test.mjs && node tests/research-schema.test.mjs && node tests/today-segment.test.mjs && node tests/export-import.test.mjs && node tests/qa-v222.test.mjs && node tests/qa-v223.test.mjs && node tests/qa-v224.test.mjs && node tests/qa-v225.test.mjs && node tests/qa-v226.test.mjs && node tests/browser-compat.test.mjs && node tests/e2e.test.mjs && node tests/qa-v229.test.mjs",
+    "test": "node tests/smoke.test.js && node tests/fold-runtime.test.mjs && node tests/shadow-runtime.test.mjs && node tests/sr-runtime.test.mjs && node tests/research-schema.test.mjs && node tests/today-segment.test.mjs && node tests/export-import.test.mjs && node tests/qa-v222.test.mjs && node tests/qa-v223.test.mjs && node tests/qa-v224.test.mjs && node tests/qa-v225.test.mjs && node tests/qa-v226.test.mjs && node tests/browser-compat.test.mjs && node tests/e2e.test.mjs && node tests/qa-v229.test.mjs && node tests/release-build.test.mjs",
     "verify": "node bin/verify-plan.mjs",
     "verify:fixture": "node bin/verify-plan.mjs tests/fixtures/fixture-success.html --no-color",
+    "build:release": "node bin/build-release.mjs",
     "version-check": "node bin/version-check.mjs",
     "tag": "node bin/tag.mjs",
     "build-samples": "node bin/build-samples.mjs",

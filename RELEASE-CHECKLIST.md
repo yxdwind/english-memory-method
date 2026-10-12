@@ -17,6 +17,7 @@
 - [ ] **每份生成方案页脚渲染版本戳**(与模板顶部版本一致,如 `v2.28.2`),用户打开即见"我跑的是哪版"。
 - [ ] **`version-check`(9 组一致性检查)全绿**:含 `plugin.json` 与主副本比对、`assets/` 与 SKILL 版本比对、记忆库 `EMM_*` 锚点比对。
 - [ ] **多源产物比对**:`git` 主副本、`npm` 发布包、`插件市场` 包三者的 `SKILL.md` + `assets/` 字节一致(建议扩展 `bin/verify-plan.mjs` 做产物 diff)。
+- [ ] **离线发布附件**:`npm run build:release` 产出 `dist/english-memory-method-vX.Y.Z.zip` + `dist/SHA256SUMS`(门禁不过会拒绝打包),两者作为附件上传 GitHub Release;抽查 `sha256sum -c` 双层校验通过、包内 `install.sh` 权限 0755。
 - [ ] **变更日志**:本次改动已写入 `CHANGELOG.md`(保留历史 bug 修复记录与 `EMM_*` 自检锚点,便于回溯)。
 - [ ] **国内可达性**:安装脚本源(jsDelivr / raw.githubusercontent)在目标网络下可下载;否则提供镜像或离线包。
 

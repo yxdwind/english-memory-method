@@ -7,6 +7,11 @@
 # Install to specific platform(s), comma-separated:
 #   ./install.sh claude,codex,trae
 #
+# Offline bundle (unzip the release package, then run the installer inside it):
+#   unzip english-memory-method-vX.Y.Z.zip && cd english-memory-method-vX.Y.Z
+#   ./install.sh            # auto local mode: copies from the bundle, no network
+#   ./install.sh --remote   # force download from GitHub / jsDelivr
+#
 # Supported aliases:
 #   autoclaw, openclaw, agents, claude, codex, trae, lingma, comate,
 #   codebuddy, windsurf, continue, roo, kimi, qoder, qwen, workbuddy, minimax
@@ -19,11 +24,22 @@ SKILL="english-memory-method"
 RAW="https://raw.githubusercontent.com/$REPO/$BRANCH"
 FILES=("SKILL.md" "assets/plan-template.html")
 
+# 本地模式：脚本所在目录即离线发布包根（含 SKILL.md/assets/）→ 直接拷贝，全程不联网
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+FORCE_REMOTE=0
+if [ "${1:-}" = "--remote" ] || [ "${1:-}" = "-r" ]; then FORCE_REMOTE=1; shift; fi
+
 # download sources with fallback: raw -> jsdelivr CDN (China-friendly)
 SOURCES=("https://raw.githubusercontent.com/$REPO/$BRANCH" "https://cdn.jsdelivr.net/gh/$REPO@$BRANCH")
 
 fetch() {
   local rel="$1" out="$2"
+  if [ "$FORCE_REMOTE" != "1" ] && [ -f "$SCRIPT_DIR/$rel" ]; then
+    mkdir -p "$(dirname "$out")"
+    cp "$SCRIPT_DIR/$rel" "$out"
+    echo "  [OK] $rel  <- local bundle"
+    return 0
+  fi
   for s in "${SOURCES[@]}"; do
     if curl -fsSL --max-time 25 "$s/$rel" -o "$out"; then
       echo "  [OK] $rel  <- $s"

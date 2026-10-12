@@ -76,9 +76,31 @@ npx english-memory-method
 If your org forbids remote execution (`irm | iex` / `curl | bash`), use the auditable path instead:
 
 1. **Download, review, then run**: manually fetch `install.ps1` / `install.sh`, read it through, then run locally.
-2. **Checksum verification**: release bundles ship a `SHA256SUMS`; verify with `sha256sum -c SHA256SUMS` before installing.
-3. **Offline bundle**: `git clone` or download the repo tarball, copy to the target machine, and run the installer fully offline — no jsDelivr / raw.githubusercontent dependency.
+2. **Checksum verification**: every release ships `english-memory-method-vX.Y.Z.zip` + `SHA256SUMS`. Run `sha256sum -c SHA256SUMS` to verify the zip itself; after unzipping, a second `SHA256SUMS` inside the bundle covers all ~40 files.
+3. **Offline bundle install** (fully air-gapped — intranet / GFW / compliance friendly):
+
+   ```bash
+   # Linux / macOS
+   sha256sum -c SHA256SUMS                                  # verify the zip
+   unzip english-memory-method-vX.Y.Z.zip
+   cd english-memory-method-vX.Y.Z
+   sha256sum -c SHA256SUMS                                  # verify all bundled files
+   ./install.sh                                             # auto local mode: copies from the bundle
+   ```
+
+   ```powershell
+   # Windows (PowerShell 5.1+)
+   sha256sum -c SHA256SUMS
+   Expand-Archive english-memory-method-vX.Y.Z.zip -DestinationPath .
+   cd english-memory-method-vX.Y.Z
+   sha256sum -c SHA256SUMS
+   .\install.ps1                                            # auto local mode
+   ```
+
+   The installer detects that it sits inside a release bundle (a sibling `SKILL.md` / `assets/`) and copies locally; pass `--remote` (ps1: `-Remote`) to force the network path.
 4. **npm alternative**: `npx english-memory-method` (uses the npm registry; can point at a private enterprise registry).
+
+> Maintainers: `npm run build:release` produces the zip + dual SHA256SUMS locally, behind a release gate (version consistency + copy identity — packaging refuses to run if either fails).
 
 Release consistency rules: see [RELEASE-CHECKLIST.md](RELEASE-CHECKLIST.md).
 
@@ -184,7 +206,7 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 **Onboarding relief + L2/L3 fallback** (v2.29.0)
 
-**v2.29.0**: 🚀 first-screen "3-Step Quick Memo" entry card (listen → hook chain → retell check-in, with jump links; everything else stays folded); ⚠️ capability banner (when TTS / recording / storage are unavailable, the affected features and workarounds are stated explicitly instead of failing silently); 🗂 Anki/CSV export (cloze cards + retell cards, one click into Anki); 🏛 memory-palace route onboarding (define your own 25-station route on first use, persisted in localStorage, shared across all plans); L2/L3 platforms now deliver a unified "Markdown Lite" plan (methodology core intact, interactive components replaced by verbal workarounds); legend row gains logic-bridge symbols (⇒↔→＋:); fixed v2.18 fold CSS accidentally nested inside the v2.16 mobile media query (no styles on desktop); template footer auto version stamp; fixed the `skills/` nested SKILL.md copy drift (dual-source fork). 20 anchors.
+**v2.29.0**: 🚀 first-screen "3-Step Quick Memo" entry card (listen → hook chain → retell check-in, with jump links; everything else stays folded); ⚠️ capability banner (when TTS / recording / storage are unavailable, the affected features and workarounds are stated explicitly instead of failing silently); 🗂 Anki/CSV export (cloze cards + retell cards, one click into Anki); 🏛 memory-palace route onboarding (define your own 25-station route on first use, persisted in localStorage, shared across all plans); L2/L3 platforms now deliver a unified "Markdown Lite" plan (methodology core intact, interactive components replaced by verbal workarounds); 📦 offline release bundle (`npm run build:release` builds a deterministic zip + dual SHA256SUMS; installers gain a local mode for fully auditable air-gapped installs); legend row gains logic-bridge symbols (⇒↔→＋:); fixed v2.18 fold CSS accidentally nested inside the v2.16 mobile media query (no styles on desktop); template footer auto version stamp; fixed the `skills/` nested SKILL.md copy drift (dual-source fork). 20 anchors.
 
 **Audit fixes** (v2.28.1)
 

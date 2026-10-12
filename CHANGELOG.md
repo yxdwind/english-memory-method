@@ -10,6 +10,7 @@
 - **Anki/CSV 导出（EMM_ANKI_V229）**：复习条新增「🗂 Anki」按钮，导出挖空卡（带空句→答案）+ 复述卡（中文提示→英文原句）为带 Anki 头（#separator:Tab / #notetype:Basic）的 CSV；`buildCloze` 给输入框加 `data-ans` 属性供导出读取。
 - **记忆宫殿路线引导（EMM_PALACE_V229）**：首次打开自动引导定义个人 25 站动线（每行一站名，存 localStorage，之后所有方案自动套用），第 17 节常驻「重新定义路线」入口，可一键恢复模板默认；回应评估 B.2「宫殿本身是前置元技能」。
 - **L2/L3 Markdown 精简版规范**：SKILL.md 新增「平台能力分级与 Markdown 精简版」章节——L2/L3 环境禁交残缺 HTML，改交精简版（3 步快背 + 逐句钩子表 + 三层钩子链 + 复述阶梯 + 挖空 + 三遍法/艾宾浩斯表），交互类组件给口头替代法；platforms/README.md 加能力差异声明。回应评估 A.2「29% 平台体验缩水」。
+- **离线发布包（可审计安装闭环）**：新增 `bin/build-release.mjs`（`npm run build:release`）——白名单收集 41 个发布文件，过发布门禁（版本一致性 + 副本同一性）后产出确定性 ZIP（store 模式 + Unix 权限位，同输入同字节）+ **双层 SHA256SUMS**（包内文件级 + dist 级 zip 哈希）；install.sh / install.ps1 新增**本地模式**（检测到自身位于发布包内即 `cp` 本地文件，全程不联网，`--remote` / `-Remote` 可强制联网）——readme 承诺过的「tarball 离线安装」路径此前实际断裂（安装器只会 curl），本次真正接通。回应评估 A.2 安全安装 + GFW。
 - **图例补逻辑桥符号**：原文区图例条与 SKILL.md 标注规范同步加入 ⇒因果 / ↔转折 / →递进 / ＋并列 / :举例，降低非语言学用户的门槛。
 - **修复**：v2.18 首屏折叠/on-boarding CSS 被误嵌套在 v2.16 的 `max-width:720px` 媒体查询内（桌面端折叠按钮与引导卡实际无样式）；模板页脚新增自动版本戳注入（JS，`v2.29.0`，RELEASE-CHECKLIST「版本水印」落地）。
 - **工程卫生**：`skills/english-memory-method/SKILL.md` 漏同步造成 version-check「主副本一致性」失败（双源真相分叉，v2.28.3 restructure 引入）——已同步；CHANGELOG 条目格式统一为 `## [X.Y.Z]`（此前 version-check 与 e2e 的格式校验实际失效）；version-check 锚点表登记 EMM_QUICK3_V229 / EMM_CAP_V229 / EMM_ANKI_V229 / EMM_PALACE_V229（现 20 组锚点）；新增 `tests/qa-v229.test.mjs`（38 项运行时断言）；fold-runtime 改按锚点定位脚本块（不再假设"最后一个 script 块"——v2.29.0 追加新块曾致其失效，已修）。
