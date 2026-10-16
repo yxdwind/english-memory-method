@@ -331,10 +331,11 @@ v2 把钩子焊成链：每一环由上一环"推"出来，**能被逻辑推出�
 - **L3 手动跟随**：把 `SKILL.md` 内容粘贴到自定义指令，体验取决于平台对长指令的支持程度。
 
 ### 浏览器与设备依赖
-自测、听写、影子跟读依赖浏览器的 `speechSynthesis` / `MediaRecorder` / `getUserMedia`：
+自测、听写、影子跟读依赖浏览器的 `speechSynthesis` / `MediaRecorder` / `getUserMedia` / `SpeechRecognition`：
 - Firefox 的 TTS 语音列表可能为空 → 听写/朗读可能不发声（已静默降级为手动模式）。
 - iOS < 14.1 不支持 `MediaRecorder` → 影子跟读录音不可用（已降级为手动自评）。
 - Safari 以 `file://` 打开本地方案时，`getUserMedia` 需 HTTPS（localhost 除外）→ 录音不可用（已降级）。
+- 影子跟读「🤖 自动评分」依赖 `SpeechRecognition`（Chrome / Edge 桌面版；识别在云端进行）——Firefox / Safari 无此 API，自动降级为手动自评。
 
 进度保存在浏览器 `localStorage`：**按浏览器与 Profile 隔离**——在 Chrome 打卡后换 Edge（或另一台电脑）打开方案，进度显示为空，这不是进度丢失；官方迁移路径 = 方案页「💾 导出 / 📥 导入」JSON。Safari / iOS 配额较小，方案堆积过多可能触发写入失败（已 `try/catch` 兜底，建议定期导出备份）。**推荐固定用一个桌面浏览器完成全部打卡；移动端功能受限。**
 

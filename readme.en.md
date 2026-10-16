@@ -338,10 +338,11 @@ Companion methods (same series): the 5-step intensive-listening diagnosis, and t
 - **L3 manual**: paste `SKILL.md` into custom instructions; quality depends on how well the platform supports long instructions.
 
 ### Browser & device dependencies
-Self-test, dictation, and shadowing rely on `speechSynthesis` / `MediaRecorder` / `getUserMedia`:
+Self-test, dictation, and shadowing rely on `speechSynthesis` / `MediaRecorder` / `getUserMedia` / `SpeechRecognition`:
 - Firefox's TTS voice list may be empty → dictation / playback may be silent (degrades silently to manual).
 - iOS < 14.1 lacks `MediaRecorder` → shadowing recording unavailable (degrades to manual self-judging).
 - Safari opening a local plan via `file://` requires HTTPS for `getUserMedia` (except localhost) → recording unavailable (degrades).
+- Shadowing's "🤖 auto-assess" relies on `SpeechRecognition` (desktop Chrome / Edge; recognition runs in the cloud) — Firefox / Safari lack the API and degrade to manual self-judging.
 
 Progress is saved in the browser `localStorage`: **it is isolated per browser and per profile** — if you check in on Chrome and then open the plan in Edge (or on another machine), progress shows empty; that is not data loss. The official migration path is the plan page's 💾/📥 JSON export/import. Safari / iOS have smaller quotas and may fail to write when many plans accumulate (handled with `try/catch`; export backups regularly). **Recommended: stick to one desktop browser for all check-ins; mobile is limited.**
 
@@ -350,7 +351,7 @@ Progress is saved in the browser `localStorage`: **it is isolated per browser an
 - Install sources default to `raw.githubusercontent.com` and jsDelivr; if your network is unreliable, use a reachable mirror or an offline package.
 
 ### Output quality depends on the host model
-Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 605 tests cover the **template and runtime**, not the quality of any specific model's generated content.
+Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 613 tests cover the **template and runtime**, not the quality of any specific model's generated content.
 
 ### Who this is NOT for
 - Absolute beginners who want a 5-minute quick-memorize flow (this method is methodology-heavy with a higher onboarding cost).
