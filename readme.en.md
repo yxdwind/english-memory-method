@@ -7,7 +7,7 @@
 Paste any English article, and it produces a **17-section longform plan (15 basic / 16 speech / 17 longform) (speeches: 16 sections incl. skeleton)** (self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.29.1-blue)
+![Version](https://img.shields.io/badge/version-2.30.0-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-15-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -204,6 +204,10 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 > Full version history (including historical bug fixes and CI self-check anchors `EMM_*`) has been moved to [CHANGELOG.md](CHANGELOG.md).
 
+**Teaching depth trio** (v2.30.0)
+
+**v2.30.0**: 🎙 shadowing gains "🤖 auto-assess" — browser speech recognition (Chrome/Edge) listens to your reading, aligns the transcript word-by-word via LCS and auto-fills ✓/✗ marks (manually correctable before saving; ≥25% wrong flows into the weak list; unsupported browsers fall back to manual self-judging); 📚 library gains a "📅 Today across plans" strip — per-plan new-learning progress / due sentences / weak counts with time estimates and a stagger suggestion when more than 3 plans pile up; 📖 vocabulary notebook — anchor words from weak sentences become candidates, confirm to enroll, each word gets its own SM-2 schedule (`emm-vocab:v1`) and graduates after streaks, closing the loop: sentence (plan) → article (shelf) → word (notebook); fixed a latent v2.19 bug (ReferenceError when saving the final sentence in shadowing). Total tests **605**.
+
 **Quality-gate hardening** (v2.29.1)
 
 **v2.29.1**: `bin/verify-plan.mjs` (six hard rules) is now Step 0 of SKILL.md's "Content Validation" — a non-zero exit code blocks delivery (the tool existed but the generation flow never referenced it; validation relied on manual discipline); cross-browser progress isolation documented — localStorage is scoped per browser/profile, so empty progress in another browser is not data loss, and the official migration path is the plan page's 💾/📥 JSON export/import (new entries in docs/CROSS-BROWSER.md + a fixed hint under the library header); badge `skill_sections-13` → **15** fixed (sections have been 15/16/17 for a while); readme.en.md version-history grouping order fixed (v2.28.2 before v2.28.1).
@@ -329,7 +333,7 @@ Progress is saved in the browser `localStorage`: **it is isolated per browser an
 - Install sources default to `raw.githubusercontent.com` and jsDelivr; if your network is unreliable, use a reachable mirror or an offline package.
 
 ### Output quality depends on the host model
-Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 472 tests cover the **template and runtime**, not the quality of any specific model's generated content.
+Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 605 tests cover the **template and runtime**, not the quality of any specific model's generated content.
 
 ### Who this is NOT for
 - Absolute beginners who want a 5-minute quick-memorize flow (this method is methodology-heavy with a higher onboarding cost).

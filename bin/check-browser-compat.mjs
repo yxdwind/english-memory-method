@@ -27,6 +27,7 @@ const MATRIX = {
   'speechSynthesis':            { ch: { v: 33, s: '✅' }, ff: { v: 49, s: '⚠ voices 列表可能为空/不全' }, sf: { v: 7, s: '✅' }, ie: { v: 79, s: '✅' }, notes: 'Firefox voices 数组可能为空，UI 需要 try/catch' },
   'SpeechSynthesisUtterance':  { ch: { v: 33, s: '✅' }, ff: { v: 49, s: '⚠' }, sf: { v: 7, s: '✅' }, ie: { v: 79, s: '✅' }, notes: '同 speechSynthesis' },
   'MediaRecorder':              { ch: { v: 47, s: '✅' }, ff: { v: 25, s: '✅' }, sf: { v: 14.1, s: '⚠ iOS 14.1+ 才支持；老 iOS 无' }, ie: { v: 79, s: '✅' }, notes: 'Safari 旧版本不支持 → 优雅降级到手动自评（v2.19 已实现）' },
+  'SpeechRecognition':          { ch: { v: 33, s: '⚠ 需网络' }, ff: { s: '✗' }, sf: { s: '✗' }, ie: { v: 79, s: '⚠ 需网络' }, notes: 'webkit 前缀；Chrome/Edge 走云端识别（v2.30 自动评分用）；不支持时降级手动自评（已实现）' },
   'getUserMedia':               { ch: { v: 53, s: '✅' }, ff: { v: 36, s: '✅' }, sf: { v: 11, s: '✅ HTTPS only' }, ie: { v: 12, s: '✅' }, notes: '必须 HTTPS 或 localhost（除 Chrome 允许 file://）' },
   'navigator.mediaDevices':     { ch: { v: 53, s: '✅' }, ff: { v: 36, s: '✅' }, sf: { v: 11, s: '✅' }, ie: { v: 12, s: '✅' }, notes: 'getUserMedia 同步检查' },
   'Blob':                       { ch: { v: 20, s: '✅' }, ff: { v: 13, s: '✅' }, sf: { v: 6, s: '✅' }, ie: { v: 12, s: '✅' }, notes: '全部支持' },

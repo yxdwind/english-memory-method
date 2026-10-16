@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  English Memory Method · 个人记忆库模板 (v2.24.0 · EMM_UX_V224 · v2.28.1/v2.28.2 微修)
+  English Memory Method · 个人记忆库模板 (v2.30.0 当前生效：今日全局排期条 + 跨方案生词本；历史：v2.24.0 EMM_UX_V224 · v2.28.x 微修)
   v2.28.1 微修：文章卡显示计划天数（days 原为死数据）；轻刷结算句号缺省补「?」；
   新增脚本截断交付校验（SKILL.md 校验第 5 条：填充后全文「脚本闭合标签」计数必须为 1——
   数据里的闭合序列一律写成 <\/ 转义形式，否则解析器提前闭合脚本、整页 JS 静默挂掉）。
@@ -43,6 +43,31 @@
   .lib-bar i{display:block;height:100%;background:var(--ok);width:0;}
   .lib-bar i.hasweak{background:#fbbf24;}
   .lib-flag{font-size:12px;color:#b45309;background:#fffbeb;border:1px solid #fde68a;border-radius:8px;padding:2px 8px;display:inline-block;}
+  /* v2.30 今日全局 + 生词本 */
+  .lib-todayall{background:#fff;border:1px solid var(--accent-border);border-left:4px solid #7c3aed;border-radius:12px;padding:12px 18px;margin:0 0 16px;font-size:13.5px;}
+  .lib-todayall h3{margin:0 0 6px;font-size:14.5px;color:#5b21b6;}
+  .lib-todayall .ta-row{display:flex;flex-wrap:wrap;gap:6px;align-items:baseline;padding:4px 0;border-top:1px dashed var(--line);}
+  .lib-todayall .ta-flag{display:inline-block;border-radius:8px;padding:1px 8px;font-size:12px;font-weight:600;}
+  .lib-todayall .ta-new{background:#eff6ff;color:#1d4ed8;border:1px solid #bfdbfe;}
+  .lib-todayall .ta-due{background:#fffbeb;color:#92400e;border:1px solid #fcd34d;}
+  .lib-todayall .ta-weak{background:#fef2f2;color:#b91c1c;border:1px solid #fecaca;}
+  .lib-todayall .ta-time{color:var(--muted);font-size:12.5px;}
+  .lib-todayall .ta-empty{color:var(--muted);}
+  .lib-vocab{background:#fff;border:1px solid var(--accent-border);border-radius:14px;padding:18px 22px;margin-top:18px;}
+  .lib-vocab h3{margin:0 0 4px;font-size:16px;color:#4c1d95;}
+  .lib-vocab .vc-sub{font-size:12.5px;color:var(--muted);margin-bottom:10px;}
+  .lib-vocab .vc-actions{display:flex;flex-wrap:wrap;gap:8px;margin:8px 0;}
+  .lib-vocab .vc-btn{cursor:pointer;border:1px solid #7c3aed;background:#fff;color:#6d28d9;border-radius:8px;padding:5px 12px;font-size:13px;font-weight:600;font-family:inherit;}
+  .lib-vocab .vc-btn:hover{background:var(--accent-bg);}
+  .lib-vocab .vc-word{display:flex;flex-wrap:wrap;gap:8px;align-items:baseline;padding:7px 0;border-top:1px dashed var(--line);}
+  .lib-vocab .vc-w{font-weight:700;color:#4c1d95;font-size:14.5px;}
+  .lib-vocab .vc-src{font-size:12.5px;color:var(--muted);}
+  .lib-vocab .vc-en{font-size:12.5px;color:#374151;width:100%;font-style:italic;}
+  .lib-vocab .vc-mini{cursor:pointer;border:1px solid #10b981;background:#fff;color:#047857;border-radius:6px;padding:2px 10px;font-size:12.5px;font-weight:600;font-family:inherit;}
+  .lib-vocab .vc-mini.vc-no{border-color:#ef4444;color:#b91c1c;}
+  .lib-vocab .vc-mini.vc-del{border-color:#d1d5db;color:#6b7280;}
+  .lib-vocab .vc-grad{font-size:12px;color:#065f46;background:#ecfdf5;border:1px solid #a7f3d0;border-radius:8px;padding:1px 8px;}
+  @media print{.lib-todayall,.lib-vocab{display:none !important;}}
   .lib-card .lc-weak{font-size:12.5px;color:#b91c1c;}
   .lib-card .lc-btns{display:flex;gap:8px;margin-top:auto;padding-top:6px;}
   .lib-btn{cursor:pointer;flex:1;border:1px solid #10b981;background:#fff;color:#047857;border-radius:8px;padding:6px 10px;font-size:13.5px;font-weight:600;text-align:center;text-decoration:none;}
@@ -116,6 +141,7 @@
   <input type="text" class="lib-search" placeholder="🔍 搜索：标题 / 钩子 / 句子关键词…">
 </header>
 <p class="lib-tip">💡 进度存在<b>当前浏览器</b>的 localStorage 里（按浏览器 / Profile 隔离）：换浏览器打开显示为空 ≠ 进度丢失，迁移用方案页「💾 导出 / 📥 导入」JSON。</p>
+<div class="lib-todayall" id="emm-lib-todayall" hidden></div>
 <div class="lib-shelf" id="emm-lib-shelf"></div>
 <div class="lib-empty" id="emm-lib-empty" hidden>
   <p><b>记忆库还是空的。</b></p>
@@ -123,6 +149,7 @@
   <p>然后对 AI 说「<b>更新记忆库</b>」，它会把所有方案汇进这里。</p>
 </div>
 <!-- ② 轻刷会话面板（组件运行时填充，无需手写） -->
+<div class="lib-vocab" id="emm-lib-vocab" hidden></div>
 <div class="lib-session" id="emm-lib-session" hidden></div>
 <!-- ③ 自检报告容器（?check=1 时由组件注入） -->
 <footer>English teacher · 个人记忆库 · 进度实时读取自本机浏览器 · 打卡与薄弱清单以原方案为准</footer>
@@ -267,6 +294,209 @@
     });
   }
   function headerSub(){ return document.querySelector('header .lib-sub'); }
+
+  /* ===== v2.30 EMM_TODAYALL_V230 + EMM_VOCAB_V230: 今日全局排期条 + 跨方案生词本（词级 SM-2）=====
+     排期条聚合各篇 emm-progress:* 的到期/进行状态（精确到段的排期仍在各方案页）；
+     生词本从薄弱句锚词提取候选，逐词确认入本，每词独立 SM-2（与方案组件 srNext 同参数：
+     ef 初始 2.5，✓=q4 / ✗=q2），存 emm-vocab:v1；reps≥2 且 interval≥7 视为毕业。 */
+  function srNextWord(q, prev){
+    prev = prev || {ef: 2.5, interval: 0, reps: 0, due: '', lastQ: null};
+    var ef = prev.ef || 2.5;
+    var reps = prev.reps || 0;
+    var interval;
+    if(q < 3){ reps = 0; interval = 1; }
+    else {
+      if(reps === 0) interval = 1;
+      else if(reps === 1) interval = 6;
+      else interval = Math.max(1, Math.round((prev.interval || 1) * ef));
+      reps = reps + 1;
+    }
+    ef = ef + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
+    if(ef < 1.3) ef = 1.3;
+    var d = new Date(); d.setDate(d.getDate() + interval);
+    var due = d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+    return {ef: ef, interval: interval, reps: reps, due: due, lastQ: q};
+  }
+  function vocabLoad(){
+    try { return JSON.parse(localStorage.getItem('emm-vocab:v1') || '{}'); } catch(e){ return {}; }
+  }
+  function vocabSave(v){ try { localStorage.setItem('emm-vocab:v1', JSON.stringify(v)); } catch(e){} }
+  function isGraduated(w){ return (w.reps || 0) >= 2 && (w.interval || 0) >= 7; }
+
+  function buildTodayAll(){
+    var box = document.getElementById('emm-lib-todayall');
+    if(!box) return;
+    if(!LIB.articles.length){ box.hidden = true; return; }
+    var today = todayDateStr();
+    var rows = [];
+    LIB.articles.forEach(function(a){
+      var s = readProgress(a);
+      if(!s) return;
+      var dueN = 0, weakN = 0;
+      Object.keys(s.sr || {}).forEach(function(k){ var w = s.sr[k] || {}; if(w.due && w.due <= today) dueN++; });
+      weakN = Object.keys(s.weak || {}).length;
+      var flags = [], mins = 0;
+      var dayN = s.start ? (dayDiff(s.start) + 1) : 0;
+      var learning = !!(s.start && a.days && dayN >= 1 && dayN <= a.days);
+      if(learning){ flags.push('<span class="ta-flag ta-new">▶ 新学中 Day ' + dayN + '/' + a.days + '</span>'); mins += 15; }
+      if(dueN){ flags.push('<span class="ta-flag ta-due">🔁 到期 ' + dueN + ' 句</span>'); mins += Math.min(10, dueN); }
+      if(weakN){ flags.push('<span class="ta-flag ta-weak">🎯 薄弱 ' + weakN + '</span>'); }
+      if(!flags.length) return;
+      rows.push({ title: a.title || a.topic, file: a.file, flags: flags.join(' '), mins: mins, due: dueN, learning: learning });
+    });
+    rows.sort(function(x, y){ return (y.due - x.due) || ((y.learning ? 1 : 0) - (x.learning ? 1 : 0)) || (y.mins - x.mins); });
+    var totalMin = 0; rows.forEach(function(r){ totalMin += r.mins; });
+    var html = '<h3>📅 今日全局（跨篇排期一览 · 精确到段的排期在各方案页「📅 今日任务」卡）</h3>';
+    if(!rows.length){
+      html += '<div class="ta-empty">今天没有到期的复习——背一篇新的，或休息 🌴。</div>';
+    } else {
+      rows.forEach(function(r){
+        html += '<div class="ta-row"><a href="' + esc(r.file || '') + '"><b>《' + esc(r.title) + '》</b></a>' + r.flags
+          + '<span class="ta-time">预计 ~' + r.mins + ' 分钟</span></div>';
+      });
+      var load = rows.length > 3 ? ' · ⚠ 今天有 ' + rows.length + ' 篇待动，建议先清「到期句数」最多的两篇，其余顺延' : '';
+      html += '<div style="font-size:12.5px;color:var(--muted);margin-top:6px;">共 ' + rows.length + ' 篇待动 · 预计总时长 ~' + totalMin + ' 分钟' + load + '</div>';
+    }
+    box.innerHTML = html;
+    box.hidden = false;
+  }
+
+  function wordNorm(w){ return String(w || '').toLowerCase().replace(/[\[\]()，,。.]/g, '').trim(); }
+  function collectCandidates(){
+    var seen = {};
+    var out = [];
+    LIB.articles.forEach(function(a){
+      var s = readProgress(a);
+      var weak = (s && s.weak) || {};
+      (a.chain || []).forEach(function(c){
+        (c.steps || []).forEach(function(st){
+          if(!weak[String((st.sidx || 1) - 1)]) return;
+          String(st.a || '').split(/\s+/).forEach(function(raw){
+            var w = wordNorm(raw);
+            if(!w || w.length < 2) return;
+            if(!seen[w]){
+              seen[w] = true;
+              out.push({ word: w, h: st.h || '', en: st.en || '', title: a.title || a.topic, file: a.file || '', sidx: st.sidx || 1 });
+            }
+          });
+        });
+      });
+    });
+    return out;
+  }
+  function renderCands(box){
+    var zone = box.querySelector('.vc-cands');
+    if(!zone) return;
+    var words = vocabLoad().words || {};
+    var cands = collectCandidates().filter(function(c){ return !words[c.word]; });
+    if(!cands.length){
+      zone.innerHTML = '<div class="vc-src" style="padding:6px 0;">没有新的候选（薄弱句锚词都已入册，或还没有薄弱句）。</div>';
+      return;
+    }
+    var h = '<div class="vc-sub">候选 ' + cands.length + ' 词（来自当前薄弱句，点「+ 入本」确认）：</div>';
+    cands.forEach(function(c){
+      h += '<div class="vc-word"><span class="vc-w">' + esc(c.word) + '</span>'
+        + '<span class="vc-src">《' + esc(c.title) + '》· 句钩「' + esc(c.h) + '」· 第 ' + c.sidx + ' 句</span>'
+        + '<button type="button" class="vc-mini vc-add" data-w="' + esc(c.word) + '">+ 入本</button>'
+        + (c.en ? '<div class="vc-en">' + esc(c.en) + '</div>' : '')
+        + '</div>';
+    });
+    zone.innerHTML = h;
+    zone.querySelectorAll('.vc-add').forEach(function(b){
+      b.addEventListener('click', function(){
+        var w = b.getAttribute('data-w');
+        var src = null;
+        collectCandidates().forEach(function(x){ if(x.word === w && !src) src = x; });
+        var st = vocabLoad(); st.words = st.words || {};
+        if(!st.words[w]) st.words[w] = srNextWord(4, null);
+        st.words[w].src = [{ t: src ? src.title : w, file: src ? src.file : '', sidx: src ? src.sidx : 1, h: src ? src.h : '', en: src ? src.en : '' }];
+        vocabSave(st);
+        renderCands(box);
+        var cnt = box.querySelector('.vc-counts');
+        if(cnt){ var all = vocabLoad().words || {}; cnt.textContent = '在册 ' + Object.keys(all).length + ' 词'; }
+      });
+    });
+  }
+  function buildVocab(){
+    var box = document.getElementById('emm-lib-vocab');
+    if(!box) return;
+    if(!LIB.articles.length){ box.hidden = true; return; }
+    renderVocab();
+    box.hidden = false;
+  }
+  function renderVocab(){
+    var box = document.getElementById('emm-lib-vocab');
+    if(!box) return;
+    var words = vocabLoad().words || {};
+    var today = todayDateStr();
+    var dueList = [], upcoming = 0, grad = 0;
+    Object.keys(words).forEach(function(w){
+      var it = words[w];
+      if(isGraduated(it)){ grad++; return; }
+      if(it.due && it.due <= today) dueList.push(w);
+      else upcoming++;
+    });
+    var html = '<h3>📖 我的生词本</h3>'
+      + '<div class="vc-sub"><span class="vc-counts">在册 ' + Object.keys(words).length + ' 词</span> · 已毕业 ' + grad + ' · 跨方案收集薄弱句锚词，逐词确认入本，SM-2 调度复习。</div>'
+      + '<div class="vc-actions"><button type="button" class="vc-btn vc-extract">🔎 从薄弱句提取候选</button>'
+      + '<button type="button" class="vc-btn vc-toggle-all">展开/收起在册词</button></div>'
+      + '<div class="vc-cands"></div>';
+    if(!Object.keys(words).length){
+      html += '<div class="vc-src">还没有在册生词——先在方案里打卡，薄弱句的锚词会出现在「提取候选」里。</div>';
+    } else if(!dueList.length){
+      html += '<div class="vc-src">今天没有到期的生词 🎉（待复习 ' + upcoming + ' 词 · 已毕业 ' + grad + ' 词）。</div>';
+    } else {
+      html += '<div class="vc-sub" style="margin-top:6px;"><b>今日到期 ' + dueList.length + ' 词</b></div>';
+      dueList.forEach(function(w){
+        var it = words[w];
+        var src = (it.src && it.src[0]) || {};
+        html += '<div class="vc-word"><span class="vc-w">' + esc(w) + '</span>'
+          + '<span class="vc-src">来自《' + esc(src.t || '') + '》· 句钩「' + esc(src.h || '') + '」</span>'
+          + '<button type="button" class="vc-mini vc-ok" data-w="' + esc(w) + '">✓ 认识</button>'
+          + '<button type="button" class="vc-mini vc-no" data-w="' + esc(w) + '">✗ 忘了</button>'
+          + '<button type="button" class="vc-mini vc-del" data-w="' + esc(w) + '">移除</button>'
+          + (src.en ? '<div class="vc-en">' + esc(src.en) + '</div>' : '')
+          + '</div>';
+      });
+    }
+    box.innerHTML = html;
+
+    box.querySelector('.vc-extract').addEventListener('click', function(){ renderCands(box); });
+    box.querySelector('.vc-toggle-all').addEventListener('click', function(){
+      var zone = box.querySelector('.vc-cands');
+      if(zone && zone.querySelector('.vc-word')){ zone.innerHTML = ''; return; }
+      var all = vocabLoad().words || {};
+      var keys = Object.keys(all);
+      if(!keys.length){ zone.innerHTML = '<div class="vc-src" style="padding:6px 0;">在册为空。</div>'; return; }
+      var h = '<div class="vc-sub">在册 ' + keys.length + ' 词：</div>';
+      keys.forEach(function(w){
+        var it = all[w];
+        h += '<div class="vc-word"><span class="vc-w">' + esc(w) + '</span>'
+          + '<span class="vc-src">间隔 ' + (it.interval || 0) + ' 天 · 到期 ' + (it.due || '?') + '</span>'
+          + (isGraduated(it) ? '<span class="vc-grad">已毕业</span>' : '')
+          + '<button type="button" class="vc-mini vc-del" data-w="' + esc(w) + '">移除</button></div>';
+      });
+      zone.innerHTML = h;
+      zone.querySelectorAll('.vc-del').forEach(function(b){
+        b.addEventListener('click', function(){
+          var st = vocabLoad(); st.words = st.words || {};
+          delete st.words[b.getAttribute('data-w')];
+          vocabSave(st);
+          renderVocab();
+        });
+      });
+    });
+    box.querySelectorAll('.vc-ok,.vc-no,.vc-del').forEach(function(b){
+      b.addEventListener('click', function(){
+        var w = b.getAttribute('data-w');
+        var st = vocabLoad(); st.words = st.words || {};
+        if(b.classList.contains('vc-del')){ delete st.words[w]; }
+        else { st.words[w] = srNextWord(b.classList.contains('vc-ok') ? 4 : 2, st.words[w]); }
+        vocabSave(st);
+        renderVocab();
+      });
+    });
+  }
   function chainText(a){
     var out = [];
     (a.chain || []).forEach(function(c){
@@ -506,6 +736,8 @@
       timer = setTimeout(renderShelf, 150);
     });
     renderShelf();
+    buildTodayAll();
+    buildVocab();
     selfCheck();
   }
 

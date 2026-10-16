@@ -3,7 +3,7 @@
  *
  * 用 jsdom 加载 plan-template.html，验证：
  *   a. 首屏「3 步快背」卡自动注入（header 之后、3 步、跳转按钮可点不报错）
- *   b. 页脚自动渲染版本戳 v2.29.0（RELEASE-CHECKLIST 版本水印）
+ *   b. 页脚自动渲染版本戳 v2.30.0（RELEASE-CHECKLIST 版本水印，随模板 EMM_VERSION 走）
  *   c. 能力探测横幅：jsdom 无 MediaRecorder → 横幅出现且列明替代做法；
  *      「知道了」可关闭并持久化；预置 emm-cap-dismissed=1 不再出现；
  *      TTS+录音+存储全可用时横幅不出现
@@ -83,6 +83,7 @@ async function boot(opts = {}) {
   else { w.speechSynthesis = { getVoices: () => [], speak: () => {}, cancel: () => {} }; }
   if (opts.fullCaps) {
     w.MediaRecorder = function MediaRecorder() {};
+    w.SpeechRecognition = function SpeechRecognition() {}; // v2.30：全能力 mock 需含语音识别
     try {
       Object.defineProperty(w.navigator, 'mediaDevices', { value: { getUserMedia: () => Promise.resolve({}) }, configurable: true });
     } catch (e) {}
@@ -140,7 +141,7 @@ ok(/⇒/.test(template) && /↔/.test(template) && /→/.test(template), '图例
   try { jumps.forEach(b => b.click()); } catch (e) { threw = true; }
   ok(!threw, '跳转按钮点击不抛错（scrollIntoView 在 jsdom 缺省时被守卫）');
   const ft = doc.querySelector('footer');
-  ok(!!ft && /v2\.29\.0/.test(ft.textContent), '页脚自动渲染版本戳 v2.29.0');
+  ok(!!ft && /v2\.30\.0/.test(ft.textContent), '页脚自动渲染版本戳 v2.30.0');
 }
 
 // ── B. 能力横幅：缺录音 → 出现 + 可关闭 + 持久化 ──

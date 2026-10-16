@@ -5,7 +5,7 @@
  *   a. bin/check-browser-compat.mjs 存在
  *   b. 脚本默认运行（无 --strict）退出码 0
  *   c. 输出含 4 大浏览器名 + 总览表头
- *   d. 5 个已知 ⚠ API 在矩阵中（speechSynthesis/MediaRecorder/getUserMedia/confirm/alert）
+ *   d. 6 个已知 ⚠ API 在矩阵中（speechSynthesis/MediaRecorder/getUserMedia/confirm/alert/SpeechRecognition）
  *   e. 已知全 ✅ API 也在矩阵中（localStorage/Blob/FileReader）
  *   f. --strict 模式：有 ⚠ 时退出码 1
  *   g. docs/CROSS-BROWSER.md 存在且含 6 大节
@@ -57,7 +57,7 @@ let output = '';
 }
 
 // D. 5 个已知 ⚠ API 都在矩阵
-const warned = ['speechSynthesis', 'MediaRecorder', 'getUserMedia', 'confirm', 'alert'];
+const warned = ['speechSynthesis', 'MediaRecorder', 'getUserMedia', 'confirm', 'alert', 'SpeechRecognition'];
 warned.forEach(api => ok(output.includes(api), `矩阵含 ${api}`));
 
 // E. 已知全 ✅ API 也在矩阵（注意：脚本仅展示模板中实际用到的 API，故只选模板里出现的）
@@ -67,7 +67,7 @@ safe.forEach(api => ok(output.includes(api), `矩阵含 ${api}`));
 // F. 警告计数
 {
   const m = output.match(/⚠ 有 (\d+) 个 API/);
-  ok(m && Number(m[1]) === 5, `警告数 = 5（actual ${m ? m[1] : '未匹配'}）`);
+  ok(m && Number(m[1]) === 6, `警告数 = 6（actual ${m ? m[1] : '未匹配'}）`);
 }
 
 // G. --strict 模式：有 ⚠ 时退出码 1

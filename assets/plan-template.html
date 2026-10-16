@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  English Memory Method · 背诵方案模板（plan-template.html · v2.29.0 当前生效）
+  English Memory Method · 背诵方案模板（plan-template.html · v2.30.0 当前生效）
   用法：复制本文件为 <topic>-memorization-plan.html，按下方 <!-- ① ... --> 注释逐节替换内容。
   所有样式已内联，不依赖外部资源；结构图引用相对路径 assets/<topic>-structure.svg。
   v2.13.0 组件新增：今日任务排期（含 .ics 导出）、自测模式（遮译文/全遮）、复述阶梯追踪、
@@ -26,6 +26,7 @@
   v2.28.0 组件新增：🚀 端到端测试——`bin/e2e-flow.mjs` 在 jsdom 里完整跑 35 步用户流（冷启动 → 评卡 → 结束 → 导出 → 重置 → 导入 → 跨页面），揭示并修复 2 个 bug：① `endRound()` `state = loadState()` 覆盖本轮 mutations 导致 rounds/weak/mode 丢失（修复：loadState 后再 apply mutations）② `build-samples.mjs` 只命中 1 个 .sent 占位导致样本只有 1 句（修复：占位替换为 N 句 join）。配档 `docs/E2E.md` 列 35 步全链路 + 已知边界。
   v2.28.1 组件修复：📊 按段统计表（多段文章仪表盘，renderDash 动态建表）包进 .emm-tblwrap 横滚容器——此前绕过了 v2.16「全部表格横滚」约定，窄屏溢出。
   v2.29.0 组件新增：🚀 入门减负三件套——①首屏「3 步快背」极简入口卡（听读→钩子链→复述打卡，可跳转，其余章节折叠）②能力探测横幅（TTS/录音/存储不可用时显式告知+替代做法，替代静默降级）③🗂 Anki/CSV 导出（挖空卡+复述卡一键进 Anki）；🏛 记忆宫殿路线引导（首次使用自定义 25 站动线，localStorage 持久化、所有方案通用）；图例条补逻辑桥符号（⇒因果/↔转折/→递进/＋并列/:举例）；修复 v2.18 首屏折叠样式被误嵌套进 v2.16 移动端媒体查询（桌面端 on-boarding/折叠按钮此前无样式）。
+  v2.30.0 组件新增：🤖 发音自动评分——影子跟读面板新增「自动评分」：浏览器 SpeechRecognition 听用户朗读，转写与原句 LCS 逐词对齐后自动填 ✓/✗ 标注（可手动修正后保存），错词 ≥25% 入薄弱清单；能力横幅补「语音识别不可用」行（Chrome/Edge 支持，其余浏览器降级手动自评）。
 -->
 <html lang="zh-CN">
 <head>
@@ -422,6 +423,7 @@ body.emm-folded .emm-advanced{display:none!important;}
   + '.rv-shadow .sv-btn:hover{background:#fef3c7;}'
   + '.rv-shadow .sv-btn:disabled{opacity:.4;cursor:not-allowed;}'
   + '.rv-shadow .sv-btn.sv-record.recording{background:#ef4444;color:#fff;border-color:#ef4444;}'
+  + '.rv-shadow .sv-btn.sv-auto.listening{background:#3b82f6;color:#fff;border-color:#3b82f6;}'
   + '.rv-shadow .sv-sent{font-size:15px;margin:8px 0 4px;color:#7c2d12;font-weight:600;font-family:Georgia,"Times New Roman",serif;line-height:1.85;}'
   + '.rv-shadow .sv-words{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;line-height:2;}'
   + '.rv-shadow .sv-w{padding:5px 10px;border:1px solid #fcd34d;border-radius:6px;cursor:pointer;user-select:none;background:#fff;font-family:inherit;font-size:13.5px;transition:all .15s;}'
@@ -1824,7 +1826,7 @@ body.emm-folded .emm-advanced{display:none!important;}
 </script>
 
 <script>
-/* ===== v2.19 EMM_SHADOW_V219: 影子跟读（MediaRecorder + 逐词自评）===== */
+/* ===== v2.19 EMM_SHADOW_V219 + v2.30 EMM_SPEECH_V230: 影子跟读（MediaRecorder 逐词自评 + SpeechRecognition 自动评分）===== */
 (function(){
   "use strict";
 
@@ -1864,6 +1866,7 @@ body.emm-folded .emm-advanced{display:none!important;}
       + '<button type="button" class="sv-btn sv-record">🎤 录音</button>'
       + '<button type="button" class="sv-btn sv-stop" disabled>⏹ 停止</button>'
       + '<button type="button" class="sv-btn sv-replay" disabled>🔁 回放</button>'
+      + '<button type="button" class="sv-btn sv-auto">🤖 自动评分</button>'
       + '<span class="sv-status"></span>'
       + '</div>'
       + '<div class="sv-words"></div>'
@@ -1872,7 +1875,7 @@ body.emm-folded .emm-advanced{display:none!important;}
       + '<button type="button" class="sv-btn sv-skip">⏭ 跳过此句</button>'
       + '<button type="button" class="sv-btn sv-save" disabled>💾 保存并下一句</button>'
       + '</div>'
-      + '<div class="sv-hint">点击每个词：✓ 正确 / ✗ 读错或漏；至少标 1 个才解锁保存。错词 ≥ 25% 自动入薄弱清单。</div>'
+      + '<div class="sv-hint">点击每个词：✓ 正确 / ✗ 读错或漏；至少标 1 个才解锁保存。错词 ≥ 25% 自动入薄弱清单。也可点「🤖 自动评分」：浏览器听你朗读、自动逐词标注（Chrome / Edge 支持，识别走云端服务）。</div>'
       + '</div>';
   }
 
@@ -2038,6 +2041,68 @@ body.emm-folded .emm-advanced{display:none!important;}
         var au = div.querySelector('audio'); if(au) au.play();
       }
     });
+    // v2.30 语音识别自动评分：浏览器听朗读 → 转写 → LCS 对齐 → 自动填 marks（可手动修正后保存）
+    var autoBtn = div.querySelector('.sv-auto');
+    var recog = null;
+    autoBtn.addEventListener('click', function(){
+      var SRClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if(!SRClass){
+        alert('当前浏览器不支持语音识别（Chrome / Edge 桌面版支持）。\n可继续手动播放 + 自评。');
+        return;
+      }
+      if(recog){ try { recog.stop(); } catch(e){} return; }
+      var r;
+      try { r = new SRClass(); } catch(e){ alert('语音识别初始化失败：' + e.message); return; }
+      r.lang = 'en-US'; r.interimResults = false; r.maxAlternatives = 1;
+      recog = r;
+      var bar = document.querySelector('.rv-shadow');
+      autoBtn.classList.add('listening');
+      autoBtn.textContent = '👂 正在听…点此结束';
+      bar.querySelector('.sv-status').textContent = '正在聆听，请大声朗读当前句…';
+      r.onresult = function(ev){
+        var said = (ev.results && ev.results[0] && ev.results[0][0] && ev.results[0][0].transcript) || '';
+        var origTokens = wordTokens(sents[SH.idx].text);
+        var saidTokens = String(said).toLowerCase().replace(/[^a-z0-9'\s]/gi, ' ').split(/\s+/).filter(Boolean);
+        if(!saidTokens.length){
+          bar.querySelector('.sv-status').textContent = '没听清，请靠近麦克风重试，或手动标注。';
+          return;
+        }
+        var norm = function(t){ return String(t).toLowerCase(); };
+        var m = saidTokens.length, n = origTokens.length;
+        var dp = [];
+        for(var i = 0; i <= m; i++){ dp.push(new Array(n + 1).fill(0)); }
+        for(var i = 1; i <= m; i++){
+          for(var j = 1; j <= n; j++){
+            dp[i][j] = (saidTokens[i-1] === norm(origTokens[j-1])) ? dp[i-1][j-1] + 1 : Math.max(dp[i-1][j], dp[i][j-1]);
+          }
+        }
+        var marks = []; for(var j = 0; j < n; j++) marks.push(0);
+        var i2 = m, j2 = n;
+        while(i2 > 0 || j2 > 0){
+          if(i2 > 0 && j2 > 0 && saidTokens[i2-1] === norm(origTokens[j2-1])){ marks[j2-1] = 1; i2--; j2--; }
+          else if(j2 > 0 && (i2 === 0 || dp[i2][j2-1] >= dp[i2-1][j2])){ j2--; }
+          else if(i2 > 0){ i2--; }
+        }
+        var matched = 0; for(var k2 = 0; k2 < n; k2++){ if(marks[k2] === 1) matched++; }
+        if(!matched){
+          bar.querySelector('.sv-status').textContent = '识别结果与原句无匹配词（识别：「' + said + '」），请重试或手动标注。';
+          return;
+        }
+        for(var k = 0; k < n; k++){ if(marks[k] === 0) marks[k] = -1; }
+        SH.marks = marks;
+        renderShadowWords();
+        bar.querySelector('.sv-status').textContent = '识别：「' + said + '」——已自动标注 ✓' + matched + ' / ✗' + (n - matched) + '，可手动修正后 💾 保存';
+      };
+      r.onerror = function(ev){
+        bar.querySelector('.sv-status').textContent = '识别失败：' + ((ev && ev.error) || '未知错误') + '（可手动自评）';
+      };
+      r.onend = function(){
+        recog = null;
+        autoBtn.classList.remove('listening');
+        autoBtn.textContent = '🤖 自动评分';
+      };
+      try { r.start(); } catch(e){ recog = null; autoBtn.classList.remove('listening'); autoBtn.textContent = '🤖 自动评分'; alert('语音识别启动失败：' + e.message); }
+    });
     div.querySelector('.sv-clear').addEventListener('click', function(){
       SH.marks = [];
       renderShadowWords();
@@ -2070,7 +2135,7 @@ body.emm-folded .emm-advanced{display:none!important;}
       SH.idx++;
       if(SH.idx >= sents.length){
         SH.active = false;
-        bar.querySelector('.sv-status').textContent = '🎉 全篇影子跟读完成！薄弱句已自动入清单。';
+        div.querySelector('.sv-status').textContent = '🎉 全篇影子跟读完成！薄弱句已自动入清单。';
         renderShadow();
       } else {
         renderShadow();
@@ -2197,7 +2262,7 @@ body.emm-folded .emm-advanced{display:none!important;}
 (function(){
   "use strict";
   // 页脚版本戳唯一来源；与模板顶部注释保持一致（RELEASE-CHECKLIST：每份生成方案打开即见"我跑的是哪版"）
-  var EMM_VERSION = 'v2.29.0';
+  var EMM_VERSION = 'v2.30.0';
 
   // 1. 页脚版本戳
   try {
@@ -2258,9 +2323,11 @@ body.emm-folded .emm-advanced{display:none!important;}
       var hasGum = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
       var secure = (window.isSecureContext !== false); // file:// 在 Safari 下 getUserMedia 失败
       var hasStore = (function(){ try { localStorage.setItem('emm-cap-probe', '1'); localStorage.removeItem('emm-cap-probe'); return true; } catch(e){ return false; } })();
+      var hasSR = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
       if(!hasTTS) caps.push(['🎧 听写 / 朗读', '当前浏览器不支持语音合成（speechSynthesis），听写模式不发声', '替代：自己朗读 + 对照原文；用第 11 节挖空自测验证记效果。']);
       if(!hasRec || !hasGum) caps.push(['🎙️ 影子跟读', '当前浏览器不支持录音（MediaRecorder / getUserMedia）', '替代：第 16 节「⑨ 录音自查法」——用手机录音机录背诵回放，对照原文挑 3 个卡壳点专练。']);
       else if(!secure) caps.push(['🎙️ 影子跟读', '当前页面非安全上下文（本地 file:// 在 Safari 下禁用麦克风）', '替代：用 Chrome/Edge 打开，或起本地服务（如 npm run preview）再开；也可用手机录音机。']);
+      if(!hasSR) caps.push(['🤖 影子跟读自动评分', '当前浏览器不支持语音识别（SpeechRecognition，Chrome / Edge 支持）', '替代：影子跟读手动自评（▶ 听原句 + 逐词点 ✓/✗），或用听写模式验证辨音。']);
       if(!hasStore) caps.push(['💾 进度保存', '当前浏览器不给本页存储（localStorage 被禁或无 file:// 存储权限）', '打卡 / 薄弱清单 / SM-2 进度无法保存：用完点「💾 导出」手动备份 JSON，换环境后「📥 导入」恢复。']);
       if(caps.length){
         var wrap2 = document.querySelector('.wrap');

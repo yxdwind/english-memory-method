@@ -40,6 +40,7 @@
 | `speechSynthesis` / `SpeechSynthesisUtterance` | ✅ 33+ | ⚠ 49+ voices 列表可能为空 | ✅ 7+ | ✅ 79+ | `speak()` 用 try/catch；Firefox 空 voices 时静默降级到手动朗读（见 v2.19） |
 | `MediaRecorder` | ✅ 47+ | ✅ 25+ | ⚠ iOS 14.1+ 才支持 | ✅ 79+ | 用户首次点 🎤 时探测，不支持则 alert 降级到手动自评（v2.19） |
 | `getUserMedia` | ✅ 53+ | ✅ 36+ | ⚠ HTTPS only | ✅ 12+ | `MediaRecorder` 失败统一 catch，无需单独处理 |
+| `SpeechRecognition` | ⚠ 33+ 需网络 | ✗ | ✗ | ⚠ 79+ 需网络 | v2.30 影子跟读自动评分用；不支持时 alert 降级手动自评（已实现） |
 | `confirm` / `alert` | ✅ | ✅ | ⚠ iOS popup blocking | ✅ | iOS Safari 禁用 popup 后会静默；用户首次手势触发后才能弹。建议未来用 DOM 自制确认 UI |
 
 ### 1.3 已知差异与缓解
@@ -246,5 +247,6 @@ $ node bin/check-browser-compat.mjs --strict  # CI 用，有问题即退码 1
 ---
 
 > **修订记录**
+> - v0.3（2026-10-16）：v2.30 — 新增 SpeechRecognition（影子跟读自动评分）兼容性行
 > - v0.2（2026-10-16）：v2.29.1 — 新增 localStorage 跨浏览器/Profile 隔离条目（§1.3 / §2.8）
 > - v0.1（2026-10-02）：初版 — v2.27 配套文档

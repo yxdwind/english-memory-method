@@ -74,6 +74,9 @@ const ANCHOR_TABLE = [
   { id: "EMM_CAP_V229",         version: [2, 29, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "能力探测横幅：TTS/录音/存储不可用显式告知 + 替代做法（替代静默降级）" },
   { id: "EMM_ANKI_V229",        version: [2, 29, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "Anki/CSV 导出：挖空卡 + 复述卡一键导入 Anki（buildCloze data-ans）" },
   { id: "EMM_PALACE_V229",      version: [2, 29, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "记忆宫殿路线引导：首次使用自定义 25 站动线，localStorage 持久化、所有方案通用" },
+  { id: "EMM_SPEECH_V230",      version: [2, 30, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "发音自动评分：影子跟读 SpeechRecognition 转写 LCS 对齐自动填标注，错词 ≥25% 入薄弱" },
+  { id: "EMM_TODAYALL_V230",    version: [2, 30, 0], file: "skills/english-memory-method/assets/library-template.html", desc: "今日全局排期条：跨篇到期/新学聚合 + 预估时长 + 撞车建议" },
+  { id: "EMM_VOCAB_V230",       version: [2, 30, 0], file: "skills/english-memory-method/assets/library-template.html", desc: "跨方案生词本：薄弱句锚词候选 → 入本 → 词级 SM-2（emm-vocab:v1）" },
 ];
 
 // ── 各项检查 ─────────────────────────────────────────────────────────────
