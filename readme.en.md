@@ -7,7 +7,7 @@
 Paste any English article, and it produces a **17-section longform plan (15 basic / 16 speech / 17 longform) (speeches: 16 sections incl. skeleton)** (self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.30.0-blue)
+![Version](https://img.shields.io/badge/version-2.30.1-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-15-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -33,6 +33,17 @@ sentence-by-sentence linking marks, hooks welded into question chains, a retelli
 | 🎧 | **Dictation check** | TTS reads each sentence → type what you hear → word-level diff; mistakes flow into the weak list |
 | 💎 | **Golden Patterns** | 5–9 transferable patterns per article (bold replaceable part + swappable template) — straight into your writing/speeches |
 | 🎤 | **Speech mode** | Detects the three-act skeleton (hook / argument / crescendo) with delivery guidance; question chain & ladder retooled for speeches |
+| 📜 | **Longform mode** | 500–2000 words auto-enabled: segment progress dashboard (🔒▶✅ flows with check-ins) + per-segment units + per-segment spaced review |
+| 🧠 | **SM-2 spacing** | Light/standard modes: standard tracks per-sentence ef/interval/due with overdue highlights (Wozniak 1990) |
+| 🎙 | **Shadowing** | TTS playback → record & self-judge, or 🤖 speech-recognition auto-assessment; ≥25% wrong flows into the weak list |
+| 📚 | **Personal library** | All plans on one bookshelf page: search / quick-drill / live progress / today-overview / vocabulary notebook, one HTML for everything |
+| 🙈 | **Self-test modes** | Off → hide translation → hide all; tap a sentence to peek |
+| ⚡ | **Weak-drill** | Only stuck sentences — a round in 5 minutes; cloze auto-graded, wrong words straight to the weak list |
+| 🛡 | **Progress fingerprint** | Plan changed? Auto-detected — progress never grafts onto the wrong version |
+| 📅 | **Today card** | Per-segment Ebbinghaus computes today's work; "set as today's new" reshuffles |
+| 🌐 | **Online samples** | Try before installing: real generated plans on GitHub Pages — check-in / dictation / shadowing, just open |
+| 🧪 | **613 automated tests** | Smoke + runtime + 35-step E2E + browser matrix, one `npm test` |
+| 🚦 | **Delivery gate** | `node bin/verify-plan.mjs` runs six hard rules before delivery — non-zero exit blocks it |
 | 🔒 | **Collapsed self-tests** | Fill the blanks first; answers hide behind "▶ 查看本段答案" toggles, auto-hidden when printing |
 | 🖥 | **16+ platforms, one command** | Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi / MiniMax… |
 | 📄 | **Self-contained single file** | Each plan is one HTML: inline SVG, collapsible, print-friendly, zero external dependencies |
@@ -52,6 +63,8 @@ irm https://cdn.jsdelivr.net/gh/yxdwind/english-memory-method@main/install.ps1 |
 ```bash
 curl -fsSL https://cdn.jsdelivr.net/gh/yxdwind/english-memory-method@main/install.sh | bash
 ```
+
+**🌐 Try online (no install)**: the [github.io sample site](https://yxdwind.github.io/english-memory-method/) — real generated plans; check-in / dictation / shadowing, just open.
 
 **Claude Code (zero CLI)**:
 
@@ -203,6 +216,10 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 > Newest first; earliest versions in the collapsed section at the bottom.
 
 > Full version history (including historical bug fixes and CI self-check anchors `EMM_*`) has been moved to [CHANGELOG.md](CHANGELOG.md).
+
+**Online samples + EN docs alignment** (v2.30.1)
+
+**v2.30.1**: 🌐 GitHub Pages sample site — `bin/build-pages.mjs` builds a self-contained landing page from tests/samples (auto-collects samples, deterministic output); every push to main deploys automatically (first time: set repo Settings → Pages source to GitHub Actions); both readmes gain an online-experience link and feature row; readme.en feature table aligned with the Chinese one (was missing 10 rows: longform / SM-2 / shadowing / library / self-test / drill / fingerprint / today card / test count / delivery gate); added tests/pages-build.test.mjs. Total tests **613**.
 
 **Teaching depth trio** (v2.30.0)
 
