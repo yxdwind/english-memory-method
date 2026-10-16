@@ -7,9 +7,9 @@
 丢给它任何一篇英语文章，它还你一份完整背诵方案（普通文章 15 节 · 演讲稿 16 节含骨架 · 长文 17 节含分段仪表，自包含 HTML）：
 逐句连读标注、钩子焊成问题链、复述五级阶梯、专业词汇梳理、折叠自测——全在一份文件里。
 
-![Version](https://img.shields.io/badge/version-2.29.0-blue)
+![Version](https://img.shields.io/badge/version-2.29.1-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
-![Skill Sections](https://img.shields.io/badge/skill_sections-13-orange)
+![Skill Sections](https://img.shields.io/badge/skill_sections-15-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Standard](https://img.shields.io/badge/Agent_Skills-standard-red)
 
@@ -42,6 +42,7 @@
 | 🛡 | **进度指纹** | 方案内容变了自动检测，进度不再错位嫁接 |
 | 📅 | **今日任务卡** | 按段艾宾浩斯自动算今天学什么，支持「设为今天新学」顺延 |
 | 🧪 | **472 项自动化测试** | 冒烟 + 运行时 + 端到端 35 步 + 跨浏览器矩阵，npm test 一键全跑 |
+| 🚦 | **交付硬门禁** | 交付前 `node bin/verify-plan.mjs` 六条硬规则机器校验（逐句对照/宫殿/钩子链/挖空/溯源），退出码非 0 不交付 |
 | 🔒 | **折叠自测** | 挖空先自己填，答案藏在"▶ 查看本段答案"里，打印自动隐藏 |
 | 🖥 | **16+ 平台直装** | Claude Code / Codex / Trae / 通义灵码 / Comate / CodeBuddy / WorkBuddy / Kimi / MiniMax… |
 | 📄 | **自包含单文件** | 每份方案一个 HTML：内联 SVG、可折叠、打印友好、零外部依赖 |
@@ -209,6 +210,10 @@ v2 把钩子焊成链：每一环由上一环"推"出来，**能被逻辑推出�
 
 > 完整版本历史（含历史 bug 修复与 CI 自检锚点 `EMM_*`）已迁出至 [CHANGELOG.md](CHANGELOG.md)。
 
+**质量门禁收口**（v2.29.1）
+
+**v2.29.1**：`bin/verify-plan.mjs` 六条硬规则写入 SKILL.md「内容校验」第 0 步——交付前退出码非 0 不得交付（工具早已存在但生成流程 0 次引用，此前校验只靠人工逐条）；跨浏览器进度隔离写入已知局限（localStorage 按浏览器/Profile 隔离，换浏览器显示为空 ≠ 丢失，官方迁移路径 =「💾/📥」JSON——docs/CROSS-BROWSER.md 新增条目，记忆库页头加固定提示）；徽章 `skill_sections-13` → 15 修正（章节早已 15/16/17 节）；readme.en.md 版本历史分组排序修正（v2.28.2 先于 v2.28.1）。
+
 **入门减负 + L2/L3 兜底**（v2.29.0）
 
 **v2.29.0**：🚀 首屏「3 步快背」极简入口卡（听读→钩子链→复述打卡，带跳转，其余章节折叠）；⚠️ 能力探测横幅（TTS/录音/存储不可用时显式告知 + 替代做法，不再静默降级）；🗂 Anki/CSV 导出（挖空卡 + 复述卡一键进 Anki）；🏛 记忆宫殿路线引导（首次使用自定义 25 站动线，localStorage 持久化、所有方案通用）；L2/L3 平台统一交付「Markdown 精简版」（方法论内核不缩水，交互组件给口头替代法）；📦 离线发布包（`npm run build:release` 产出 zip + 双层 SHA256SUMS，安装器新增本地模式，全程可离线审计安装）；图例条补逻辑桥符号（⇒↔→＋:）；修复 v2.18 折叠样式被误嵌套进移动端媒体查询（桌面端失效）；模板页脚自动版本戳；修复 `skills/` 嵌套 SKILL.md 漏同步造成的双源分叉。锚点 20 组。
@@ -320,7 +325,7 @@ v2 把钩子焊成链：每一环由上一环"推"出来，**能被逻辑推出�
 - iOS < 14.1 不支持 `MediaRecorder` → 影子跟读录音不可用（已降级为手动自评）。
 - Safari 以 `file://` 打开本地方案时，`getUserMedia` 需 HTTPS（localhost 除外）→ 录音不可用（已降级）。
 
-进度保存在浏览器 `localStorage`：Safari / iOS 配额较小，方案堆积过多可能触发写入失败（已 `try/catch` 兜底，建议定期导出备份）。**推荐使用桌面版 Chrome / Edge / Firefox 获得完整体验；移动端功能受限。**
+进度保存在浏览器 `localStorage`：**按浏览器与 Profile 隔离**——在 Chrome 打卡后换 Edge（或另一台电脑）打开方案，进度显示为空，这不是进度丢失；官方迁移路径 = 方案页「💾 导出 / 📥 导入」JSON。Safari / iOS 配额较小，方案堆积过多可能触发写入失败（已 `try/catch` 兜底，建议定期导出备份）。**推荐固定用一个桌面浏览器完成全部打卡；移动端功能受限。**
 
 ### 安装与网络
 - 一键安装会直接执行远端脚本（`irm | iex` / `curl | bash`）。安全敏感环境请**先下载脚本审阅再运行**，或使用 `npx` / 插件市场方式。

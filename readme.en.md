@@ -7,9 +7,9 @@
 Paste any English article, and it produces a **17-section longform plan (15 basic / 16 speech / 17 longform) (speeches: 16 sections incl. skeleton)** (self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.29.0-blue)
+![Version](https://img.shields.io/badge/version-2.29.1-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
-![Skill Sections](https://img.shields.io/badge/skill_sections-13-orange)
+![Skill Sections](https://img.shields.io/badge/skill_sections-15-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
 ![Standard](https://img.shields.io/badge/Agent_Skills-standard-red)
 
@@ -27,7 +27,7 @@ sentence-by-sentence linking marks, hooks welded into question chains, a retelli
 | 📖 | **Close reading** | Chinese translation + full connected-speech marking (⌒ linking / weak forms / flap t / h-dropping) + term highlighting |
 | 📚 | **Terminology tables** | Word-formation breakdown (roots & affixes) + IPA + memory hooks — know the root, and new words become familiar ones |
 | 💬 | **Life examples for phrases** | Every collocation gets a plain-English daily sentence, **ready to mimic** (no translation — think in English) |
-| 🗂 | **14-section closed loop** | Strategy → close reading → hooks & chains → retelling ladder → three-pass → review → self-test → accumulation |
+| 🗂 | **15-section closed loop (17 longform / 16 speech)** | Strategy → close reading → hooks & chains → retelling ladder → three-pass → review → self-test → accumulation |
 | 🔁 | **Review loop** | Sentence-level OK/stuck check-in → weak-sentence list (click to jump) → graduate after 2 clean rounds; progress persists in your browser |
 | 🏛 | **Memory palace** | 25-station daily-life route, one sentence per station — weak stations auto-marked red on check-in, cleared on graduation |
 | 🎧 | **Dictation check** | TTS reads each sentence → type what you hear → word-level diff; mistakes flow into the weak list |
@@ -204,15 +204,21 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 > Full version history (including historical bug fixes and CI self-check anchors `EMM_*`) has been moved to [CHANGELOG.md](CHANGELOG.md).
 
+**Quality-gate hardening** (v2.29.1)
+
+**v2.29.1**: `bin/verify-plan.mjs` (six hard rules) is now Step 0 of SKILL.md's "Content Validation" — a non-zero exit code blocks delivery (the tool existed but the generation flow never referenced it; validation relied on manual discipline); cross-browser progress isolation documented — localStorage is scoped per browser/profile, so empty progress in another browser is not data loss, and the official migration path is the plan page's 💾/📥 JSON export/import (new entries in docs/CROSS-BROWSER.md + a fixed hint under the library header); badge `skill_sections-13` → **15** fixed (sections have been 15/16/17 for a while); readme.en.md version-history grouping order fixed (v2.28.2 before v2.28.1).
+
 **Onboarding relief + L2/L3 fallback** (v2.29.0)
 
 **v2.29.0**: 🚀 first-screen "3-Step Quick Memo" entry card (listen → hook chain → retell check-in, with jump links; everything else stays folded); ⚠️ capability banner (when TTS / recording / storage are unavailable, the affected features and workarounds are stated explicitly instead of failing silently); 🗂 Anki/CSV export (cloze cards + retell cards, one click into Anki); 🏛 memory-palace route onboarding (define your own 25-station route on first use, persisted in localStorage, shared across all plans); L2/L3 platforms now deliver a unified "Markdown Lite" plan (methodology core intact, interactive components replaced by verbal workarounds); 📦 offline release bundle (`npm run build:release` builds a deterministic zip + dual SHA256SUMS; installers gain a local mode for fully auditable air-gapped installs); legend row gains logic-bridge symbols (⇒↔→＋:); fixed v2.18 fold CSS accidentally nested inside the v2.16 mobile media query (no styles on desktop); template footer auto version stamp; fixed the `skills/` nested SKILL.md copy drift (dual-source fork). 20 anchors.
 
-**Audit fixes** (v2.28.1)
+**Quality-gate hardening** (v2.29.1)
 
 **Engineering closeout** (v2.28.2)
 
 **v2.28.2**: five audit leftovers — `build-samples` now fills the cloze section with idempotence locked (re-runs no longer revert samples to placeholders); version-check anchor table remaps `EMM_UX_V224` to the library; memory library `?check=1` gains runtime duplicate-key detection; verify-plan anchor expectations split by file type; `.gitattributes` added for line endings. Total tests **472**. Also adds the **npm release pipeline**: GitHub Actions Trusted Publishing (OIDC, zero tokens — a tag auto-publishes, immune to npm's 2026-08/2027-01 bypass-token crackdown); `npx english-memory-method` goes live with the first publish.
+
+**Audit fixes** (v2.28.1)
 
 **v2.28.1**: **Copy divergence + truncation guard** — fixed the dual-source-of-truth break caused by the v2.18→v2.28 batch update (`assets/` stuck at v2.16/v2.17, `plugin.json` missed, npm users got stale components; version-check gains 2 new groups for plugin.json & copy identity, now 9); fixed the library `</script` truncation hazard (hard SKILL.md check + 3 smoke guards: a closing-sequence in data makes the parser terminate the script early and the whole page silently dies); segment-stats table wrapped for mobile scroll; drill recap shows "?" for missing sentence numbers; plan cards show the planned days; test version assertion now compares CHANGELOG dynamically. Total tests **468**.
 
@@ -316,7 +322,7 @@ Self-test, dictation, and shadowing rely on `speechSynthesis` / `MediaRecorder` 
 - iOS < 14.1 lacks `MediaRecorder` → shadowing recording unavailable (degrades to manual self-judging).
 - Safari opening a local plan via `file://` requires HTTPS for `getUserMedia` (except localhost) → recording unavailable (degrades).
 
-Progress is saved in the browser `localStorage`: Safari / iOS have smaller quotas and may fail to write when many plans accumulate (handled with `try/catch`; export backups regularly). **Recommended: desktop Chrome / Edge / Firefox for the full experience; mobile is limited.**
+Progress is saved in the browser `localStorage`: **it is isolated per browser and per profile** — if you check in on Chrome and then open the plan in Edge (or on another machine), progress shows empty; that is not data loss. The official migration path is the plan page's 💾/📥 JSON export/import. Safari / iOS have smaller quotas and may fail to write when many plans accumulate (handled with `try/catch`; export backups regularly). **Recommended: stick to one desktop browser for all check-ins; mobile is limited.**
 
 ### Install & network
 - One-line install executes a remote script (`irm | iex` / `curl | bash`). In security-sensitive environments, **download and review the script first**, or use `npx` / the plugin marketplace.

@@ -25,6 +25,7 @@
   header{background:linear-gradient(135deg,#5b21b6,#7c3aed);color:#fff;border-radius:16px;padding:28px 34px;margin-bottom:24px;}
   header h1{font-size:26px;margin-bottom:6px;}
   header .lib-sub{opacity:.92;font-size:14px;}
+  .lib-tip{margin:-12px 0 16px;padding:8px 16px;font-size:12.5px;line-height:1.7;color:var(--muted);background:#fff;border:1px solid var(--line);border-radius:10px;}
   .lib-search{width:100%;margin-top:14px;border:1px solid rgba(255,255,255,.4);background:rgba(255,255,255,.15);color:#fff;border-radius:10px;padding:9px 14px;font-size:14.5px;outline:none;}
   .lib-search::placeholder{color:rgba(255,255,255,.75);}
   .lib-search:focus{background:rgba(255,255,255,.25);}
@@ -114,6 +115,7 @@
   <p class="lib-sub"></p>
   <input type="text" class="lib-search" placeholder="🔍 搜索：标题 / 钩子 / 句子关键词…">
 </header>
+<p class="lib-tip">💡 进度存在<b>当前浏览器</b>的 localStorage 里（按浏览器 / Profile 隔离）：换浏览器打开显示为空 ≠ 进度丢失，迁移用方案页「💾 导出 / 📥 导入」JSON。</p>
 <div class="lib-shelf" id="emm-lib-shelf"></div>
 <div class="lib-empty" id="emm-lib-empty" hidden>
   <p><b>记忆库还是空的。</b></p>

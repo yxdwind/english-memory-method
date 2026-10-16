@@ -51,6 +51,7 @@
 | **Firefox speechSynthesis voices 列表可能为空** | TTS 不发声但无报错 | ✅ `speak()` 用 try/catch 包，超时不报错 |
 | **iOS Safari popup blocking**：首次手势前不能弹 confirm | 备份提醒 / 重置确认等可能失效 | ⏳ 待办：未来改用 DOM 自制确认 UI |
 | **Safari file:// 协议**：HTTPS 检查更严 | getUserMedia 必须 https（除 localhost） | ✅ MediaRecorder 失败统一降级 |
+| **localStorage 按浏览器/Profile 隔离**：Chrome、Edge、Firefox 各自独立存储（file:// 在同一浏览器内同源共享，但绝不跨浏览器） | 换浏览器打开方案/记忆库，进度显示为空（不是丢失） | ✅ v2.29.1 入档：方案页「💾 导出/📥 导入」JSON 为官方迁移路径；记忆库页头加固定提示 |
 | **iOS Safari `100vh` 含底栏**：viewport 高度计算 | 折叠 / 吸顶位置可能偏差 | ✅ 用 `100dvh` 渐进增强 |
 | **`<details>` 元素**：Safari < 17 默认三角符号不同 | 挖空答案的折叠样式 | ✅ 用户体验差异，不影响功能 |
 
@@ -92,6 +93,11 @@
 - **症状**：`<input type="date">` 在 Safari 旧版格式不同
 - **根因**：Safari < 14 不支持 `type="date"`
 - **缓解**：✅ 用 `<input type="text">` 接受 `YYYY-MM-DD` 字符串（手写验证）
+
+### 2.8 "换个浏览器打开，进度全没了"
+- **症状**：在 Chrome 打卡多日的方案，用 Edge（或另一台电脑的浏览器）打开显示未开始
+- **根因**：localStorage 按浏览器（乃至 Profile）隔离——file:// 页面在同一浏览器内同源共享，但跨浏览器/跨 Profile 互不可见
+- **缓解**：✅ v2.29.1 文档化——官方迁移路径 = 方案页「💾 导出 / 📥 导入」JSON；记忆库页头固定提示；readme「已知局限」中英双语声明
 
 ---
 
@@ -240,4 +246,5 @@ $ node bin/check-browser-compat.mjs --strict  # CI 用，有问题即退码 1
 ---
 
 > **修订记录**
+> - v0.2（2026-10-16）：v2.29.1 — 新增 localStorage 跨浏览器/Profile 隔离条目（§1.3 / §2.8）
 > - v0.1（2026-10-02）：初版 — v2.27 配套文档
