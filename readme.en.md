@@ -7,7 +7,7 @@
 Paste any English article, and it produces a **17-section longform plan (15 basic / 16 speech / 17 longform) (speeches: 16 sections incl. skeleton)** (self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.30.1-blue)
+![Version](https://img.shields.io/badge/version-2.30.2-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-15-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -42,7 +42,7 @@ sentence-by-sentence linking marks, hooks welded into question chains, a retelli
 | 🛡 | **Progress fingerprint** | Plan changed? Auto-detected — progress never grafts onto the wrong version |
 | 📅 | **Today card** | Per-segment Ebbinghaus computes today's work; "set as today's new" reshuffles |
 | 🌐 | **Online samples** | Try before installing: real generated plans on GitHub Pages — check-in / dictation / shadowing, just open |
-| 🧪 | **613 automated tests** | Smoke + runtime + 35-step E2E + browser matrix, one `npm test` |
+| 🧪 | **621 automated tests** | Smoke + runtime + 35-step E2E + browser matrix, one `npm test` |
 | 🚦 | **Delivery gate** | `node bin/verify-plan.mjs` runs six hard rules before delivery — non-zero exit blocks it |
 | 🔒 | **Collapsed self-tests** | Fill the blanks first; answers hide behind "▶ 查看本段答案" toggles, auto-hidden when printing |
 | 🖥 | **16+ platforms, one command** | Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi / MiniMax… |
@@ -217,6 +217,10 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 > Full version history (including historical bug fixes and CI self-check anchors `EMM_*`) has been moved to [CHANGELOG.md](CHANGELOG.md).
 
+**Architecture review, batch 1** (v2.30.2)
+
+**v2.30.2**: 🛡 version-check's anchor manifest is now scan-generated (23 hand-written entries deleted — templates are the single source of truth; anchor versions parse from the name; zero registration for new features; first catch: a stale EMM_UX_V224 marker in plan-template); 🧪 new docs-sync gate — bilingual feature-table rows / test counts / version badges interlocked with CHANGELOG; the bilingual readme seam finally has a machine check. Total tests **621**.
+
 **Online samples + EN docs alignment** (v2.30.1)
 
 **v2.30.1**: 🌐 GitHub Pages sample site — `bin/build-pages.mjs` builds a self-contained landing page from tests/samples (auto-collects samples, deterministic output); every push to main deploys automatically (first time: set repo Settings → Pages source to GitHub Actions); both readmes gain an online-experience link and feature row; readme.en feature table aligned with the Chinese one (was missing 10 rows: longform / SM-2 / shadowing / library / self-test / drill / fingerprint / today card / test count / delivery gate); added tests/pages-build.test.mjs. Total tests **613**.
@@ -351,7 +355,7 @@ Progress is saved in the browser `localStorage`: **it is isolated per browser an
 - Install sources default to `raw.githubusercontent.com` and jsDelivr; if your network is unreliable, use a reachable mirror or an offline package.
 
 ### Output quality depends on the host model
-Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 613 tests cover the **template and runtime**, not the quality of any specific model's generated content.
+Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 621 tests cover the **template and runtime**, not the quality of any specific model's generated content.
 
 ### Who this is NOT for
 - Absolute beginners who want a 5-minute quick-memorize flow (this method is methodology-heavy with a higher onboarding cost).

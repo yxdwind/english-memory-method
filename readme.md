@@ -7,7 +7,7 @@
 丢给它任何一篇英语文章，它还你一份完整背诵方案（普通文章 15 节 · 演讲稿 16 节含骨架 · 长文 17 节含分段仪表，自包含 HTML）：
 逐句连读标注、钩子焊成问题链、复述五级阶梯、专业词汇梳理、折叠自测——全在一份文件里。
 
-![Version](https://img.shields.io/badge/version-2.30.1-blue)
+![Version](https://img.shields.io/badge/version-2.30.2-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-15-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -42,7 +42,7 @@
 | 🛡 | **进度指纹** | 方案内容变了自动检测，进度不再错位嫁接 |
 | 📅 | **今日任务卡** | 按段艾宾浩斯自动算今天学什么，支持「设为今天新学」顺延 |
 | 🌐 | **在线样例** | 不装先玩：GitHub Pages 上有真实生成的方案，打卡/听写/影子跟读点开即用 |
-| 🧪 | **613 项自动化测试** | 冒烟 + 运行时 + 端到端 35 步 + 跨浏览器矩阵，npm test 一键全跑 |
+| 🧪 | **621 项自动化测试** | 冒烟 + 运行时 + 端到端 35 步 + 跨浏览器矩阵，npm test 一键全跑 |
 | 🚦 | **交付硬门禁** | 交付前 `node bin/verify-plan.mjs` 六条硬规则机器校验（逐句对照/宫殿/钩子链/挖空/溯源），退出码非 0 不交付 |
 | 🔒 | **折叠自测** | 挖空先自己填，答案藏在"▶ 查看本段答案"里，打印自动隐藏 |
 | 🖥 | **16+ 平台直装** | Claude Code / Codex / Trae / 通义灵码 / Comate / CodeBuddy / WorkBuddy / Kimi / MiniMax… |
@@ -213,6 +213,10 @@ v2 把钩子焊成链：每一环由上一环"推"出来，**能被逻辑推出�
 
 > 完整版本历史（含历史 bug 修复与 CI 自检锚点 `EMM_*`）已迁出至 [CHANGELOG.md](CHANGELOG.md)。
 
+**架构体检第一批**（v2.30.2）
+
+**v2.30.2**：🛡 version-check 锚点清单从 23 条手写改为扫描生成（模板=唯一真相源，锚点版本号从名字解析，新特性零注册；上线即清除 EMM_UX_V224 化石标记）；🧪 新增 docs-sync 文档一致性 gate——双语功能表行数/测试数/徽章版本与 CHANGELOG 互锁，双语 readme seam 首次有机器检查。总测试数 **621**。
+
 **在线样例 + 英文文档对齐**（v2.30.1）
 
 **v2.30.1**：🌐 GitHub Pages 在线样例上线——`bin/build-pages.mjs` 从 tests/samples 生成落地页（自动收录样例、确定性输出），push main 即自动部署（首次需在仓库 Settings → Pages 将 Source 设为 GitHub Actions）；双语 readme「快速开始」与功能表加在线体验入口；readme.en 功能表补齐与中文版对齐（此前缺 10 行：长文模式/SM-2/影子跟读/记忆库/自测三档/薄弱快刷/进度指纹/今日任务卡/测试数/交付硬门禁）；新增 tests/pages-build.test.mjs。总测试数 **613**。
@@ -344,7 +348,7 @@ v2 把钩子焊成链：每一环由上一环"推"出来，**能被逻辑推出�
 - 安装源默认走 `raw.githubusercontent.com` 与 jsDelivr；若所在网络访问不稳，可改用可达镜像或离线包。
 
 ### 生成质量依赖宿主模型
-方案由宿主 Agent 的模型现生成，质量随模型能力浮动；弱模型或 L2/L3 平台输出会更简略。613 项测试覆盖**模板与运行时**，不保证任意模型生成内容的优劣。
+方案由宿主 Agent 的模型现生成，质量随模型能力浮动；弱模型或 L2/L3 平台输出会更简略。621 项测试覆盖**模板与运行时**，不保证任意模型生成内容的优劣。
 
 ### 这份方案「不适合」谁
 - 想要 5 分钟极简背词的纯新手（本方案偏重方法论，入门成本较高）。

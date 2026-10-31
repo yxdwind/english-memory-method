@@ -3,8 +3,8 @@
 //
 // 检查：
 //   1. package.json "version" 字段格式合法（semver）
-//   2. 已声明的 EMM_xxx_Vxxx 锚点在对应模板中"恰好出现 1 次"
-//   3. package.json 版本号 ≥ 所有锚点版本号（防止"v2.18.0 模板里却写着 v2.7.0 锚点"漂移）
+//   2. 扫描模板中的 EMM_xxx_Vxxx 锚点，每个"恰好出现 1 次"（清单自动生成，v2.30.2 起不再手写）
+//   3. package.json 版本号 ≥ 所有扫描到的锚点版本号（锚点版本号由锚点名自带，防漂移）
 //   4. SKILL.md 与 plan-template.html 的 title 行包含当前版本号
 //   5. CHANGELOG.md 最新条目版本号与 package.json 一致
 //   6. .claude-plugin/plugin.json 版本与 package.json 一致
@@ -52,32 +52,43 @@ function readPkg() {
   return { pkgPath, pkg };
 }
 
-// ── 读锚点声明表（权威）─────────────────────────────────────────────────
-const ANCHOR_TABLE = [
-  { id: "EMM_TODAY_V213",       version: [2, 13, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "自测与排期套件" },
-  { id: "EMM_DRILL_CLOZE_V214", version: [2, 14, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "快刷与交互挖空" },
-  { id: "EMM_V215_STABLE",      version: [2, 15, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "稳健性补丁" },
-  { id: "EMM_MOBILE_V216",      version: [2, 16, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "移动端自适应" },
-  { id: "EMM_LIBRARY_V217",     version: [2, 17, 0], file: "skills/english-memory-method/assets/library-template.html", desc: "个人记忆库" },
-  { id: "EMM_FOLD_V218",        version: [2, 18, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "首屏折叠 + on-boarding" },
-  { id: "EMM_SHADOW_V219",      version: [2, 19, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "影子跟读（MediaRecorder + 逐词自评）" },
-  { id: "EMM_SR_V220",          version: [2, 20, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "SM-2 算法升级（Wozniak 1990）+ 轻量/标准切换" },
-  { id: "EMM_PROGRESS_V221",    version: [2, 21, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "进度导出/导入 + 段间切换 + 样例方案" },
-  { id: "EMM_QA_V222",          version: [2, 22, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "工程卫生：ics 时区修复 + 备份提醒 + 章节精简 + 渐进引导" },
-  { id: "EMM_QUALITY_V223",     version: [2, 23, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "内容质量：按段统计 + ?check=1 内容可疑项 + IPA 校验 + 模式向导" },
-  { id: "EMM_UX_V224",          version: [2, 24, 0], file: "skills/english-memory-method/assets/library-template.html", desc: "学习路径优化：轻刷一键回补、状态筛选 chip、今天先做这个按钮（v2.28.2 修正映射：改动在 library-template,此前误挂 plan-template）" },
-  { id: "EMM_ASSESS_V225",      version: [2, 25, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "评估优化：段落测试 60s + 毕业阈值配置" },
-  { id: "EMM_FIXTURE_V226",     version: [2, 26, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "工程卫生：fixture 从真实生成反推（bin/sync-fixtures.mjs）" },
-  { id: "EMM_BROWSER_V227",     version: [2, 27, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "跨浏览器测试矩阵：bin/check-browser-compat.mjs 静态扫描 + docs/CROSS-BROWSER.md" },
-  { id: "EMM_E2E_V228",         version: [2, 28, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "端到端测试：bin/e2e-flow.mjs session driver + 修复 endRound 持久化 bug + 修复 build-samples 多句插入" },
-  { id: "EMM_QUICK3_V229",      version: [2, 29, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "入门减负：首屏 3 步快背入口卡（听读→钩子链→复述打卡，带跳转）" },
-  { id: "EMM_CAP_V229",         version: [2, 29, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "能力探测横幅：TTS/录音/存储不可用显式告知 + 替代做法（替代静默降级）" },
-  { id: "EMM_ANKI_V229",        version: [2, 29, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "Anki/CSV 导出：挖空卡 + 复述卡一键导入 Anki（buildCloze data-ans）" },
-  { id: "EMM_PALACE_V229",      version: [2, 29, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "记忆宫殿路线引导：首次使用自定义 25 站动线，localStorage 持久化、所有方案通用" },
-  { id: "EMM_SPEECH_V230",      version: [2, 30, 0], file: "skills/english-memory-method/assets/plan-template.html",   desc: "发音自动评分：影子跟读 SpeechRecognition 转写 LCS 对齐自动填标注，错词 ≥25% 入薄弱" },
-  { id: "EMM_TODAYALL_V230",    version: [2, 30, 0], file: "skills/english-memory-method/assets/library-template.html", desc: "今日全局排期条：跨篇到期/新学聚合 + 预估时长 + 撞车建议" },
-  { id: "EMM_VOCAB_V230",       version: [2, 30, 0], file: "skills/english-memory-method/assets/library-template.html", desc: "跨方案生词本：薄弱句锚词候选 → 入本 → 词级 SM-2（emm-vocab:v1）" },
+// ── 锚点扫描（v2.30.2 起清单自动生成，模板 = 唯一真相源）─────────────────────
+// 原实现：23 条手写锚点清单——与模板构成两条真相，注册靠记忆
+// （10-31 架构体检险情：改头部注释时把 EMM_UX_V224 唯一出现抹掉）。
+// 现实现：扫描两个模板中的 EMM_*_V\d{3}（兼容 EMM_V215_STABLE 式后缀），
+// 版本号从锚点名解析（V213 → 2.13.0），"每个锚点恰好 1 次"由扫描结果直接执行——新特性零注册。
+const ANCHOR_FILES = [
+  "skills/english-memory-method/assets/plan-template.html",
+  "skills/english-memory-method/assets/library-template.html",
 ];
+const ANCHOR_RE = /EMM_(?:[A-Z0-9_]+_)?V(\d{3})(?:_[A-Z0-9]+)?/g;
+
+function anchorVersionFromId(id) {
+  const m = /V(\d{3})/.exec(id);
+  return m ? [+m[1][0], +m[1].slice(1), 0] : null;
+}
+
+function scanAnchors() {
+  const map = new Map(); // id -> { version:[M,m,0], occurrences:[{file,count}] }
+  for (const relPath of ANCHOR_FILES) {
+    const p = join(PKG_ROOT, relPath);
+    if (!existsSync(p)) continue;
+    const text = readFileSync(p, "utf8");
+    ANCHOR_RE.lastIndex = 0;
+    let m;
+    while ((m = ANCHOR_RE.exec(text)) !== null) {
+      const id = m[0];
+      const version = anchorVersionFromId(id);
+      if (!version) continue;
+      if (!map.has(id)) map.set(id, { version, occurrences: [] });
+      const e = map.get(id);
+      const occ = e.occurrences.find(o => o.file === relPath);
+      if (occ) occ.count += 1;
+      else e.occurrences.push({ file: relPath, count: 1 });
+    }
+  }
+  return map;
+}
 
 // ── 各项检查 ─────────────────────────────────────────────────────────────
 function checkPkgVersion(pkgVer) {
@@ -87,40 +98,34 @@ function checkPkgVersion(pkgVer) {
 }
 
 function checkAnchors() {
+  const anchors = scanAnchors();
   const out = [];
-  for (const anchor of ANCHOR_TABLE) {
-    const path = join(PKG_ROOT, anchor.file);
-    if (!existsSync(path)) {
-      out.push({ ok: false, msg: `${anchor.id}（v${anchor.version.join(".")}）：文件 ${rel(PKG_ROOT, path)} 不存在`, anchor });
-      continue;
-    }
-    const text = readFileSync(path, "utf8");
-    const re = new RegExp(anchor.id, "g");
-    const count = (text.match(re) || []).length;
-    if (count === 1) {
-      out.push({ ok: true, msg: `${anchor.id}（v${anchor.version.join(".")}）：在 ${rel(PKG_ROOT, path)} 中恰好 1 次 ✓` });
-    } else if (count === 0) {
-      out.push({ ok: false, msg: `${anchor.id}（v${anchor.version.join(".")}）：在 ${rel(PKG_ROOT, path)} 中未出现（期望 1 次）`, anchor });
+  if (anchors.size === 0) {
+    return [{ ok: false, msg: "未在模板中扫描到任何 EMM_*_Vxxx 锚点（模板损坏或路径变化？）" }];
+  }
+  for (const [id, e] of [...anchors.entries()].sort((a, b) => a[0].localeCompare(b[0]))) {
+    const total = e.occurrences.reduce((s, o) => s + o.count, 0);
+    const where = e.occurrences.map(o => `${rel(PKG_ROOT, join(PKG_ROOT, o.file))} ×${o.count}`).join(" + ");
+    if (total === 1) {
+      out.push({ ok: true, msg: `${id}（v${e.version.join(".")}）：${where} ✓` });
     } else {
-      out.push({ ok: false, msg: `${anchor.id}（v${anchor.version.join(".")}）：在 ${rel(PKG_ROOT, path)} 中出现 ${count} 次（期望 1 次）`, anchor });
+      out.push({ ok: false, msg: `${id}（v${e.version.join(".")}）：共出现 ${total} 次（${where}；期望恰好 1 次）` });
     }
   }
   return out;
 }
-
 function checkAnchorVersionsLtePkg(pkgVer) {
   const v = parseSemver(pkgVer);
   if (!v) return [{ ok: false, msg: "package.json version 不合法，跳过锚点版本对齐检查" }];
   const out = [];
-  for (const a of ANCHOR_TABLE) {
-    if (cmpTuple(a.version, v) > 0) {
-      out.push({ ok: false, msg: `锚点 ${a.id} v${a.version.join(".")} > package.json v${pkgVer}（升级 package.json）` });
+  for (const [id, e] of scanAnchors()) {
+    if (cmpTuple(e.version, v) > 0) {
+      out.push({ ok: false, msg: `锚点 ${id} v${e.version.join(".")} > package.json v${pkgVer}（升级 package.json）` });
     }
   }
-  if (out.length === 0) out.push({ ok: true, msg: `所有锚点版本 ≤ package.json v${pkgVer}` });
+  if (out.length === 0) out.push({ ok: true, msg: `所有扫描到的锚点版本 ≤ package.json v${pkgVer}` });
   return out;
 }
-
 function checkTitleFileContains(path, label, pkgVer) {
   const fullPath = join(PKG_ROOT, path);
   if (!existsSync(fullPath)) return [{ ok: false, msg: `${label} 文件 ${rel(PKG_ROOT, fullPath)} 不存在` }];
@@ -131,8 +136,11 @@ function checkTitleFileContains(path, label, pkgVer) {
   if (versions.length === 0) return [{ ok: true, msg: `${label} 头部无版本字符串（允许：模板可不含）` }];
   const found = versions.reduce((a, b) => cmpTuple(a, b) > 0 ? a : b);
   // 头部声明的最高版本必须 ≥ 文件中最高锚点版本
-  const markers = ANCHOR_TABLE.filter(a => rel(PKG_ROOT, join(PKG_ROOT, a.file)) === rel(PKG_ROOT, fullPath));
-  const maxMarker = markers.reduce((m, a) => (m && cmpTuple(m, a.version) > 0 ? m : a.version), null);
+  const relFull = rel(PKG_ROOT, fullPath);
+  const markerVersions = [...scanAnchors().entries()]
+    .filter(([, e]) => e.occurrences.some(o => rel(PKG_ROOT, join(PKG_ROOT, o.file)) === relFull))
+    .map(([, e]) => e.version);
+  const maxMarker = markerVersions.reduce((m, a) => (m && cmpTuple(m, a) > 0 ? m : a), null);
   if (maxMarker && cmpTuple(found, maxMarker) < 0) {
     return [{ ok: false, msg: `${label} 头部最高声明 v${found.join(".")}，但文件含 v${maxMarker.join(".")} 锚点（声明必须 ≥ 锚点）` }];
   }
