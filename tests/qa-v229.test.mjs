@@ -17,24 +17,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-let JSDOM, VirtualConsole;
-try {
-  const jsdom = await import('jsdom');
-  JSDOM = jsdom.JSDOM;
-  VirtualConsole = jsdom.VirtualConsole;
-} catch (e) {
-  console.error('缺少 jsdom：请先执行 npm i --no-save jsdom@16 后重跑');
-  process.exit(1);
-}
-
-const HERE = path.dirname(fileURLToPath(import.meta.url));
-const template = fs.readFileSync(path.join(HERE, '..', 'skills', 'english-memory-method', 'assets', 'plan-template.html'), 'utf8');
-
-function quietConsole() {
-  const vc = new VirtualConsole();
-  vc.on('jsdomError', (e) => { if (!/^Not implemented/.test(e.message || '')) console.error('jsdomError:', e.message); });
-  return vc;
-}
+import { PLAN_TEMPLATE as template, bootCore } from './helpers/boot.mjs';
 
 let passed = 0, failed = 0;
 function ok(cond, label) {
@@ -69,50 +52,7 @@ const fakeArticle = `
 `;
 
 async function boot(opts = {}) {
-  const dom = new JSDOM(template, {
-    runScripts: 'outside-only',
-    url: 'http://localhost/plan.html' + (opts.query || ''),
-    virtualConsole: quietConsole(),
-  });
-  const w = dom.window;
-  w.URL.createObjectURL = () => 'blob:mock';
-  w.URL.revokeObjectURL = () => {};
-  w.scrollTo = () => {};
-  // 默认让 TTS 可用（只缺录音），便于分别验证两条分支
-  if (opts.noTTS) { try { delete w.speechSynthesis; } catch (e) {} }
-  else { w.speechSynthesis = { getVoices: () => [], speak: () => {}, cancel: () => {} }; }
-  if (opts.fullCaps) {
-    w.MediaRecorder = function MediaRecorder() {};
-    w.SpeechRecognition = function SpeechRecognition() {}; // v2.30：全能力 mock 需含语音识别
-    try {
-      Object.defineProperty(w.navigator, 'mediaDevices', { value: { getUserMedia: () => Promise.resolve({}) }, configurable: true });
-    } catch (e) {}
-  }
-  const alerts = [];
-  w.alert = (m) => alerts.push(String(m));
-  w.confirm = () => true;
-  // 捕获下载（a.click）
-  const downloads = [];
-  const origClick = w.HTMLAnchorElement.prototype.click;
-  w.HTMLAnchorElement.prototype.click = function () {
-    if (this.download) downloads.push({ name: this.download, href: this.href });
-    else origClick.call(this);
-  };
-  if (opts.preload) {
-    Object.entries(opts.preload).forEach(([k, v]) => {
-      try { w.localStorage.setItem(k, String(v)); } catch (e) {}
-    });
-  }
-  const wrap = w.document.querySelector('.wrap');
-  if (wrap && opts.replaceWrap !== null) wrap.innerHTML = opts.replaceWrap === undefined ? fakeArticle : opts.replaceWrap;
-  const scriptBlocks = [...template.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
-  const allScripts = scriptBlocks.join('\n;\n');
-  try { w.eval(allScripts); } catch (e) {
-    console.error('eval error:', e.message);
-    process.exit(1);
-  }
-  await new Promise(r => setTimeout(r, 80));
-  return { w, doc: w.document, alerts, downloads };
+  return bootCore({ replaceWrap: fakeArticle, captureDownloads: true, ...opts });
 }
 
 console.log('\n== v2.29.0 入门减负三件套（3 步快背 / 能力横幅 / Anki 导出）运行时验证 ==');

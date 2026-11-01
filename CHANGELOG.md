@@ -4,6 +4,10 @@
 > `SKILL.md` 正文已于 v2.28.2 后"剥离变更日志"——只保留行为规则,版本噪音迁出至此,以减少生成上下文占用。
 > 章节编号以 `assets/plan-template.html` 的 h2 顺序为唯一真相源(记忆钩子=15 / 复述技巧包=16 / 记忆宫殿=17)。
 
+## [2.30.3] (架构体检第二批：测试 harness 收敛 · 2026-11-01)
+- **新增 tests/helpers/boot.mjs 共享 harness**：quietConsole / PLAN_TEMPLATE / LIB_TEMPLATE / scriptBlocks / evalAllScripts / tick / dstr / progKeyOfDoc / FakeSR+resetSR / fillLib / bootLib / bootCore（JSDOM 装配 + URL/TTS/SR/录音 mock + alert/confirm + 下载捕获 + preload + wrap 注入 + eval 策略参数化）——11 个 .mjs 套件的复制粘贴 harness 收敛为一个 deep module，各文件 boot() 退化为几行本地组装。行为保持型重构：断言零改动，通过数逐文件比对一致；smoke.test.js（CJS 旧套件）保留自带 harness 不迁移。
+- **测试**：总测试数 **621**（不变，重构零新增断言）。
+
 ## [2.30.2] (架构体检第一批：锚点清单自动生成 + 文档一致性 gate · 2026-10-31)
 - **version-check 锚点清单改为扫描生成**：删除 23 条手写 ANCHOR_TABLE（与模板构成两条真相，10-31 体检险情：改 library 头部注释时 EMM_UX_V224 唯一出现被误删）——现扫描两个模板中的 EMM_*_V\d{3}（兼容 EMM_V215_STABLE 式后缀），版本号从锚点名解析（V213→2.13.0），"每个锚点恰好 1 次"与"锚点版本 ≤ package.json"由扫描结果直接执行，新特性零注册。**上线即抓获历史悬案**：EMM_UX_V224 在 plan-template 残留化石标记（v2.28.2 手工改映射时遗留），已清除。
 - **新增 tests/docs-sync.test.mjs 文档一致性 gate**：双语功能表行数一致、双语测试数一致且等于 CHANGELOG 最新条目、已知局限测试数一致、版本徽章 = package.json、章节徽章一致——双语 readme seam 首次有机器检查（10-16 曾实测 3 处漂移）。

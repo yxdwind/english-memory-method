@@ -7,7 +7,7 @@
 丢给它任何一篇英语文章，它还你一份完整背诵方案（普通文章 15 节 · 演讲稿 16 节含骨架 · 长文 17 节含分段仪表，自包含 HTML）：
 逐句连读标注、钩子焊成问题链、复述五级阶梯、专业词汇梳理、折叠自测——全在一份文件里。
 
-![Version](https://img.shields.io/badge/version-2.30.2-blue)
+![Version](https://img.shields.io/badge/version-2.30.3-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-15-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -212,6 +212,10 @@ v2 把钩子焊成链：每一环由上一环"推"出来，**能被逻辑推出�
 > 从新到旧排列，最早版本见底部折叠区。
 
 > 完整版本历史（含历史 bug 修复与 CI 自检锚点 `EMM_*`）已迁出至 [CHANGELOG.md](CHANGELOG.md)。
+
+**架构体检第二批**（v2.30.3）
+
+**v2.30.3**：🧪 测试 harness 收敛——新增 tests/helpers/boot.mjs（JSDOM 装配/浏览器 mock/localStorage 预置/eval 策略一个 deep module），11 个 .mjs 套件的复制粘贴 harness 全部迁移，断言零改动、通过数逐文件一致；smoke（CJS）保留自带 harness。总测试数 **621**（不变）。
 
 **架构体检第一批**（v2.30.2）
 

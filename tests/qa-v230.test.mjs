@@ -11,29 +11,7 @@
  *
  * 跑：node tests/qa-v230.test.mjs（需要 npm i --no-save jsdom@16）
  */
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-let JSDOM, VirtualConsole;
-try {
-  const jsdom = await import('jsdom');
-  JSDOM = jsdom.JSDOM;
-  VirtualConsole = jsdom.VirtualConsole;
-} catch (e) {
-  console.error('缺少 jsdom：请先执行 npm i --no-save jsdom@16 后重跑');
-  process.exit(1);
-}
-
-const HERE = path.dirname(fileURLToPath(import.meta.url));
-const planTemplate = fs.readFileSync(path.join(HERE, '..', 'assets', 'plan-template.html'), 'utf8');
-const libTemplate = fs.readFileSync(path.join(HERE, '..', 'assets', 'library-template.html'), 'utf8');
-
-function quietConsole() {
-  const vc = new VirtualConsole();
-  vc.on('jsdomError', (e) => { if (!/^Not implemented/.test(e.message || '')) console.error('jsdomError:', e.message); });
-  return vc;
-}
+import { PLAN_TEMPLATE as planTemplate, LIB_TEMPLATE as libTemplate, bootCore, bootLib, FakeSR, resetSR, dstr } from './helpers/boot.mjs';
 
 let passed = 0, failed = 0;
 function ok(cond, label) {
@@ -41,25 +19,7 @@ function ok(cond, label) {
   else      { failed++; console.log('  ❌ ' + label); }
 }
 
-function dstr(offsetDays) {
-  const d = new Date();
-  d.setDate(d.getDate() + offsetDays);
-  return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
-}
-
-// ── 可控的 SpeechRecognition mock ──
-class FakeSR {
-  constructor() {
-    FakeSR.instances.push(this);
-    this.lang = ''; this.interimResults = false; this.maxAlternatives = 1;
-    this.onresult = null; this.onerror = null; this.onend = null;
-  }
-  start() { FakeSR.started++; }
-  stop() { FakeSR.stopped++; if (this.onend) this.onend(); }
-  abort() { this.stop(); }
-}
-FakeSR.instances = []; FakeSR.started = 0; FakeSR.stopped = 0;
-function resetSR() { FakeSR.instances = []; FakeSR.started = 0; FakeSR.stopped = 0; }
+// ── 可控 SpeechRecognition mock（helpers 提供，测试内重置计数）──
 
 // ── plan boot（同 qa-v229 模式）──
 const fakeArticle = `
@@ -84,30 +44,7 @@ const fakeArticle = `
 `;
 
 async function bootPlan(opts = {}) {
-  const dom = new JSDOM(planTemplate, {
-    runScripts: 'outside-only',
-    url: 'http://localhost/plan.html',
-    virtualConsole: quietConsole(),
-  });
-  const w = dom.window;
-  w.URL.createObjectURL = () => 'blob:mock';
-  w.URL.revokeObjectURL = () => {};
-  w.scrollTo = () => {};
-  w.speechSynthesis = { getVoices: () => [], speak: () => {}, cancel: () => {} };
-  if (opts.fullCaps) {
-    w.MediaRecorder = function MediaRecorder() {};
-    try {
-      Object.defineProperty(w.navigator, 'mediaDevices', { value: { getUserMedia: () => Promise.resolve({}) }, configurable: true });
-    } catch (e) {}
-  }
-  if (opts.withSR || opts.fullCaps) w.SpeechRecognition = FakeSR;
-  const alerts = []; w.alert = (m) => alerts.push(String(m)); w.confirm = () => true;
-  const wrap = w.document.querySelector('.wrap');
-  if (wrap) wrap.innerHTML = fakeArticle;
-  const scriptBlocks = [...planTemplate.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
-  try { w.eval(scriptBlocks.join('\n;\n')); } catch (e) { console.error('eval error:', e.message); process.exit(1); }
-  await new Promise(r => setTimeout(r, 80));
-  return { w, doc: w.document, alerts };
+  return bootCore({ replaceWrap: fakeArticle, ...opts });
 }
 
 // ── library boot（同 smoke 模式）──
@@ -134,32 +71,6 @@ const libB = {
   ] } ],
   cloze: [ { q: 'Dream one ______ and ______ here.', a: ['onlyone'] } ],
 };
-
-async function bootLib(articles, opts = {}) {
-  const html = fillLib(articles);
-  const dom = new JSDOM(html, {
-    runScripts: 'outside-only',
-    url: 'http://localhost/memory-library.html',
-    virtualConsole: quietConsole(),
-  });
-  const w = dom.window;
-  w.Element.prototype.scrollIntoView = () => {};
-  w.scrollTo = () => {};
-  if (opts.seed) {
-    Object.entries(opts.seed).forEach(([k, v]) => {
-      w.localStorage.setItem(k, typeof v === 'string' ? v : JSON.stringify(v));
-    });
-  }
-  const js = [...html.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]).join('\n;\n');
-  w.eval(js);
-  await new Promise(r => setTimeout(r, 80));
-  return { w, doc: w.document };
-}
-function fillLib(articles) {
-  return libTemplate
-    .replace('{{DATE}}', '2026-10-16')
-    .replace('{{ARTICLES}}', articles.map(a => JSON.stringify(a)).join(',\n'));
-}
 
 const KEY_A = 'emm-progress:Success背诵方案';
 const KEY_B = 'emm-progress:Dream背诵方案';

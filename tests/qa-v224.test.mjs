@@ -15,26 +15,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
 
-let JSDOM, VirtualConsole;
-try {
-  const jsdom = await import('jsdom');
-  JSDOM = jsdom.JSDOM;
-  VirtualConsole = jsdom.VirtualConsole;
-} catch (e) {
-  console.error('缺少 jsdom：请先执行 npm i --no-save jsdom@16 后重跑');
-  process.exit(1);
-}
-
-const HERE = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.join(HERE, '..');
-const planTpl = fs.readFileSync(path.join(ROOT, 'skills', 'english-memory-method', 'assets', 'plan-template.html'), 'utf8');
-const libTpl = fs.readFileSync(path.join(ROOT, 'skills', 'english-memory-method', 'assets', 'library-template.html'), 'utf8');
-
-function quietConsole() {
-  const vc = new VirtualConsole();
-  vc.on('jsdomError', (e) => { if (!/^Not implemented/.test(e.message || '')) console.error('jsdomError:', e.message); });
-  return vc;
-}
+import { PLAN_TEMPLATE as planTpl, LIB_TEMPLATE as libTpl, bootCore, JSDOM, quietConsole } from './helpers/boot.mjs';
 
 let passed = 0, failed = 0;
 function ok(cond, label) {
@@ -43,30 +24,7 @@ function ok(cond, label) {
 }
 
 async function bootPlan(opts = {}) {
-  const dom = new JSDOM(planTpl, {
-    runScripts: 'outside-only',
-    url: 'http://localhost/plan.html' + (opts.query || ''),
-    virtualConsole: quietConsole(),
-  });
-  const w = dom.window;
-  w.URL.createObjectURL = () => 'blob:mock';
-  w.URL.revokeObjectURL = () => {};
-  w.scrollTo = () => {};
-  w.scrollBy = () => {};
-  w.speechSynthesis = { getVoices: () => [], speak: () => {}, cancel: () => {} };
-  w.alert = opts.alert || (() => {});
-  w.confirm = opts.confirm || (() => true);
-  if (opts.preload) {
-    Object.entries(opts.preload).forEach(([k, v]) => {
-      try { w.localStorage.setItem(k, String(v)); } catch (e) {}
-    });
-  }
-  const wrap = w.document.querySelector('.wrap');
-  if (wrap && opts.replaceWrap) wrap.innerHTML = opts.replaceWrap;
-  const scriptBlocks = [...planTpl.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
-  try { w.eval(scriptBlocks.join('\n;\n')); } catch (e) { console.error('eval error:', e.message); process.exit(1); }
-  await new Promise(r => setTimeout(r, 80));
-  return { w, doc: w.document };
+  return bootCore(opts);
 }
 
 const fakeArticle = `

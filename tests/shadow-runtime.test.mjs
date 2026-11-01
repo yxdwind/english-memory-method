@@ -13,32 +13,7 @@
  *
  * 跑：node tests/shadow-runtime.test.mjs（需要 npm i --no-save jsdom@16）
  */
-import fs from 'node:fs';
-import path from 'node:path';
-import { fileURLToPath } from 'node:url';
-
-let JSDOM, VirtualConsole;
-try {
-  const jsdom = await import('jsdom');
-  JSDOM = jsdom.JSDOM;
-  VirtualConsole = jsdom.VirtualConsole;
-} catch (e) {
-  console.error('缺少 jsdom：请先执行 npm i --no-save jsdom@16 后重跑');
-  process.exit(1);
-}
-
-const HERE = path.dirname(fileURLToPath(import.meta.url));
-const template = fs.readFileSync(path.join(HERE, '..', 'skills', 'english-memory-method', 'assets', 'plan-template.html'), 'utf8');
-
-function quietConsole() {
-  const vc = new VirtualConsole();
-  vc.on('jsdomError', (e) => { if (!/^Not implemented/.test(e.message || '')) console.error('jsdomError:', e.message); });
-  vc.on('error', (...args) => console.error('[js]', ...args));
-  vc.on('warn', (...args) => console.warn('[js]', ...args));
-  vc.on('log', (...args) => console.log('[js]', ...args));
-  // jsdom 在 error 时也会抛 window.onerror
-  return vc;
-}
+import { PLAN_TEMPLATE as template, bootCore } from './helpers/boot.mjs';
 
 let passed = 0, failed = 0;
 function ok(cond, label) {
@@ -63,43 +38,7 @@ const fakeArticle = `
 `;
 
 async function boot(opts = {}) {
-  const dom = new JSDOM(template, {
-    runScripts: 'outside-only',
-    url: 'http://localhost/plan.html' + (opts.query || ''),
-    virtualConsole: quietConsole(),
-  });
-  const w = dom.window;
-  w.URL.createObjectURL = () => 'blob:mock';
-  w.URL.revokeObjectURL = () => {};
-  w.scrollTo = () => {};
-  w.speechSynthesis = {
-    getVoices: () => [],
-    speak: opts.recordSpeak ? ((u) => { (opts.recordSpeak.calls || (opts.recordSpeak.calls = [])).push(u.text); }) : (() => {}),
-    cancel: () => {},
-  };
-  if (opts.preload) {
-    Object.entries(opts.preload).forEach(([k, v]) => {
-      try { w.localStorage.setItem(k, String(v)); } catch (e) {}
-    });
-  }
-  const wrap = w.document.querySelector('.wrap');
-  if (wrap && opts.replaceWrap) {
-    // 替换整个 wrap 内容（避免模板里的示例 .sent 干扰计数）
-    wrap.innerHTML = opts.replaceWrap;
-  } else if (wrap && opts.prefix) {
-    wrap.innerHTML = opts.prefix + wrap.innerHTML;
-  }
-  // 运行所有 <script> 块（顺序：v2.18 主组件 → v2.18 fold → v2.19 shadow）
-  const scriptBlocks = [...template.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
-  // 拼接所有 script 一次性 eval：浏览器把同一 <script> 块里的所有内容作为同一词法作用域运行，
-  // 所以"独立 eval 各 IIFE"会因 strict mode 看不到 `state/sentences` 而失效；必须拼接
-  const allScripts = scriptBlocks.join('\n;\n');
-  try { w.eval(allScripts); } catch (e) {
-    console.error('eval error:', e.message, '\n', e.stack && e.stack.split('\n').slice(0, 4).join('\n'));
-    process.exit(1);
-  }
-  await new Promise(r => setTimeout(r, 100));
-  return { w, doc: w.document };
+  return bootCore({ forwardConsole: true, wait: 100, ...opts });
 }
 
 console.log('\n== v2.19 EMM_SHADOW_V219 影子跟读 运行时验证 ==');

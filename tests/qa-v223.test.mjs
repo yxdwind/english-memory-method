@@ -24,16 +24,10 @@ try {
   process.exit(1);
 }
 
+import { PLAN_TEMPLATE as template, bootCore, progKeyOfDoc as progKey } from './helpers/boot.mjs';
 const HERE = path.dirname(fileURLToPath(import.meta.url));
 const ROOT = path.join(HERE, '..');
-const template = fs.readFileSync(path.join(ROOT, 'skills', 'english-memory-method', 'assets', 'plan-template.html'), 'utf8');
 const skillMd = fs.readFileSync(path.join(ROOT, 'SKILL.md'), 'utf8');
-
-function quietConsole() {
-  const vc = new VirtualConsole();
-  vc.on('jsdomError', (e) => { if (!/^Not implemented/.test(e.message || '')) console.error('jsdomError:', e.message); });
-  return vc;
-}
 
 let passed = 0, failed = 0;
 function ok(cond, label) {
@@ -81,34 +75,7 @@ const fakeArticleBadIPA = `
 `;
 
 async function boot(opts = {}) {
-  const dom = new JSDOM(template, {
-    runScripts: 'outside-only',
-    url: 'http://localhost/plan.html' + (opts.query || ''),
-    virtualConsole: quietConsole(),
-  });
-  const w = dom.window;
-  w.URL.createObjectURL = () => 'blob:mock';
-  w.URL.revokeObjectURL = () => {};
-  w.scrollTo = () => {};
-  w.speechSynthesis = { getVoices: () => [], speak: () => {}, cancel: () => {} };
-  w.alert = opts.alert || (() => {});
-  w.confirm = opts.confirm || (() => true);
-  if (opts.preload) {
-    Object.entries(opts.preload).forEach(([k, v]) => {
-      try { w.localStorage.setItem(k, String(v)); } catch (e) {}
-    });
-  }
-  const wrap = w.document.querySelector('.wrap');
-  if (wrap && opts.replaceWrap) wrap.innerHTML = opts.replaceWrap;
-  const scriptBlocks = [...template.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
-  try { w.eval(scriptBlocks.join('\n;\n')); } catch (e) { console.error('eval error:', e.message); process.exit(1); }
-  await new Promise(r => setTimeout(r, 80));
-  return { w, doc: w.document };
-}
-
-function progKey(doc) {
-  var h = doc.querySelector('h1');
-  return 'emm-progress:' + (h ? h.textContent.trim().slice(0, 40) : (doc.title || '').slice(0, 40) || 'plan');
+  return bootCore(opts);
 }
 
 console.log('\n== v2.23 EMM_QUALITY_V223 内容质量大礼包 运行时验证 ==');

@@ -7,7 +7,7 @@
 Paste any English article, and it produces a **17-section longform plan (15 basic / 16 speech / 17 longform) (speeches: 16 sections incl. skeleton)** (self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.30.2-blue)
+![Version](https://img.shields.io/badge/version-2.30.3-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-15-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -216,6 +216,10 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 > Newest first; earliest versions in the collapsed section at the bottom.
 
 > Full version history (including historical bug fixes and CI self-check anchors `EMM_*`) has been moved to [CHANGELOG.md](CHANGELOG.md).
+
+**Architecture review, batch 2** (v2.30.3)
+
+**v2.30.3**: 🧪 test harness consolidated — new tests/helpers/boot.mjs (JSDOM assembly / browser mocks / preload / eval strategy in one deep module); all 11 .mjs suites migrated from copy-pasted harnesses, zero assertion changes, per-file pass counts verified identical; smoke (CJS) keeps its own harness. Total tests **621** (unchanged).
 
 **Architecture review, batch 1** (v2.30.2)
 

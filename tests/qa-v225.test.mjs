@@ -24,15 +24,7 @@ try {
   process.exit(1);
 }
 
-const HERE = path.dirname(fileURLToPath(import.meta.url));
-const ROOT = path.join(HERE, '..');
-const planTpl = fs.readFileSync(path.join(ROOT, 'skills', 'english-memory-method', 'assets', 'plan-template.html'), 'utf8');
-
-function quietConsole() {
-  const vc = new VirtualConsole();
-  vc.on('jsdomError', (e) => { if (!/^Not implemented/.test(e.message || '')) console.error('jsdomError:', e.message); });
-  return vc;
-}
+import { PLAN_TEMPLATE as planTpl, bootCore, progKeyOfDoc as progKey } from './helpers/boot.mjs';
 
 let passed = 0, failed = 0;
 function ok(cond, label) {
@@ -54,34 +46,7 @@ const fakeArticleWithCloze = `
 `;
 
 async function boot(opts = {}) {
-  const dom = new JSDOM(planTpl, {
-    runScripts: 'outside-only',
-    url: 'http://localhost/plan.html' + (opts.query || ''),
-    virtualConsole: quietConsole(),
-  });
-  const w = dom.window;
-  w.URL.createObjectURL = () => 'blob:mock';
-  w.URL.revokeObjectURL = () => {};
-  w.scrollTo = w.scrollBy = () => {};
-  w.speechSynthesis = { getVoices: () => [], speak: () => {}, cancel: () => {} };
-  w.alert = opts.alert || (() => {});
-  w.confirm = opts.confirm || (() => true);
-  if (opts.preload) {
-    Object.entries(opts.preload).forEach(([k, v]) => {
-      try { w.localStorage.setItem(k, String(v)); } catch (e) {}
-    });
-  }
-  const wrap = w.document.querySelector('.wrap');
-  if (wrap && opts.replaceWrap) wrap.innerHTML = opts.replaceWrap;
-  const scriptBlocks = [...planTpl.matchAll(/<script>([\s\S]*?)<\/script>/g)].map(m => m[1]);
-  try { w.eval(scriptBlocks.join('\n;\n')); } catch (e) { console.error('eval error:', e.message); process.exit(1); }
-  await new Promise(r => setTimeout(r, 80));
-  return { w, doc: w.document };
-}
-
-function progKey(doc) {
-  var h = doc.querySelector('h1');
-  return 'emm-progress:' + (h ? h.textContent.trim().slice(0, 40) : (doc.title || '').slice(0, 40) || 'plan');
+  return bootCore(opts);
 }
 
 console.log('\n== v2.25 EMM_ASSESS_V225 评估优化 运行时验证 ==');
