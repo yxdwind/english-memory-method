@@ -7,7 +7,7 @@
 Paste any English article, and it produces a **17-section longform plan (15 basic / 16 speech / 17 longform) (speeches: 16 sections incl. skeleton)** (self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.30.3-blue)
+![Version](https://img.shields.io/badge/version-2.31.0-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-15-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -42,7 +42,7 @@ sentence-by-sentence linking marks, hooks welded into question chains, a retelli
 | 🛡 | **Progress fingerprint** | Plan changed? Auto-detected — progress never grafts onto the wrong version |
 | 📅 | **Today card** | Per-segment Ebbinghaus computes today's work; "set as today's new" reshuffles |
 | 🌐 | **Online samples** | Try before installing: real generated plans on GitHub Pages — check-in / dictation / shadowing, just open |
-| 🧪 | **621 automated tests** | Smoke + runtime + 35-step E2E + browser matrix, one `npm test` |
+| 🧪 | **626 automated tests** | Smoke + runtime + 35-step E2E + browser matrix, one `npm test` |
 | 🚦 | **Delivery gate** | `node bin/verify-plan.mjs` runs six hard rules before delivery — non-zero exit blocks it |
 | 🔒 | **Collapsed self-tests** | Fill the blanks first; answers hide behind "▶ 查看本段答案" toggles, auto-hidden when printing |
 | 🖥 | **16+ platforms, one command** | Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi / MiniMax… |
@@ -217,6 +217,10 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 > Full version history (including historical bug fixes and CI self-check anchors `EMM_*`) has been moved to [CHANGELOG.md](CHANGELOG.md).
 
+**Architecture review, batch 3** (v2.31.0)
+
+**v2.31.0**: 🏗 source monolith split — the plan-template source now lives as 10 modules under src/plan/ (CSS / section skeleton / 6 scripts as separate files); `npm run build:template` assembles and dual-writes both copies; purely mechanical — the artifact is byte-identical to the old file, all 621 assertions unchanged; new template-build drift gate catches "edited src, forgot to build" and "edited the artifact directly". The deliverable is still a single zero-dependency file. Total tests **626**.
+
 **Architecture review, batch 2** (v2.30.3)
 
 **v2.30.3**: 🧪 test harness consolidated — new tests/helpers/boot.mjs (JSDOM assembly / browser mocks / preload / eval strategy in one deep module); all 11 .mjs suites migrated from copy-pasted harnesses, zero assertion changes, per-file pass counts verified identical; smoke (CJS) keeps its own harness. Total tests **621** (unchanged).
@@ -359,7 +363,7 @@ Progress is saved in the browser `localStorage`: **it is isolated per browser an
 - Install sources default to `raw.githubusercontent.com` and jsDelivr; if your network is unreliable, use a reachable mirror or an offline package.
 
 ### Output quality depends on the host model
-Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 621 tests cover the **template and runtime**, not the quality of any specific model's generated content.
+Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 626 tests cover the **template and runtime**, not the quality of any specific model's generated content.
 
 ### Who this is NOT for
 - Absolute beginners who want a 5-minute quick-memorize flow (this method is methodology-heavy with a higher onboarding cost).

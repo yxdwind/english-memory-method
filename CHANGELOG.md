@@ -4,6 +4,12 @@
 > `SKILL.md` 正文已于 v2.28.2 后"剥离变更日志"——只保留行为规则,版本噪音迁出至此,以减少生成上下文占用。
 > 章节编号以 `assets/plan-template.html` 的 h2 顺序为唯一真相源(记忆钩子=15 / 复述技巧包=16 / 记忆宫殿=17)。
 
+## [2.31.0] (架构体检第三批：源码单体拆分 · 2026-11-01)
+- **plan-template 源码拆分（src/plan/）**：单体的源码布局变为 10 个模块——00-head.html（doctype+用法注释+head 开）、css/main.css、01-body.html（17 节骨架+占位符）、scripts/01-main·02-sr·03-shadow·04-fold·05-onboard·06-markers.js、99-tail.html；`bin/build-template.mjs` 按序拼装并**双写 assets/ 与 skills/ 副本**（手动 Copy-Item 同步步骤退役）。Phase 1 为纯机械拆分：build(源码) === 原 artifact 字节级一致，621 项断言零改动全绿——交付物仍是单文件零依赖，产品承诺不变。
+- **新增 tests/template-build.test.mjs 漂移 gate**：重建产物必须与已提交 artifact 逐字节一致——改 src/ 忘构建、或直接手改产物，都会被拦下。
+- **测试**：新增 template-build 5 项，总测试数 **626**。
+- library-template 拆分与 progress-store 整合（体检 #2）留待下一批，在新布局上进行。
+
 ## [2.30.3] (架构体检第二批：测试 harness 收敛 · 2026-11-01)
 - **新增 tests/helpers/boot.mjs 共享 harness**：quietConsole / PLAN_TEMPLATE / LIB_TEMPLATE / scriptBlocks / evalAllScripts / tick / dstr / progKeyOfDoc / FakeSR+resetSR / fillLib / bootLib / bootCore（JSDOM 装配 + URL/TTS/SR/录音 mock + alert/confirm + 下载捕获 + preload + wrap 注入 + eval 策略参数化）——11 个 .mjs 套件的复制粘贴 harness 收敛为一个 deep module，各文件 boot() 退化为几行本地组装。行为保持型重构：断言零改动，通过数逐文件比对一致；smoke.test.js（CJS 旧套件）保留自带 harness 不迁移。
 - **测试**：总测试数 **621**（不变，重构零新增断言）。
