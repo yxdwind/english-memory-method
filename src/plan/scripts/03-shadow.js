@@ -13,14 +13,11 @@
     }
     return out;
   }
-  function getH1(){ var h = document.querySelector('h1'); return h ? h.textContent.trim().slice(0, 40) : ((document.title || '').slice(0, 40) || 'plan'); }
-  function keyOf(){ return 'emm-progress:' + getH1(); }
-  function loadProgress(){
-    try { return JSON.parse(localStorage.getItem(keyOf()) || '{}'); } catch(e) { return {}; }
-  }
-  function saveProgress(prog){
-    try { localStorage.setItem(keyOf(), JSON.stringify(prog)); } catch(e){}
-  }
+  // v2.32.0：进度契约收敛到 EMM_PROGRESS store（00-store.js）——同签名薄委托
+  function getH1(){ return EMMProgressStore.getH1(); }
+  function keyOf(){ return EMMProgressStore.keyOf(); }
+  function loadProgress(){ return EMMProgressStore.load(); }
+  function saveProgress(prog){ EMMProgressStore.save(prog); }
 
   var sents = getSentences();
   if(!sents.length) return;

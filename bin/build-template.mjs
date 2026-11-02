@@ -15,7 +15,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 const NL = String.fromCharCode(10);
 const S = (...p) => readFileSync(join(ROOT, 'src/plan', ...p), 'utf8');
-const SCRIPTS = ['01-main', '02-sr', '03-shadow', '04-fold', '05-onboard', '06-markers'];
+const SCRIPTS = ['00-store', '01-main', '02-sr', '03-shadow', '04-fold', '05-onboard', '06-markers'];
 const DESTS = ['assets/plan-template.html', 'skills/english-memory-method/assets/plan-template.html'];
 
 const out = S('00-head.html')

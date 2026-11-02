@@ -34,27 +34,14 @@
     return {ef: ef, interval: interval, reps: reps, due: due, lastQ: q};
   }
 
-  // localStorage 路径与 main IIFE 一致（keyOf = 'emm-progress:' + h1 text）
-  function getH1(){ var h = document.querySelector('h1'); return h ? h.textContent.trim().slice(0, 40) : ((document.title || '').slice(0, 40) || 'plan'); }
-  function keyOf(){ return 'emm-progress:' + getH1(); }
-  function loadProgress(){
-    try { return JSON.parse(localStorage.getItem(keyOf()) || '{}'); } catch(e) { return {}; }
-  }
+  // v2.32.0：进度键派生与读写收敛到 EMMProgressStore（00-store.js），此处为同签名薄委托
+  // v2.32.0：进度契约收敛到 EMM_PROGRESS store（00-store.js）——同签名薄委托
+  function getH1(){ return EMMProgressStore.getH1(); }
+  function keyOf(){ return EMMProgressStore.keyOf(); }
+  function loadProgress(){ return EMMProgressStore.load(); }
   // 只 patch sr 字段（不重写整个 state），避免与 main 的 save(state) 写竞态
-  function patchSr(srObj){
-    try {
-      var p = JSON.parse(localStorage.getItem(keyOf()) || '{}');
-      p.sr = srObj;
-      localStorage.setItem(keyOf(), JSON.stringify(p));
-    } catch(e){}
-  }
-  function patchSrMode(mode){
-    try {
-      var p = JSON.parse(localStorage.getItem(keyOf()) || '{}');
-      p.srMode = mode;
-      localStorage.setItem(keyOf(), JSON.stringify(p));
-    } catch(e){}
-  }
+  function patchSr(srObj){ EMMProgressStore.patch(function(p){ p.sr = srObj; }); }
+  function patchSrMode(mode){ EMMProgressStore.patch(function(p){ p.srMode = mode; }); }
 
   // 与 Ebbinghaus 间隔表（1/2/4/7/15）对齐：取 max(SR.due, ebbinghausRound)
   // 用途：保证标准模式不会让复习频率低于经典 Ebbinghaus 节奏

@@ -4,6 +4,11 @@
 > `SKILL.md` 正文已于 v2.28.2 后"剥离变更日志"——只保留行为规则,版本噪音迁出至此,以减少生成上下文占用。
 > 章节编号以 `assets/plan-template.html` 的 h2 顺序为唯一真相源(记忆钩子=15 / 复述技巧包=16 / 记忆宫殿=17)。
 
+## [2.32.0] (架构体检第四批：进度存储契约收敛 · 2026-11-01)
+- **新增 src/plan/scripts/00-store.js（EMM_STORE_V232）**：进度存储契约唯一实现——键派生（字面量全模板唯一）与 load/loadRaw/save/patch（参数双形态：doc 或完整键，library 批接入用）；main IIFE 的 keyOf/save/loadState 首行、SR IIFE 的 getH1/keyOf/loadProgress/patchSr/patchSrMode、shadow IIFE 的 getH1/keyOf/loadProgress/saveProgress 全部改为同签名薄委托，调用点零改动。此前同一契约在模板内复制 3 份（体检 #2 证据），漂移只能靠人肉比对。
+- **块顺序**：store 块插为第 1 个脚本块（先于 main IIFE），产物 script 块 6→7；template-build 断言同步。
+- **测试**：新增 qa-v232 10 项，总测试数 **636**。
+
 ## [2.31.0] (架构体检第三批：源码单体拆分 · 2026-11-01)
 - **plan-template 源码拆分（src/plan/）**：单体的源码布局变为 10 个模块——00-head.html（doctype+用法注释+head 开）、css/main.css、01-body.html（17 节骨架+占位符）、scripts/01-main·02-sr·03-shadow·04-fold·05-onboard·06-markers.js、99-tail.html；`bin/build-template.mjs` 按序拼装并**双写 assets/ 与 skills/ 副本**（手动 Copy-Item 同步步骤退役）。Phase 1 为纯机械拆分：build(源码) === 原 artifact 字节级一致，621 项断言零改动全绿——交付物仍是单文件零依赖，产品承诺不变。
 - **新增 tests/template-build.test.mjs 漂移 gate**：重建产物必须与已提交 artifact 逐字节一致——改 src/ 忘构建、或直接手改产物，都会被拦下。

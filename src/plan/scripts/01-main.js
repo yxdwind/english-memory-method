@@ -55,15 +55,10 @@
   + '@media print{.rv-bar,.rv-dash,.rv-judge,.rv-dict,.rv-shadow{display:none !important;}}'
   + '';
 
-  function keyOf(){
-    var t = document.title || '';
-    var h = document.querySelector('h1');
-    return 'emm-progress:' + (h ? h.textContent.trim().slice(0, 40) : (t.slice(0, 40) || 'plan'));
-  }
+  function keyOf(){ return EMMProgressStore.keyOf(); }
 
   function loadState(){
-    var s = null;
-    try { s = JSON.parse(localStorage.getItem(keyOf()) || 'null'); } catch(e){ s = null; }
+    var s = EMMProgressStore.loadRaw(keyOf());
     var f = fresh();
     if(!s) return f;
     for(var k in s){ f[k] = s[k]; }
@@ -82,7 +77,7 @@
              srMode:'light',  // v2.20：'light' 默认（连顺 2 轮毕业）；'standard' 走 SM-2
              fingerprint:'' };
   }
-  function save(s){ try { localStorage.setItem(keyOf(), JSON.stringify(s)); } catch(e){} }
+  function save(s){ EMMProgressStore.save(s); }
 
   var state, sentences = [];
 

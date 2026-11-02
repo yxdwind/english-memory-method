@@ -28,7 +28,7 @@ console.log('\n== v2.31.0 模板构建漂移 gate ==');
 
 const SRC = [
   '00-head.html', 'css/main.css', '01-body.html',
-  'scripts/01-main.js', 'scripts/02-sr.js', 'scripts/03-shadow.js',
+  'scripts/00-store.js', 'scripts/01-main.js', 'scripts/02-sr.js', 'scripts/03-shadow.js',
   'scripts/04-fold.js', 'scripts/05-onboard.js', 'scripts/06-markers.js',
   '99-tail.html',
 ];
@@ -41,7 +41,7 @@ try {
 ok(checkOk, 'build --check：src/plan 重建 === 已提交产物（无漂移）');
 
 const artifact = fs.readFileSync(path.join(ROOT, 'assets', 'plan-template.html'), 'utf8');
-ok((artifact.match(/<script>/g) || []).length === 6, '产物仍为 6 个 script 块');
+ok((artifact.match(/<script>/g) || []).length === 7, '产物为 7 个 script 块（00-store + 6 原有）');
 ok(artifact.includes('{{TITLE}}'), '产物保留 {{TITLE}} 占位符');
 
 const copy = fs.readFileSync(path.join(ROOT, 'skills', 'english-memory-method', 'assets', 'plan-template.html'), 'utf8');
