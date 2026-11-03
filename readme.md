@@ -7,7 +7,7 @@
 丢给它任何一篇英语文章，它还你一份完整背诵方案（普通文章 15 节 · 演讲稿 16 节含骨架 · 长文 17 节含分段仪表，自包含 HTML）：
 逐句连读标注、钩子焊成问题链、复述五级阶梯、专业词汇梳理、折叠自测——全在一份文件里。
 
-![Version](https://img.shields.io/badge/version-2.33.0-blue)
+![Version](https://img.shields.io/badge/version-2.34.0-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-15-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -42,7 +42,7 @@
 | 🛡 | **进度指纹** | 方案内容变了自动检测，进度不再错位嫁接 |
 | 📅 | **今日任务卡** | 按段艾宾浩斯自动算今天学什么，支持「设为今天新学」顺延 |
 | 🌐 | **在线样例** | 不装先玩：GitHub Pages 上有真实生成的方案，打卡/听写/影子跟读点开即用 |
-| 🧪 | **639 项自动化测试** | 冒烟 + 运行时 + 端到端 35 步 + 跨浏览器矩阵，npm test 一键全跑 |
+| 🧪 | **642 项自动化测试** | 冒烟 + 运行时 + 端到端 35 步 + 跨浏览器矩阵，npm test 一键全跑 |
 | 🚦 | **交付硬门禁** | 交付前 `node bin/verify-plan.mjs` 六条硬规则机器校验（逐句对照/宫殿/钩子链/挖空/溯源），退出码非 0 不交付 |
 | 🔒 | **折叠自测** | 挖空先自己填，答案藏在"▶ 查看本段答案"里，打印自动隐藏 |
 | 🖥 | **16+ 平台直装** | Claude Code / Codex / Trae / 通义灵码 / Comate / CodeBuddy / WorkBuddy / Kimi / MiniMax… |
@@ -217,6 +217,8 @@ v2 把钩子焊成链：每一环由上一环"推"出来，**能被逻辑推出�
 
 **v2.33.0**：🏗 library-template 源码拆分——40KB 单体源码变为 src/library/ 下 5 个模块，build-template 扩为双模板构建器（plan + library 双写双副本，--check 同时校验两份）；纯机械拆分，产物字节级一致（CRLF 原样保留）。总测试数 **639**。
 
+**v2.34.0**：🔌 library 接入进度存储契约——build-template 将 EMMProgressStore（00-store.js，锚点字面量替换）注入 library 产物为第 1 个脚本块，library 的 progKey/readProgress 改为字符串键形态委托（loadRaw，缺失/损坏 → null 语义不变）；src/library 行尾统一 LF、产物保持 CRLF。总测试数 **642**。
+
 **架构体检第四批**（v2.32.0）
 
 **v2.32.0**：🔌 进度存储契约收敛——新增 src/plan/scripts/00-store.js（EMM_STORE_V232）：键派生与 load/loadRaw/save/patch 唯一实现（参数双形态：doc 或完整键），main/SR/shadow 三处复制契约改为同签名薄委托，调用点零改动；键前缀字面量全模板唯一；store 块为第 1 个脚本块。总测试数 **636**。
@@ -364,7 +366,7 @@ v2 把钩子焊成链：每一环由上一环"推"出来，**能被逻辑推出�
 - 安装源默认走 `raw.githubusercontent.com` 与 jsDelivr；若所在网络访问不稳，可改用可达镜像或离线包。
 
 ### 生成质量依赖宿主模型
-方案由宿主 Agent 的模型现生成，质量随模型能力浮动；弱模型或 L2/L3 平台输出会更简略。639 项测试覆盖**模板与运行时**，不保证任意模型生成内容的优劣。
+方案由宿主 Agent 的模型现生成，质量随模型能力浮动；弱模型或 L2/L3 平台输出会更简略。642 项测试覆盖**模板与运行时**，不保证任意模型生成内容的优劣。
 
 ### 这份方案「不适合」谁
 - 想要 5 分钟极简背词的纯新手（本方案偏重方法论，入门成本较高）。

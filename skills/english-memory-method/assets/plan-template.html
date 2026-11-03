@@ -389,7 +389,8 @@ body.emm-folded .emm-advanced{display:none!important;}
    main IIFE（keyOf/save/loadState 首行）、SR IIFE（getH1/keyOf/loadProgress/
    patchSr/patchSrMode）、shadow IIFE（getH1/keyOf/loadProgress/saveProgress）
    均为同签名薄委托——契约改动只改本块。本块必须是第 1 个脚本块（先于 main）。
-   library-template 的 article-key 版本在 library 拆分批次接入。 */
+   library-template（v2.34.0）：builder 将本块内版本锚点字面量替换后注入为其
+   第 1 个脚本块；library 的 progKey 以字符串键形态（keyArg）调用 loadRaw/save/patch。 */
 window.EMMProgressStore = (function(){
   "use strict";
   function title40(doc) {

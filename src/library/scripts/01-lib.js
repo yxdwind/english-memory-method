@@ -30,12 +30,11 @@
     if(!m) return null;
     return Math.round((new Date() - new Date(+m[1], +m[2]-1, +m[3])) / 86400000);
   }
-  /* 与方案组件 keyOf() 约定一致：emm-progress:<方案 h1 文本前 40 字> */
+  /* v2.34.0：进度读取委托 EMMProgressStore（builder 注入本页第 1 个脚本块）。
+     键约定与方案组件一致：emm-progress:<标识前 40 字>（本页用 article.key），
+     以字符串键形态（keyArg）调用；缺失/损坏返回 null 的语义由 loadRaw 保证 */
   function progKey(article){ return 'emm-progress:' + (article.key || '').slice(0, 40); }
-  function readProgress(article){
-    try { return JSON.parse(localStorage.getItem(progKey(article)) || 'null'); }
-    catch(e){ return null; }
-  }
+  function readProgress(article){ return EMMProgressStore.loadRaw(progKey(article)); }
   function progStats(article){
     var s = readProgress(article);
     if(!s) return null;

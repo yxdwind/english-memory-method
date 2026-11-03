@@ -4,6 +4,11 @@
 > `SKILL.md` 正文已于 v2.28.2 后"剥离变更日志"——只保留行为规则,版本噪音迁出至此,以减少生成上下文占用。
 > 章节编号以 `assets/plan-template.html` 的 h2 顺序为唯一真相源(记忆钩子=15 / 复述技巧包=16 / 记忆宫殿=17)。
 
+## [2.34.0] (架构体检收官：library 接入进度存储契约 · 2026-11-02)
+- **library 接入 EMMProgressStore**：`bin/build-template.mjs` 将 `src/plan/scripts/00-store.js` 内 `EMM_STORE_V232` 锚点字面量替换为 `EMM_STORE` 后注入 library 产物为第 1 个脚本块（锚点保持 plan 单点）；library 的 `progKey/readProgress` 改为字符串键形态（keyArg）委托——`readProgress = loadRaw(progKey(article))`，缺失/损坏返回 null 的语义不变。
+- **行尾策略**：src/library 源码统一 LF（符合仓库 eol=lf 约定），builder 组装 library 产物时统一 LF→CRLF，历史产物行尾保持不变。
+- **测试**：smoke 新增 3 项（library 双 script 块 / store 先于主脚本 / 锚点剥离），template-build 计数更新（library 2 块），总测试数 **642**。
+
 ## [2.33.0] (架构体检第五批：library-template 源码拆分 · 2026-11-02)
 - **library-template 源码拆分（src/library/）**：40KB 单体源码变为 5 个模块——00-head.html、css/main.css、01-body.html、scripts/01-lib.js（主 IIFE + schema 注释，单词法作用域原样保留）、99-tail.html；`bin/build-template.mjs` 扩展为**双模板构建器**（plan + library 各自双写 assets/ 与 skills/ 副本，--check 同时校验两份）。纯机械拆分：build(源码) === 原 artifact 字节级一致（CRLF 行尾原样保留），断言零改动。其 progKey/readProgress 接入 EMMProgressStore（keyArg 字符串形态）与内部模块化（vocab/todayall 独立 module）留待行为性批次——单词法作用域拆分需先重构作用域链。
 - **测试**：template-build 扩至 8 项（library 模块齐全/单 script 块/双副本），总测试数 **639**。

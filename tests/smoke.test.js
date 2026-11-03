@@ -500,11 +500,15 @@ async function runLibrary() {
   {
     // 根因（审计 v2.28.1）：{{ARTICLES}} 填进 <script> 内，数据若含 </script 会让 HTML 解析器
     // 在字符串内部提前闭合脚本 → 整页 JS 静默挂掉，而 node --check 与 JS 提取都查不出来。
-    // 交付校验 = 填充后全文 </script 计数必须为 1（SKILL.md 校验第 5 条）。这里锁死三件事：
-    ok((libTemplate.match(/<\/script/g) || []).length === 1, '模板本身 </script 恰好 1 次');
-    ok((fillLib([libA]).match(/<\/script/g) || []).length === 1, '正常数据填充后仍恰好 1 次');
+    // 交付校验 = 填充后全文 </script 计数必须为 2（v2.34.0 store 注入块 + 主脚本，SKILL.md 校验第 5 条）。这里锁死六件事：
+    ok((libTemplate.match(/<\/script/g) || []).length === 2, '模板本身 </script 恰好 2 次（store 注入块 + 主脚本）');
+    ok((fillLib([libA]).match(/<\/script/g) || []).length === 2, '正常数据填充后仍恰好 2 次');
     const hostileC = Object.assign({}, libB, { title: 'Dream</script>' });
-    ok((fillLib([hostileC]).match(/<\/script/g) || []).length === 2, '含闭合序列的数据填充后计数变 2 → 交付校验可捕获');
+    ok((fillLib([hostileC]).match(/<\/script/g) || []).length === 3, '含闭合序列的数据填充后计数变 3 → 交付校验可捕获');
+    // v2.34.0: EMMProgressStore 注入（builder 注入为主脚本前置块，锚点字面量替换）
+    ok((libTemplate.match(/<script>/g) || []).length === 2, 'library 模板 2 个 script 块（EMMProgressStore 注入 + 主脚本）');
+    ok(libTemplate.indexOf('EMMProgressStore') >= 0 && libTemplate.indexOf('EMMProgressStore') < libTemplate.indexOf('function progKey'), 'store 块先于主脚本');
+    ok(libTemplate.split(String.fromCharCode(10)).every(l => l.indexOf('EMM_STORE_V232') < 0), 'library 产物不含 EMM_STORE_V232 锚点（锚点 plan 单点）');
   }
 
   console.log('== v2.28.2 记忆库：同名 key 检测 ==');

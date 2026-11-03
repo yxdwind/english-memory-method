@@ -1,7 +1,9 @@
 #!/usr/bin/env node
-// english-memory-method · 模板构建器（v2.33.0+ 双模板）
+// english-memory-method · 模板构建器（v2.34.0+ 双模板）
 // src/plan/* → assets/plan-template.html + skills/ 副本
 // src/library/* → assets/library-template.html + skills/ 副本
+//   library 产物额外注入 00-store.js（替换 EMM_STORE_V232 锚点字面量）为主脚本前置块；
+//   src 统一 LF，library 产物末尾统一转 CRLF（历史行尾不变）
 //
 // 用法：
 //   node bin/build-template.mjs            # 生成并双写全部副本
@@ -20,17 +22,24 @@ const S = (...p) => readFileSync(join(ROOT, 'src/plan', ...p), 'utf8');
 const L = (...p) => readFileSync(join(ROOT, 'src/library', ...p), 'utf8');
 
 const PLAN_SCRIPTS = ['00-store', '01-main', '02-sr', '03-shadow', '04-fold', '05-onboard', '06-markers'];
+// v2.34.0：store 单点 —— plan 产物带锚点（version-check 扫描），library 产物剥离锚点行后注入
+const STORE_SRC = S('scripts', '00-store.js');
+const LIB_STORE_SRC = STORE_SRC.split('EMM_STORE_V232').join('EMM_STORE');
 const outPlan = S('00-head.html')
   + '<style>' + S('css/main.css') + '</style>'
   + S('01-body.html')
   + PLAN_SCRIPTS.map(n => '<script>' + S('scripts', n + '.js') + '</script>').join(NL + NL)
   + NL + NL + S('99-tail.html');
 
-const outLib = L('00-head.html')
+const outLibRaw = L('00-head.html')
   + '<style>' + L('css/main.css') + '</style>'
   + L('01-body.html')
+  + '<script>' + LIB_STORE_SRC + '</script>'
+  + NL + NL
   + '<script>' + L('scripts/01-lib.js') + '</script>'
-  + CRLF + CRLF + L('99-tail.html');
+  + NL + NL + L('99-tail.html');
+// library 产物保持历史 CRLF 行尾（src 已统一 LF，此处统一转换）
+const outLib = outLibRaw.split(NL).join(CRLF);
 
 const TARGETS = [
   { out: outPlan, dests: ['assets/plan-template.html', 'skills/english-memory-method/assets/plan-template.html'], label: 'plan-template' },

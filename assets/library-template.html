@@ -155,6 +155,46 @@
 <footer>English teacher · 个人记忆库 · 进度实时读取自本机浏览器 · 打卡与薄弱清单以原方案为准</footer>
 </div>
 
+<script>/* ===== v2.32.0 EMM_STORE: 进度存储契约（唯一实现）=====
+   keyOf = 进度键前缀 + (h1 文本前 40 字 | title 前 40 字 | 'plan')。
+   main IIFE（keyOf/save/loadState 首行）、SR IIFE（getH1/keyOf/loadProgress/
+   patchSr/patchSrMode）、shadow IIFE（getH1/keyOf/loadProgress/saveProgress）
+   均为同签名薄委托——契约改动只改本块。本块必须是第 1 个脚本块（先于 main）。
+   library-template（v2.34.0）：builder 将本块内版本锚点字面量替换后注入为其
+   第 1 个脚本块；library 的 progKey 以字符串键形态（keyArg）调用 loadRaw/save/patch。 */
+window.EMMProgressStore = (function(){
+  "use strict";
+  function title40(doc) {
+    var d = doc || document;
+    var h = d.querySelector ? d.querySelector('h1') : null;
+    if (h) return h.textContent.trim().slice(0, 40);
+    var t = d.title || '';
+    return t.slice(0, 40) || 'plan';
+  }
+  function keyOf(doc) { return 'emm-progress:' + title40(doc); }
+  // 参数双形态：传 doc → 按 h1/title 派生键；传字符串 → 视为完整键（library 批接入用）
+  function keyArg(x) { return (typeof x === 'string') ? x : keyOf(x); }
+  function load(x) {
+    try { return JSON.parse(localStorage.getItem(keyArg(x)) || '{}'); } catch(e) { return {}; }
+  }
+  function loadRaw(x) {
+    try { return JSON.parse(localStorage.getItem(keyArg(x)) || 'null'); } catch(e) { return null; }
+  }
+  function save(prog, x) {
+    try { localStorage.setItem(keyArg(x), JSON.stringify(prog)); } catch(e){}
+  }
+  function patch(fn, x) {
+    try {
+      var k = keyArg(x);
+      var p = JSON.parse(localStorage.getItem(k) || '{}');
+      fn(p);
+      localStorage.setItem(k, JSON.stringify(p));
+    } catch(e){}
+  }
+  return { title40: title40, keyOf: keyOf, load: load, loadRaw: loadRaw, save: save, patch: patch };
+})();
+</script>
+
 <script>
 /* ===== EMM_LIBRARY_V217: personal memory library (self-contained; no deps) ===== */
 (function(){
@@ -187,12 +227,11 @@
     if(!m) return null;
     return Math.round((new Date() - new Date(+m[1], +m[2]-1, +m[3])) / 86400000);
   }
-  /* 与方案组件 keyOf() 约定一致：emm-progress:<方案 h1 文本前 40 字> */
+  /* v2.34.0：进度读取委托 EMMProgressStore（builder 注入本页第 1 个脚本块）。
+     键约定与方案组件一致：emm-progress:<标识前 40 字>（本页用 article.key），
+     以字符串键形态（keyArg）调用；缺失/损坏返回 null 的语义由 loadRaw 保证 */
   function progKey(article){ return 'emm-progress:' + (article.key || '').slice(0, 40); }
-  function readProgress(article){
-    try { return JSON.parse(localStorage.getItem(progKey(article)) || 'null'); }
-    catch(e){ return null; }
-  }
+  function readProgress(article){ return EMMProgressStore.loadRaw(progKey(article)); }
   function progStats(article){
     var s = readProgress(article);
     if(!s) return null;

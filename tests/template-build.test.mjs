@@ -6,7 +6,7 @@
  *   b. src/library 5 个源码模块齐全
  *   c. node bin/build-template.mjs --check → plan/library 重建都必须与已提交产物逐字节一致
  *      （拦两类漂移：改了 src 忘构建；直接手改产物）
- *   d. 产物健全性：plan 7 个 script 块 + 占位符；library 1 个 script 块
+ *   d. 产物健全性：plan 7 个 script 块 + 占位符；library 2 个 script 块（store 注入 + 主脚本）
  *   e. 双副本逐字节一致（assets ≡ skills）
  *
  * 跑：node tests/template-build.test.mjs
@@ -51,7 +51,7 @@ ok((plan.match(/<script>/g) || []).length === 7, 'plan 产物为 7 个 script �
 ok(plan.includes('{{TITLE}}'), 'plan 产物保留 {{TITLE}} 占位符');
 
 const lib = fs.readFileSync(path.join(ROOT, 'assets', 'library-template.html'), 'utf8');
-ok((lib.match(/<script>/g) || []).length === 1, 'library 产物为 1 个 script 块');
+ok((lib.match(/<script>/g) || []).length === 2, 'library 产物为 2 个 script 块（EMMProgressStore 注入 + 主脚本）');
 ok(lib.includes('{{DATE}}') && lib.includes('{{ARTICLES}}'), 'library 产物保留填充占位符');
 
 const planCopy = fs.readFileSync(path.join(ROOT, 'skills', 'english-memory-method', 'assets', 'plan-template.html'), 'utf8');
