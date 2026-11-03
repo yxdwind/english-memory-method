@@ -1,0 +1,25 @@
+
+</head>
+<body>
+<div class="wrap">
+<!-- ① 头部与书架容器（无需改动，数字由组件运行时计算） -->
+<header>
+  <h1>🧠 我的记忆库</h1>
+  <p class="lib-sub"></p>
+  <input type="text" class="lib-search" placeholder="🔍 搜索：标题 / 钩子 / 句子关键词…">
+</header>
+<p class="lib-tip">💡 进度存在<b>当前浏览器</b>的 localStorage 里（按浏览器 / Profile 隔离）：换浏览器打开显示为空 ≠ 进度丢失，迁移用方案页「💾 导出 / 📥 导入」JSON。</p>
+<div class="lib-todayall" id="emm-lib-todayall" hidden></div>
+<div class="lib-shelf" id="emm-lib-shelf"></div>
+<div class="lib-empty" id="emm-lib-empty" hidden>
+  <p><b>记忆库还是空的。</b></p>
+  <p>先用背诵法生成第一篇方案（<b>&lt;topic&gt;-memorization-plan.html</b>），</p>
+  <p>然后对 AI 说「<b>更新记忆库</b>」，它会把所有方案汇进这里。</p>
+</div>
+<!-- ② 轻刷会话面板（组件运行时填充，无需手写） -->
+<div class="lib-vocab" id="emm-lib-vocab" hidden></div>
+<div class="lib-session" id="emm-lib-session" hidden></div>
+<!-- ③ 自检报告容器（?check=1 时由组件注入） -->
+<footer>English teacher · 个人记忆库 · 进度实时读取自本机浏览器 · 打卡与薄弱清单以原方案为准</footer>
+</div>
+

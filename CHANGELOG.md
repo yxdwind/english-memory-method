@@ -4,6 +4,10 @@
 > `SKILL.md` 正文已于 v2.28.2 后"剥离变更日志"——只保留行为规则,版本噪音迁出至此,以减少生成上下文占用。
 > 章节编号以 `assets/plan-template.html` 的 h2 顺序为唯一真相源(记忆钩子=15 / 复述技巧包=16 / 记忆宫殿=17)。
 
+## [2.33.0] (架构体检第五批：library-template 源码拆分 · 2026-11-02)
+- **library-template 源码拆分（src/library/）**：40KB 单体源码变为 5 个模块——00-head.html、css/main.css、01-body.html、scripts/01-lib.js（主 IIFE + schema 注释，单词法作用域原样保留）、99-tail.html；`bin/build-template.mjs` 扩展为**双模板构建器**（plan + library 各自双写 assets/ 与 skills/ 副本，--check 同时校验两份）。纯机械拆分：build(源码) === 原 artifact 字节级一致（CRLF 行尾原样保留），断言零改动。其 progKey/readProgress 接入 EMMProgressStore（keyArg 字符串形态）与内部模块化（vocab/todayall 独立 module）留待行为性批次——单词法作用域拆分需先重构作用域链。
+- **测试**：template-build 扩至 8 项（library 模块齐全/单 script 块/双副本），总测试数 **639**。
+
 ## [2.32.0] (架构体检第四批：进度存储契约收敛 · 2026-11-01)
 - **新增 src/plan/scripts/00-store.js（EMM_STORE_V232）**：进度存储契约唯一实现——键派生（字面量全模板唯一）与 load/loadRaw/save/patch（参数双形态：doc 或完整键，library 批接入用）；main IIFE 的 keyOf/save/loadState 首行、SR IIFE 的 getH1/keyOf/loadProgress/patchSr/patchSrMode、shadow IIFE 的 getH1/keyOf/loadProgress/saveProgress 全部改为同签名薄委托，调用点零改动。此前同一契约在模板内复制 3 份（体检 #2 证据），漂移只能靠人肉比对。
 - **块顺序**：store 块插为第 1 个脚本块（先于 main IIFE），产物 script 块 6→7；template-build 断言同步。
