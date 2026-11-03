@@ -4,6 +4,10 @@
 > `SKILL.md` 正文已于 v2.28.2 后"剥离变更日志"——只保留行为规则,版本噪音迁出至此,以减少生成上下文占用。
 > 章节编号以 `assets/plan-template.html` 的 h2 顺序为唯一真相源(记忆钩子=15 / 复述技巧包=16 / 记忆宫殿=17)。
 
+## [2.34.1] (行尾统一 LF · 2026-11-02)
+- **产物行尾对齐仓库约定**：library 产物不再保留历史 CRLF——builder 去除 LF→CRLF 转换，src 与产物全链路 LF，与 `.gitattributes`（`* text=auto eol=lf`，v2.28.2 起）一致。此前磁盘 CRLF 仅因 git 只在 checkout 时改写工作副本而存在，任何新 clone 都会得到 LF 产物并触发 drift gate 误报；本次一并消除。
+- samples/fixtures 由 build-samples + sync-fixtures 随模板行尾自然刷新，内容不变。总测试数 **642**（不变）。
+
 ## [2.34.0] (架构体检收官：library 接入进度存储契约 · 2026-11-02)
 - **library 接入 EMMProgressStore**：`bin/build-template.mjs` 将 `src/plan/scripts/00-store.js` 内 `EMM_STORE_V232` 锚点字面量替换为 `EMM_STORE` 后注入 library 产物为第 1 个脚本块（锚点保持 plan 单点）；library 的 `progKey/readProgress` 改为字符串键形态（keyArg）委托——`readProgress = loadRaw(progKey(article))`，缺失/损坏返回 null 的语义不变。
 - **行尾策略**：src/library 源码统一 LF（符合仓库 eol=lf 约定），builder 组装 library 产物时统一 LF→CRLF，历史产物行尾保持不变。

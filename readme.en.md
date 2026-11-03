@@ -7,7 +7,7 @@
 Paste any English article, and it produces a **17-section longform plan (15 basic / 16 speech / 17 longform) (speeches: 16 sections incl. skeleton)** (self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.34.0-blue)
+![Version](https://img.shields.io/badge/version-2.34.1-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-15-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -221,7 +221,7 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 **v2.33.0**: 🏗 library-template source split — the 40KB monolith source now lives as 5 modules under src/library/; build-template becomes a dual-template builder (plan + library, each dual-written to both copies, --check validates both); purely mechanical — the artifact is byte-identical (CRLF endings preserved). Total tests **639**.
 
-**v2.34.0**: 🔌 library adopts the progress-store contract — build-template injects EMMProgressStore (00-store.js, anchor literal replaced) as the library artifact's first script block; library progKey/readProgress now delegate in string-key form (loadRaw; missing/corrupt → null unchanged); src/library unified to LF, artifact stays CRLF. Total tests **642**.
+**v2.34.0**: 🔌 library adopts the progress-store contract — build-template injects EMMProgressStore (00-store.js, anchor literal replaced) as the library artifact's first script block; library progKey/readProgress now delegate in string-key form (loadRaw; missing/corrupt → null unchanged); line endings unified to LF across the pipeline (v2.34.1). Total tests **642**.
 
 **Architecture review, batch 4** (v2.32.0)
 
