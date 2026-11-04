@@ -4,10 +4,10 @@
 
 **Turn "memorizing English articles" from rote grinding into a path you can actually walk.**
 
-Paste any English article, and it produces a **17-section longform plan (15 basic / 16 speech / 17 longform) (speeches: 16 sections incl. skeleton)** (self-contained HTML):
+Paste any English article, and it produces a complete memorization plan (**15 sections** regular · **16** speech incl. skeleton · **17** longform incl. segment dashboard; self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.34.1-blue)
+![Version](https://img.shields.io/badge/version-2.34.2-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-15-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -82,7 +82,7 @@ npx english-memory-method
 > The installer auto-detects **every installed platform** and deploys to each one (16+ aliases — see [Platform Support](#-platform-support)).
 > If jsdelivr lags, switch to the official source: `irm https://raw.githubusercontent.com/yxdwind/english-memory-method/main/install.ps1 | iex`
 
-**Trigger**: paste an English article + ask for a memorization plan. No restart needed.
+**Trigger**: paste an English article + ask for "a memorization plan" (or "memory tricks"). No restart needed.
 
 ### 🔒 Auditable / offline install (security-sensitive environments)
 
@@ -125,17 +125,17 @@ Release consistency rules: see [RELEASE-CHECKLIST.md](RELEASE-CHECKLIST.md).
 |---|---|---|
 | 1 | Strategy | Detect genre & skeleton, estimate length and days |
 | 2 | Structure map | Compress the article into one SVG map |
-| 3 | Close reading | Translation + linking marks + term highlighting, sentence by sentence |
+| 3 | Close reading | Chinese translation + linking marks + term highlighting (**three layers per sentence**) |
 | 4 | Keyword table | 1–2 hook words per sentence + Chinese cues |
 | 5 | Question chain | Weld hooks into 4–7 signpost questions — self-QA when retelling |
 | 6 | Retelling ladder | L1 hooks → L2 chain → L3 titles → L4 bare hands → L5 tell someone |
 | 9 | Three-pass method | Read ×3 → retell with hooks → retell with the chain |
 | 10 | Spaced review | 5 min → tonight → next day → day 3 → day 7/15 |
-| 11 | Fill-in-blank test | 2–5 blanks per paragraph; answers collapsed |
+| 11 | Fill-in-blank test | 2–5 blanks per paragraph; answers collapsed — fill first, then check |
 | 12 | Phrase list | 8–15 collocations + corpus-style examples, ready to reuse |
 | 13 | Terminology | Word-formation breakdown + IPA + memory hooks |
 | 14 | Golden Patterns | Four-column transferable patterns: pattern / meaning / swappable template / usage scene |
-| 15 | Memory hooks | In-text hooks + **three-layer hook chain**: paragraph hook → sentence-hook chain (logic bridges) → English anchors |
+| 15 | Memory hooks | In-text hooks + **three-layer hook chain**: paragraph hook → sentence-hook chain (logic bridges) → English anchors, unlocked sentence by sentence |
 | 16 | Retelling toolkit | 10 techniques: stall recovery / delivery / practice tips |
 | 17 | Palace map | 25-station daily-life route, one sentence per station — spatial backup for lost sentences |
 
@@ -147,9 +147,9 @@ Release consistency rules: see [RELEASE-CHECKLIST.md](RELEASE-CHECKLIST.md).
 | 1 | Strategy | Speech path: skeleton → keywords → three-pass → spaced review |
 | 2 | Structure map | Three-act SVG map |
 | **3** | **Speech Skeleton** 🎤 | Three-act stations (hook / argument / crescendo) with rhetorical function + transferable technique; breathing groups & intonation |
-| 4 | Close reading | Translation + linking marks, sentence by sentence |
+| 4 | Close reading | Translation + linking marks + **speaking notes** (three layers per sentence) |
 | 5 | Keyword table | Hook words + Chinese cues |
-| 6 | Question chain | **Audience-viewpoint** "what's next?" self-QA |
+| 6 | Question chain | **Audience-viewpoint** "what's next?" — six-question self-QA |
 | 7 | Retelling ladder | L3 = **retell from the skeleton** |
 | 8 | Three-pass method | Read ×3 → retell with hooks → retell with the chain |
 | 9 | Spaced review | 5 min → tonight → next day → day 3 → day 7/15 |
@@ -161,7 +161,7 @@ Release consistency rules: see [RELEASE-CHECKLIST.md](RELEASE-CHECKLIST.md).
 | 15 | Retelling toolkit | 10 techniques (incl. speech recovery) |
 | 16 | Palace map | 25-station route, spatial backup |
 
-Sample: the Gettysburg Address plan (triple negation → deed-vs-words line → of-by-for the people).
+Sample: [the Gettysburg Address plan](gettysburg-memorization-plan.html) (triple negation → deed-vs-words line → of-by-for the people).
 
 </details>
 
@@ -184,16 +184,16 @@ Sample: the Gettysburg Address plan (triple negation → deed-vs-words line → 
 | 16 | Retelling toolkit | 10 techniques |
 | 17 | Palace map | Station numbering continuous across segments (station 1 = first sentence) |
 
-Sample: the [Declaration of Independence condensed edition](declaration-memorization-plan.html) (5 segments / 21 sentences / ~830 words / 5 days).
+Sample: the [Declaration of Independence condensed edition](declaration-memorization-plan.html) (5 segments / 21 sentences / ~830 words / 5 days, segment dashboard + per-segment Ebbinghaus).
 
 </details>
 
 
 
 
-**Quality gates**: every generated plan runs **6 mandatory content checks** (sentence completeness / annotation precision / palace alignment / station numbering / cloze consistency / term & pattern provenance) via `bin/verify-plan.mjs` — each rule reports error/warning, and a failing plan doesn't ship.
 
-**Memory-friendly**: the whole flow is designed for weaker memorizers — pictographic hooks (the weirder the better), blanks-before-learning, first-screen folding (core 4 sections only), a first-visit onboarding card, and SM-2's "light mode" as the default (ignore the algorithm, keep the old behavior).
+
+
 **Core idea**: isolated hooks = broken points — you memorize the hooks, the order, AND the mapping. Triple burden.
 v2 welds hooks into chains: each link is *inferred* from the previous one — **whatever can be logically derived doesn't need memorizing**.
 
@@ -222,6 +222,8 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 **v2.33.0**: 🏗 library-template source split — the 40KB monolith source now lives as 5 modules under src/library/; build-template becomes a dual-template builder (plan + library, each dual-written to both copies, --check validates both); purely mechanical — the artifact is byte-identical (CRLF endings preserved). Total tests **639**.
 
 **v2.34.0**: 🔌 library adopts the progress-store contract — build-template injects EMMProgressStore (00-store.js, anchor literal replaced) as the library artifact's first script block; library progKey/readProgress now delegate in string-key form (loadRaw; missing/corrupt → null unchanged); line endings unified to LF across the pipeline (v2.34.1). Total tests **642**.
+
+**v2.34.2**: 📝 EN readme non-table alignment — fixed the intro, trigger phrasing, how-it-works table details (three layers per sentence / fill-then-check / unlocked sentence by sentence / six-question QA / speaking notes), sample links, six version-history range directions, and two collapsed-history details; removed two stale EN-only paragraphs (Quality gates / Memory-friendly — both covered by the feature table) and one orphan group header. Total tests **642** (unchanged).
 
 **Architecture review, batch 4** (v2.32.0)
 
@@ -255,8 +257,6 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 **v2.29.0**: 🚀 first-screen "3-Step Quick Memo" entry card (listen → hook chain → retell check-in, with jump links; everything else stays folded); ⚠️ capability banner (when TTS / recording / storage are unavailable, the affected features and workarounds are stated explicitly instead of failing silently); 🗂 Anki/CSV export (cloze cards + retell cards, one click into Anki); 🏛 memory-palace route onboarding (define your own 25-station route on first use, persisted in localStorage, shared across all plans); L2/L3 platforms now deliver a unified "Markdown Lite" plan (methodology core intact, interactive components replaced by verbal workarounds); 📦 offline release bundle (`npm run build:release` builds a deterministic zip + dual SHA256SUMS; installers gain a local mode for fully auditable air-gapped installs); legend row gains logic-bridge symbols (⇒↔→＋:); fixed v2.18 fold CSS accidentally nested inside the v2.16 mobile media query (no styles on desktop); template footer auto version stamp; fixed the `skills/` nested SKILL.md copy drift (dual-source fork). 20 anchors.
 
-**Quality-gate hardening** (v2.29.1)
-
 **Engineering closeout** (v2.28.2)
 
 **v2.28.2**: five audit leftovers — `build-samples` now fills the cloze section with idempotence locked (re-runs no longer revert samples to placeholders); version-check anchor table remaps `EMM_UX_V224` to the library; memory library `?check=1` gains runtime duplicate-key detection; verify-plan anchor expectations split by file type; `.gitattributes` added for line endings. Total tests **472**. Also adds the **npm release pipeline**: GitHub Actions Trusted Publishing (OIDC, zero tokens — a tag auto-publishes, immune to npm's 2026-08/2027-01 bypass-token crackdown); `npx english-memory-method` goes live with the first publish.
@@ -265,7 +265,7 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 **v2.28.1**: **Copy divergence + truncation guard** — fixed the dual-source-of-truth break caused by the v2.18→v2.28 batch update (`assets/` stuck at v2.16/v2.17, `plugin.json` missed, npm users got stale components; version-check gains 2 new groups for plugin.json & copy identity, now 9); fixed the library `</script` truncation hazard (hard SKILL.md check + 3 smoke guards: a closing-sequence in data makes the parser terminate the script early and the whole page silently dies); segment-stats table wrapped for mobile scroll; drill recap shows "?" for missing sentence numbers; plan cards show the planned days; test version assertion now compares CHANGELOG dynamically. Total tests **468**.
 
-**Testing infrastructure** (v2.28.0–v2.26.0)
+**Testing infrastructure** (v2.26.0–v2.28.0)
 
 **v2.28.0**: **End-to-end session driver** — jsdom runs the full 35-step user flow (`bin/e2e-flow.mjs`, --strict); fixed the endRound persistence bug; total tests 455.
 
@@ -273,7 +273,7 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 **v2.26.0**: fixture sync tool `bin/sync-fixtures.mjs` + CI-friendly `--check` mode.
 
-**Polish & self-test** (v2.25.0–v2.23.0)
+**Polish & self-test** (v2.23.0–v2.25.0)
 
 **v2.25.0**: 📝 60-second cloze challenge countdown; 🎯 configurable graduation threshold (2/3/4/5 streak).
 
@@ -281,7 +281,7 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 **v2.23.0**: Step 0 genre detection (short/longform/speech) in the workflow; per-segment stats table.
 
-**Scheduling & portability** (v2.22.0–v2.19.0)
+**Scheduling & portability** (v2.19.0–v2.22.0)
 
 **v2.22.0**: git tag automation `bin/tag.mjs`; .ics timezone fixes.
 
@@ -291,15 +291,15 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 **v2.19.0**: Shadowing — TTS → MediaRecorder recording → comparison scoring; wrong words auto-feed the weak list.
 
-**Platform & library** (v2.18.0–v2.16.0)
+**Platform & library** (v2.16.0–v2.18.0)
 
 **v2.18.0**: First-screen folding (h2 ≥9 collapsed by default) + first-visit onboarding card.
 
-**v2.17.0**: **Personal memory library** `memory-library.html` — bookshelf / search / quick-drill / live progress.
+**v2.17.0**: **Personal memory library** `memory-library.html` — bookshelf / search / quick-drill (chain recall → cloze → settle-up) / live progress.
 
 **v2.16.0**: Narrow-screen (≤720px) adaptation — horizontal-scroll tables, stacked task cards, sticky toolbars.
 
-**Learning loop** (v2.15.0–v2.13.0)
+**Learning loop** (v2.13.0–v2.15.0)
 
 **v2.15.0**: Progress content fingerprint — regenerated plans detected, no more stale misalignment; palace `data-sents` precise weak-station mapping.
 
@@ -309,7 +309,7 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 
 <details>
-<summary><b>Expand early versions (v2.12.0 → v2.1)</b></summary>
+<summary><b>Expand early versions (v2.1 → v2.12.0)</b></summary>
 
 **v2.12.0**: Longform mode — articles of 500–2000 words (or 12+ sentences) automatically produce a 17-section plan: new Section 3 "Segment Dashboard" (per-segment row: name / schedule / 🔒▶✅ state driven by check-ins / weak count), sections 4.1–4.N per-segment units (each with its own close reading + keywords + question chain + hook chain), per-segment staggered Ebbinghaus schedules plus a full-text assembly day, a cross-segment master chain to learn first, and a continuous 21-station palace. Sample: the Declaration of Independence condensed edition (5 segments / 21 sentences).
 
@@ -321,7 +321,7 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 **v2.8.1**: Palace × check-in linkage completed — on "end round", stations of weak sentences turn red automatically; graduate on 2 clean rounds clears the mark; reopening the file restores marks from saved progress, so the palace always mirrors current weak spots.
 
-**v2.8.0**: Memory-palace layer — new Section 14 "Palace map": a 25-station daily-life route (bed → … → bed-side; replaceable with your own route via parameter), one sentence per station in order, hooks & anchors reused straight from the hook chain. Walk the logic line (hook chain) normally; switch to the spatial line (palace) when stuck — an "empty station" pinpoints the lost sentence instantly. Injected into all 30 plans.
+**v2.8.0**: Memory-palace layer — new Section 14 "Palace map": a 25-station daily-life route (wake-up → … → bed; replaceable with your own route via parameter), one sentence per station in order, hooks & anchors reused straight from the hook chain. Walk the logic line (hook chain) normally; switch to the spatial line (palace) when stuck — an "empty station" pinpoints the lost sentence instantly. Injected into all 30 plans.
 
 **v2.7.0**: Review loop — plans now ship with a built-in sentence-level check-in widget: mark each sentence OK/stuck, stuck ones auto-join the **weak-sentence list** (click to jump to the text), graduate after 2 consecutive OK rounds; rounds settle with dates, progress persists in localStorage, controls hidden when printing. Built into all 30 plans — just open the file to track progress.
 
