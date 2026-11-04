@@ -102,11 +102,11 @@
 
 ---
 
-## 3. Playwright 跨浏览器集成（待启用）
+## 3. Playwright 集成（v2.36.0 轻量已启用；完整矩阵扩展路线）
 
-> **状态**：本仓库目前**未集成** Playwright（避免安装 200MB+ 浏览器二进制污染仓库）。下面是启用步骤。
+> **状态**：**v2.36.0 起轻量已集成**——`tests/browser-optional.test.mjs`（devDependency `playwright-core`，不下载浏览器二进制，直接用系统 Chrome/Edge）跑 7 项真实渲染冒烟：store 注入块真实执行 / getty 10 句 / 仪表盘统计 / 自测开关真实点击 / boundary 100 句 / 内联 SVG 结构图 / 全程零 pageerror 与 console.error；找不到系统浏览器时整组自动跳过（CI exit 0）。`npm run test:browser` 单独运行。下面 3.1–3.4 保留为**完整 4 浏览器矩阵**（firefox/webkit/edge 并行 + webServer）的扩展路线，按需启用。
 
-### 3.1 安装 Playwright（用户自行执行）
+### 3.1 完整矩阵：安装 Playwright（按需执行）
 
 ```bash
 npm i --save-dev @playwright/test
