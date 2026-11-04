@@ -91,12 +91,40 @@ const boundaryCloze = {
   answers: 'hundred / sent / scale / check / rendering',
 };
 
-function build(title, subtitle, structureHint, sents, fillFirstN, outFile, cloze){
+// ── 结构图内联 SVG（v2.35.1）────────────────────────────
+// 此前样本保留模板的 <img src="assets/{{topic}}-structure.svg"> 脚手架 → 破图 + 404。
+// 改为确定性生成的内联链式背诵地图（段盒子 + 箭头），样本自包含、无外部引用。
+function chainSvg(labels) {
+  const n = labels.length;
+  const w = 760, h = 96, bw = 168;
+  const gap = (w - n * bw) / (n + 1);
+  let s = '<svg role="img" aria-label="背诵地图" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto">';
+  for (let i = 0; i < n; i++) {
+    const x = gap + i * (bw + gap);
+    s += '<rect x="' + x + '" y="24" width="' + bw + '" height="48" rx="10" fill="#eef3ff" stroke="#4a6fa5" stroke-width="1.5"/>';
+    s += '<text x="' + (x + bw / 2) + '" y="44" text-anchor="middle" font-size="13" fill="#1f2d3d">' + labels[i] + '</text>';
+    s += '<text x="' + (x + bw / 2) + '" y="62" text-anchor="middle" font-size="11" fill="#5a6b7f">段 ' + (i + 1) + '</text>';
+    if (i < n - 1) {
+      const ax = x + bw + 4, aw = gap - 8;
+      s += '<line x1="' + ax + '" y1="48" x2="' + (ax + aw) + '" y2="48" stroke="#4a6fa5" stroke-width="2" marker-end="url(#arr)"/>';
+    }
+  }
+  s += '<defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#4a6fa5"/></marker></defs>';
+  return s + '</svg>';
+}
+
+function build(title, subtitle, structureHint, sents, fillFirstN, outFile, cloze, structureLabels){
   let html = tpl;
   html = html.replace(/\{\{TITLE\}\}/g, title);
   html = html.replace(/<title>\{\{TITLE\}\}背诵方案<\/title>/, '<title>' + title + '背诵方案</title>');
   html = html.replace(/\{\{SUBTITLE：结构类型 · 句数 · 目标天数\}\}/g, subtitle);
   html = html.replace(/\{\{对结构图的一句话导读\}\}/g, structureHint);
+
+  // v2.35.1：结构图占位 <img src="assets/{{topic}}-structure.svg">（{{TITLE}} 已先被替换）
+  // 用内联 SVG 链式背诵地图替换，样本自包含、无破图外链。
+  if (structureLabels){
+    html = html.replace('<img src="assets/{{topic}}-structure.svg" alt="' + title + '结构图">', chainSvg(structureLabels));
+  }
 
   // 替换第一个 .sent 占位块：模板只有 1 个占位，需要复制 N 份以生成多句方案
   const sentBlockRe = /<div class="sent">[\s\S]*?<\/div>\s*<\/div>/;
@@ -126,7 +154,8 @@ build(
   gettySents,
   10,
   'getty-memorialization-plan.html',
-  gettyCloze
+  gettyCloze,
+  ['起源 · 国家诞生', '命题 · 当前危机', '召唤 · 战场祭奠']
 );
 
 build(
@@ -136,7 +165,8 @@ build(
   aiSents,
   10,
   'ai-education-plan.html',
-  aiCloze
+  aiCloze,
+  ['议题 · AI 改变学习', '益处 · 个性化', '风险 · 数据点化', '辩证 · 服务教学法', '结论 · 人师不可替']
 );
 
 build(
@@ -146,7 +176,8 @@ build(
   boundarySents,
   100,
   'boundary-100-plan.html',
-  boundaryCloze
+  boundaryCloze,
+  ['句 1–20', '句 21–40', '句 41–60', '句 61–80', '句 81–100']
 );
 
 console.log('\n用法：npm run preview → 浏览器打开 http://localhost:4173/tests/samples/');

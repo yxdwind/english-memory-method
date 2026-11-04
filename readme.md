@@ -7,7 +7,7 @@
 丢给它任何一篇英语文章，它还你一份完整背诵方案（普通文章 15 节 · 演讲稿 16 节含骨架 · 长文 17 节含分段仪表，自包含 HTML）：
 逐句连读标注、钩子焊成问题链、复述五级阶梯、专业词汇梳理、折叠自测——全在一份文件里。
 
-![Version](https://img.shields.io/badge/version-2.35.0-blue)
+![Version](https://img.shields.io/badge/version-2.35.1-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-15-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -222,6 +222,8 @@ v2 把钩子焊成链：每一环由上一环"推"出来，**能被逻辑推出�
 **v2.34.2**：📝 readme.en 非功能表对齐——修正导语、触发语、工作原理表格细节（逐句三层/先填后核对/逐句放行/6 问/朗读要点）、样例链接、版本历史区间方向（6 处）与折叠区两处细节；删除英文版两段过时残留（Quality gates/Memory-friendly，功能表已覆盖）与 1 个孤儿分组头。总测试数 **642**（不变）。
 
 **v2.35.0**：🧱 性能边界守护——新增确定性生成的 100 句边界样本（boundary-100-plan.html，5 段 × 20 句）与 perf-boundary 门禁（结构完整/体积上限/职责内占位符零残留/jsdom 全量渲染/耗时阈值）；真实浏览器实测 100 句全页加载 357ms、1178 DOM 节点，无病态行为。总测试数 **647**。
+
+**v2.35.1**：🗺 样本结构图自包含——三样本的 `<img src="assets/{{topic}}-structure.svg">` 脚手架改为内联 SVG 链式背诵地图（GitHub Pages 上线验收时发现的破图 + 404）。总测试数 **647**（不变）。
 
 **架构体检第四批**（v2.32.0）
 

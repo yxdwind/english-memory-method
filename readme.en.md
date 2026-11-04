@@ -7,7 +7,7 @@
 Paste any English article, and it produces a complete memorization plan (**15 sections** regular · **16** speech incl. skeleton · **17** longform incl. segment dashboard; self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.35.0-blue)
+![Version](https://img.shields.io/badge/version-2.35.1-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-15-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -226,6 +226,8 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 **v2.34.2**: 📝 EN readme non-table alignment — fixed the intro, trigger phrasing, how-it-works table details (three layers per sentence / fill-then-check / unlocked sentence by sentence / six-question QA / speaking notes), sample links, six version-history range directions, and two collapsed-history details; removed two stale EN-only paragraphs (Quality gates / Memory-friendly — both covered by the feature table) and one orphan group header. Total tests **642** (unchanged).
 
 **v2.35.0**: 🧱 performance-boundary guard — new deterministic 100-sentence boundary sample (boundary-100-plan.html, 5 segments × 20) + tests/perf-boundary.test.mjs gate (structural integrity / size cap / no build-owned placeholder leftovers / full jsdom render / all 100 sentences in DOM / time budget); real-browser measurement: full load 357ms at 1178 DOM nodes, no pathological behavior. Total tests **647**.
+
+**v2.35.1**: 🗖 self-contained sample structure maps — the samples' `<img src="assets/{{topic}}-structure.svg">` scaffolding becomes inline-SVG chain maps (broken image + 404 found during the GitHub Pages launch verification). Total tests **647** (unchanged).
 
 **Architecture review, batch 4** (v2.32.0)
 
