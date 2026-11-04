@@ -1,12 +1,13 @@
 {
   "name": "english-memory-method",
-  "version": "2.35.1",
+  "version": "2.36.0",
   "description": "English passage memorization method - AI agent skill (multi-platform). Turns any English article into a structured, chained-retelling study plan. 英语篇章背诵法。",
   "bin": {
     "english-memory-method": "bin/install.mjs"
   },
   "scripts": {
-    "test": "node tests/smoke.test.js && node tests/fold-runtime.test.mjs && node tests/shadow-runtime.test.mjs && node tests/sr-runtime.test.mjs && node tests/research-schema.test.mjs && node tests/today-segment.test.mjs && node tests/export-import.test.mjs && node tests/qa-v222.test.mjs && node tests/qa-v223.test.mjs && node tests/qa-v224.test.mjs && node tests/qa-v225.test.mjs && node tests/qa-v226.test.mjs && node tests/browser-compat.test.mjs && node tests/e2e.test.mjs && node tests/qa-v229.test.mjs && node tests/qa-v230.test.mjs && node tests/qa-v232.test.mjs && node tests/pages-build.test.mjs && node tests/template-build.test.mjs && node tests/docs-sync.test.mjs && node tests/perf-boundary.test.mjs && node tests/release-build.test.mjs",
+    "test": "node tests/smoke.test.js && node tests/fold-runtime.test.mjs && node tests/shadow-runtime.test.mjs && node tests/sr-runtime.test.mjs && node tests/research-schema.test.mjs && node tests/today-segment.test.mjs && node tests/export-import.test.mjs && node tests/qa-v222.test.mjs && node tests/qa-v223.test.mjs && node tests/qa-v224.test.mjs && node tests/qa-v225.test.mjs && node tests/qa-v226.test.mjs && node tests/browser-compat.test.mjs && node tests/e2e.test.mjs && node tests/qa-v229.test.mjs && node tests/qa-v230.test.mjs && node tests/qa-v232.test.mjs && node tests/pages-build.test.mjs && node tests/template-build.test.mjs && node tests/docs-sync.test.mjs && node tests/perf-boundary.test.mjs && node tests/browser-optional.test.mjs && node tests/release-build.test.mjs",
+    "test:browser": "node tests/browser-optional.test.mjs",
     "verify": "node bin/verify-plan.mjs",
     "verify:fixture": "node bin/verify-plan.mjs tests/fixtures/fixture-success.html --no-color",
     "build:template": "node bin/build-template.mjs",
@@ -50,5 +51,8 @@
   },
   "engines": {
     "node": ">=18"
+  },
+  "devDependencies": {
+    "playwright-core": "^1.64.1"
   }
 }

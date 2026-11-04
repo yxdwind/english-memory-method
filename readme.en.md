@@ -7,7 +7,7 @@
 Paste any English article, and it produces a complete memorization plan (**15 sections** regular · **16** speech incl. skeleton · **17** longform incl. segment dashboard; self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.35.1-blue)
+![Version](https://img.shields.io/badge/version-2.36.0-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-15-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -42,7 +42,7 @@ sentence-by-sentence linking marks, hooks welded into question chains, a retelli
 | 🛡 | **Progress fingerprint** | Plan changed? Auto-detected — progress never grafts onto the wrong version |
 | 📅 | **Today card** | Per-segment Ebbinghaus computes today's work; "set as today's new" reshuffles |
 | 🌐 | **Online samples** | Try before installing: real generated plans on GitHub Pages — check-in / dictation / shadowing, just open |
-| 🧪 | **647 automated tests** | Smoke + runtime + 35-step E2E + browser matrix + perf boundary, one `npm test` |
+| 🧪 | **654 automated tests** | Smoke + runtime + 35-step E2E + browser matrix + perf boundary + optional real-browser suite, one `npm test` |
 | 🚦 | **Delivery gate** | `node bin/verify-plan.mjs` runs six hard rules before delivery — non-zero exit blocks it |
 | 🔒 | **Collapsed self-tests** | Fill the blanks first; answers hide behind "▶ 查看本段答案" toggles, auto-hidden when printing |
 | 🖥 | **16+ platforms, one command** | Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi / MiniMax… |
@@ -229,6 +229,8 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 **v2.35.1**: 🗖 self-contained sample structure maps — the samples' `<img src="assets/{{topic}}-structure.svg">` scaffolding becomes inline-SVG chain maps (broken image + 404 found during the GitHub Pages launch verification). Total tests **647** (unchanged).
 
+**v2.36.0**: 🌐 optional real-browser suite — playwright-core (devDependency) + system Chrome/Edge run real-rendering smoke checks (7: store execution / sentence counts / dashboard / real clicks / 100-sentence page / inline SVG map / zero errors), auto-skip without a browser; the rendering layer jsdom can't see now has a machine gate. Total tests **654**.
+
 **Architecture review, batch 4** (v2.32.0)
 
 **v2.32.0**: 🔌 progress-store contract consolidated — new src/plan/scripts/00-store.js (EMM_STORE_V232): key derivation and load/loadRaw/save/patch in one place (params take a doc or a full key); the 3 copies inside main/SR/shadow IIFEs became same-signature thin delegates, zero call-site changes; the key-prefix literal is now unique across the template. The store block is the first script block. Total tests **636**.
@@ -377,7 +379,7 @@ Progress is saved in the browser `localStorage`: **it is isolated per browser an
 - Install sources default to `raw.githubusercontent.com` and jsDelivr; if your network is unreliable, use a reachable mirror or an offline package.
 
 ### Output quality depends on the host model
-Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 647 tests cover the **template and runtime**, not the quality of any specific model's generated content.
+Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 654 tests cover the **template and runtime**, not the quality of any specific model's generated content.
 
 ### Who this is NOT for
 - Absolute beginners who want a 5-minute quick-memorize flow (this method is methodology-heavy with a higher onboarding cost).

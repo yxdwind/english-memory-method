@@ -4,6 +4,11 @@
 > `SKILL.md` 正文已于 v2.28.2 后"剥离变更日志"——只保留行为规则,版本噪音迁出至此,以减少生成上下文占用。
 > 章节编号以 `assets/plan-template.html` 的 h2 顺序为唯一真相源(记忆钩子=15 / 复述技巧包=16 / 记忆宫殿=17)。
 
+## [2.36.0] (可选真浏览器套件 · 2026-11-04)
+- **playwright-core + 系统 Chrome/Edge**（devDependency，不影响消费者零依赖）：新增 `tests/browser-optional.test.mjs`——本地找得到系统浏览器时跑真实渲染冒烟（store 注入块真实执行 / getty 10 句 / 仪表盘统计 / 自测开关真实点击 / boundary 100 句 / 内联 SVG 结构图 / 全程无 pageerror 与 console.error，共 7 项），找不到时整组跳过（CI exit 0）。`npm run test:browser` 可单独强制运行。
+- **jsdom --no-save 剪除教训**：`npm i -D` 会把 extraneous 的 jsdom@16 剪掉——恢复命令 `npm i --no-save jsdom@16`（测试报错信息有引导）。
+- **测试**：总测试数 **654**（+7，23 套件；其中真浏览器套件 7 项，无浏览器环境自动跳过）。
+
 ## [2.35.1] (样本结构图自包含 · 2026-11-04)
 - **修复**：三个样本保留着模板的 `<img src="assets/{{topic}}-structure.svg">` 脚手架——上线 GitHub Pages 后即破图 + 404（违背「自包含 HTML」承诺）。`build-samples.mjs` 新增 `chainSvg()`：按样本段落确定性生成内联 SVG 链式背诵地图（段盒子 + 箭头，如葛底斯堡「起源→命题→召唤」），三样本零外链。
 - **验收**：GitHub Pages 已上线（用户开启开关）——落地页 + 三样本全部 HTTP 200，最新部署含 v2.35.0 边界样本；线上 `{{topic}}` 残留随本版消除。总测试数 **647**（不变）。
