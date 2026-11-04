@@ -187,7 +187,7 @@ console.log('\n== v2.22 EMM_QA_V222 工程卫生大礼包 运行时验证 ==');
 {
   execSync('node bin/build-samples.mjs', { cwd: ROOT, stdio: 'pipe' });
   const snap = {};
-  for (const f of ['getty-memorialization-plan.html', 'ai-education-plan.html']) {
+  for (const f of ['getty-memorialization-plan.html', 'ai-education-plan.html', 'boundary-100-plan.html']) {
     snap[f] = fs.readFileSync(path.join(ROOT, 'tests', 'samples', f), 'utf8').replace(/\r\n/g, '\n');
   }
   execSync('node bin/build-samples.mjs', { cwd: ROOT, stdio: 'pipe' });

@@ -74,6 +74,23 @@ const aiCloze = {
   answers: 'learn / tutoring / grading',
 };
 
+// ── Sample 3: 100 句性能边界样本（v2.35.0 · 程序化生成 · 幂等）──────────
+// 目的：把模板推到大句数压测渲染与文件体积——100 个 .sent 块 + 挖空节。
+// 句子内容为确定性生成（不随机），保证 build-samples 连跑逐字稳定。
+const boundarySents = [];
+for (let i = 1; i <= 100; i++) {
+  const seg = Math.ceil(i / 20);
+  const en = 'Boundary sentence ' + i + ' stress-tests the template with a moderately long English clause — item ' + i + ' of segment ' + seg + ' in this synthetic article.';
+  const zh = '边界句 ' + i + '：用一条中等长度的英文从句压测模板（第 ' + seg + ' 段第 ' + (((i - 1) % 20) + 1) + ' 句）。';
+  const lbl = (i % 2 === 1) ? '连读' : '弱读';
+  boundarySents.push('<div class="sent">\n  <div class="sent-en">' + en + '</div>\n  <div class="sent-zh">' + zh + '</div>\n  <div class="pron"><span class="lbl">' + lbl + '</span>sentence ' + i + ' · /ˈsɛntəns ' + i + '/ · 边界样本生成标注</div>\n</div>');
+}
+const boundaryCloze = {
+  secLabel: '第 1 段 · 边界压测（100 句样本）',
+  text: 'This synthetic article carries one ______ sentences in total; every ______ block adds DOM nodes, and the template must stay responsive at this ______. Fill each blank first, then ______ the answers below; the sample exists to keep the ______ honest.',
+  answers: 'hundred / sent / scale / check / rendering',
+};
+
 function build(title, subtitle, structureHint, sents, fillFirstN, outFile, cloze){
   let html = tpl;
   html = html.replace(/\{\{TITLE\}\}/g, title);
@@ -120,6 +137,16 @@ build(
   10,
   'ai-education-plan.html',
   aiCloze
+);
+
+build(
+  '100 句边界压测',
+  '边界样本 · 5 段 100 句 · 压测',
+  '确定性生成的 100 句合成文章：验证模板在大句数下的渲染与体积上限（性能边界守护样本，tests/perf-boundary.test.mjs 消费）',
+  boundarySents,
+  100,
+  'boundary-100-plan.html',
+  boundaryCloze
 );
 
 console.log('\n用法：npm run preview → 浏览器打开 http://localhost:4173/tests/samples/');

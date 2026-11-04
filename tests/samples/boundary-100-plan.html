@@ -1,0 +1,2969 @@
+<!DOCTYPE html>
+<!--
+  English Memory Method · 背诵方案模板（plan-template.html · v2.32.0 当前生效）
+  用法：复制本文件为 <topic>-memorization-plan.html，按下方 <!-- ① ... --> 注释逐节替换内容。
+  所有样式已内联，不依赖外部资源；结构图引用相对路径 assets/<topic>-structure.svg。
+  v2.13.0 组件新增：今日任务排期（含 .ics 导出）、自测模式（遮译文/全遮）、复述阶梯追踪、
+  亲手改造留白（每段主线 / 宫殿画面）、?check=1 结构自检报告。
+  v2.14.0 组件新增：⚡ 薄弱句快刷（只显示薄弱句的短会话模式）、挖空交互化（______ 自动转输入框、
+  回车/失焦自动批改、错空直通薄弱清单）、今日任务直达锚点（去背诵 / 去自测 / 看薄弱）。
+  v2.15.0 组件新增：进度内容指纹（方案更新后检测并询问重置，防旧进度错位）、
+  宫殿 data-sents 句号标注（>25 句同站多物的红站联动与自检精确化）。
+  v2.16.0 组件新增：移动端自适应——表格横滚容器、今日任务卡窄屏堆叠、
+  复习/快刷/自测工具条吸顶（仅窄屏与激活态生效，桌面端零变化）。
+  v2.18.0 组件新增：首屏折叠（默认隐藏 h2 编号 ≥ 9 章节）+ 首次访问 on-boarding 5 步引导卡片。
+  v2.19.0 组件新增：🎙️ 影子跟读（MediaRecorder 录音 + 逐词自评，错词 ≥ 25% 自动入薄弱清单）。
+  v2.20.0 组件新增：🧠 SM-2 算法升级（Wozniak 1990）——每句维护 ef/interval/reps/due，仪表盘显示「下次复习」，
+  评卡时钩入 main IIFE 的 judge()/endRound()，自动与 Ebbinghaus 间隔取 max；轻量/标准模式切换。
+  v2.21.0 组件新增：💾 导出/📥 导入进度按钮（换浏览器/换电脑迁移用）——导出当前 localStorage 为 JSON（含 SM-2 / shadow / weak 全部字段），
+  导入做 fingerprint 失配确认；今日任务卡每段行加「📌 设为今天新学」按钮，倒推 start 日期让该段成为当天新学。
+  v2.22.0 组件新增：🛠 工程卫生大礼包——①.ics 时区修复（DTEND+DTSTAMP UTC+X-WR-TIMEZONE，避免跨时区/DST 偏移）②备份提醒（>30 天未打开弹 confirm 提示导出）③章节命名精简（去掉嵌套括号/版本号）④阶梯渐进引导（未完成 L1 时锁住 L2-L5）。
+  v2.23.0 组件新增：📊 内容质量大礼包——①按段统计（仪表盘加「段/句数/薄弱率/耗时」表，仅多段文章显示）②?check=1 加内容可疑项（译文长度比 + IPA 音标中文检测 + 连读覆盖率）③SKILL.md 加 Step 0 模式识别（短文/长文/演讲稿体裁判断与专属组件对照表）。
+  v2.24.0 组件新增：🎯 学习路径优化——①轻刷结算页加「一键回原方案补打卡」按钮（带 ?jump= 参数自动定位到缺句）②记忆库加状态筛选 chip（全部/有进度/薄弱最多/超 14 天未复习）③方案复习条加「★ 今天先做这个」按钮（智能判断薄弱/轮次/阶梯优先级后跳转）。
+  v2.25.0 组件新增：📊 评估优化——①「📝 段落测试」按钮（60 秒挖空挑战 + 自动批改给 0-100 分，写入 state.segTest.last）②毕业阈值配置「🎯 连顺 N 轮」（默认 3，点切换 2/3/4/5，state.streakToGoal）。
+  v2.26.0 组件新增：🧪 工程卫生——`bin/sync-fixtures.mjs` 把 `tests/samples/` 下真实生成方案同步到 `tests/fixtures/fixture-success.html`，fixture 现已反映"真实生成结果"而非手写字符串。CI 用 `npm run sync-fixtures -- --check` 检测漂移。
+  v2.27.0 组件新增：🌐 跨浏览器测试矩阵——`bin/check-browser-compat.mjs` 静态扫描模板用到的 43 个 Web API，对照 Chrome/Firefox/Safari/Edge 兼容性矩阵给出 ⚠/✅ 报告（`--strict` 模式有 ⚠ 时退出码 1）。配档 `docs/CROSS-BROWSER.md` 列 4 大浏览器差异 + 已知 bug 根因 + Playwright 集成样板。零运行时副作用。
+  v2.28.0 组件新增：🚀 端到端测试——`bin/e2e-flow.mjs` 在 jsdom 里完整跑 35 步用户流（冷启动 → 评卡 → 结束 → 导出 → 重置 → 导入 → 跨页面），揭示并修复 2 个 bug：① `endRound()` `state = loadState()` 覆盖本轮 mutations 导致 rounds/weak/mode 丢失（修复：loadState 后再 apply mutations）② `build-samples.mjs` 只命中 1 个 .sent 占位导致样本只有 1 句（修复：占位替换为 N 句 join）。配档 `docs/E2E.md` 列 35 步全链路 + 已知边界。
+  v2.28.1 组件修复：📊 按段统计表（多段文章仪表盘，renderDash 动态建表）包进 .emm-tblwrap 横滚容器——此前绕过了 v2.16「全部表格横滚」约定，窄屏溢出。
+  v2.29.0 组件新增：🚀 入门减负三件套——①首屏「3 步快背」极简入口卡（听读→钩子链→复述打卡，可跳转，其余章节折叠）②能力探测横幅（TTS/录音/存储不可用时显式告知+替代做法，替代静默降级）③🗂 Anki/CSV 导出（挖空卡+复述卡一键进 Anki）；🏛 记忆宫殿路线引导（首次使用自定义 25 站动线，localStorage 持久化、所有方案通用）；图例条补逻辑桥符号（⇒因果/↔转折/→递进/＋并列/:举例）；修复 v2.18 首屏折叠样式被误嵌套进 v2.16 移动端媒体查询（桌面端 on-boarding/折叠按钮此前无样式）。
+  v2.30.0 组件新增：🤖 发音自动评分——影子跟读面板新增「自动评分」：浏览器 SpeechRecognition 听用户朗读，转写与原句 LCS 逐词对齐后自动填 ✓/✗ 标注（可手动修正后保存），错词 ≥25% 入薄弱清单；能力横幅补「语音识别不可用」行（Chrome/Edge 支持，其余浏览器降级手动自评）。
+  v2.31.0 组件重构：源码拆分至 src/plan/（本文件为构建产物，改源码后 npm run build:template 重新生成）。
+  v2.32.0 组件新增：🔌 进度存储契约收敛——新增 00-store 块（第 1 个脚本块）：键派生与 load/loadRaw/save/patch 唯一实现，main/SR/shadow 的同名函数改为同签名薄委托（调用点零改动）。
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>100 句边界压测背诵方案</title>
+<style>
+  :root{--accent:#7c3aed;--accent-bg:#f5f3ff;--accent-border:#ddd6fe;--ink:#1f2937;--muted:#6b7280;--line:#e5e7eb;}
+  *{box-sizing:border-box;margin:0;padding:0;}
+  body{font-family:"Segoe UI","Microsoft YaHei","PingFang SC",sans-serif;background:#f6f8fb;color:var(--ink);line-height:1.75;}
+  .wrap{max-width:980px;margin:0 auto;padding:32px 20px 64px;}
+  header{background:linear-gradient(135deg,{{HEADER_DARK}},{{HEADER_ACCENT}});color:#fff;border-radius:16px;padding:32px 34px;margin-bottom:28px;}
+  header h1{font-size:26px;margin-bottom:6px;}
+  header p{opacity:.92;font-size:14px;margin-bottom:8px;}
+  .badge{display:inline-block;background:rgba(255,255,255,.2);border:1px solid rgba(255,255,255,.35);border-radius:999px;padding:2px 12px;font-size:13px;margin:4px 6px 0 0;}
+  h2{font-size:20px;margin:38px 0 14px;padding-left:12px;border-left:4px solid var(--accent);}
+  h3{font-size:16px;margin:18px 0 8px;}
+  .card{background:#fff;border:1px solid var(--line);border-radius:12px;padding:18px 20px;margin:12px 0;}
+  table{width:100%;border-collapse:collapse;margin:10px 0;font-size:14px;background:#fff;}
+  th,td{border:1px solid var(--line);padding:8px 12px;text-align:left;vertical-align:top;}
+  th{background:#f1f5f9;font-weight:600;}
+  tr:nth-child(even) td{background:#fafbfc;}
+  .tl{position:relative;margin:16px 0 16px 10px;padding-left:32px;}
+  .tl::before{content:"";position:absolute;left:10px;top:8px;bottom:8px;width:2px;background:var(--line);}
+  .tl .step{position:relative;margin-bottom:16px;}
+  .tl .marker{position:absolute;left:-32px;top:2px;width:22px;height:22px;border-radius:50%;background:var(--accent);color:#fff;font-size:12px;display:flex;align-items:center;justify-content:center;font-weight:600;}
+  .tl .t{font-weight:600;}
+  .tl .d{font-size:14px;color:#374151;}
+  details{background:#fff;border:1px solid var(--line);border-radius:10px;padding:14px 18px;margin:10px 0;font-size:15px;}
+  summary{cursor:pointer;font-weight:600;color:var(--accent);}
+  details .answer{margin-top:10px;color:var(--muted);font-style:italic;font-size:14px;}
+  .tip{background:var(--accent-bg);border:1px solid var(--accent-border);border-radius:10px;padding:12px 18px;margin:12px 0;font-size:14px;}
+  figure{margin:18px 0;text-align:center;}
+  figure img{max-width:100%;border-radius:12px;border:1px solid var(--line);}
+  figcaption{font-size:13px;color:var(--muted);margin-top:8px;}
+  ul{padding-left:22px;}
+  li{margin:5px 0;}
+  /* v2.1 逐句翻译 + 全现象连读标注 */
+  .legend{display:flex;gap:14px;flex-wrap:wrap;font-size:12.5px;color:var(--muted);border:1px solid var(--line);background:#fff;padding:8px 14px;border-radius:8px;margin:10px 0 14px;}
+  .sent{margin:16px 0;padding-bottom:14px;border-bottom:1px dashed var(--line);}
+  .sent:last-child{border-bottom:none;padding-bottom:0;}
+  .sent-en{font-family:Georgia,"Times New Roman",serif;font-size:17px;line-height:1.95;}
+  .sent-en .tie{color:#d97706;font-weight:bold;margin:0 1px;}
+  .sent-en .wk{color:#9ca3af;font-style:italic;}
+  .sent-en .ft{color:#b91c1c;font-weight:bold;text-decoration:underline wavy #b91c1c 1px;text-underline-offset:3px;}
+  .sent-en .hk{color:#9ca3af;text-decoration:underline dashed #9ca3af 1px;text-underline-offset:3px;}
+  .sent-zh{color:var(--muted);font-size:14px;border-left:3px solid var(--accent-border);padding-left:10px;margin:6px 0;}
+  .pron{font-size:13.5px;background:#f8f5ec;border-left:3px solid #d97706;padding:7px 12px;color:#4b4030;line-height:2;border-radius:0 6px 6px 0;}
+  .pron .lbl{font-size:11px;letter-spacing:.15em;color:#d97706;display:block;}
+  .sent-en .term{background:#fef3c7;border-bottom:2px solid #f59e0b;padding:0 2px;border-radius:3px;}
+  footer{margin-top:44px;color:var(--muted);font-size:13px;text-align:center;}
+/* v2.6.0 三层钩子链 */
+.hook-chain{background:#fffbeb;border:1px solid #fcd34d;border-left:4px solid #f59e0b;border-radius:10px;padding:12px 14px;margin:10px 0;font-size:14.5px;line-height:2;}
+.hook-chain .seg{display:inline-block;background:#fff;border:1px solid #fde68a;border-radius:8px;padding:2px 10px;margin:2px 0;font-weight:600;color:#92400e;}
+.hook-chain .anchor{font-family:Consolas,'Courier New',monospace;font-weight:400;font-size:13px;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:0 6px;margin-left:6px;}
+.hook-chain .bridge{display:inline-block;font-size:12px;color:#fff;background:#f59e0b;border-radius:10px;padding:1px 8px;margin:0 4px;}
+.hook-chain .para-hook{display:inline-block;font-size:13px;font-weight:700;color:#92400e;background:#fde68a;border-radius:8px;padding:2px 10px;margin-right:6px;}
+@media print{.hook-chain{background:#fff;border-color:#9ca3af}.hook-chain .seg,.hook-chain .anchor{border-color:#9ca3af}.hook-chain .anchor{color:#000;background:#fff}.hook-chain .bridge{background:#374151}}
+/* v2.8.0 palace map */
+.palace-route{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0;}
+.palace-stop{background:#f5f3ff;border:1px solid #c4b5fd;border-left:4px solid #7c3aed;border-radius:10px;padding:8px 10px;min-width:150px;flex:1 1 160px;max-width:240px;}
+.palace-stop .st-no{display:inline-block;font-size:11px;font-weight:700;color:#fff;background:#7c3aed;border-radius:8px;padding:1px 8px;margin-bottom:4px;}
+.palace-stop .st-name{font-weight:700;color:#5b21b6;font-size:14px;}
+.palace-stop .st-hook{font-size:13px;color:#374151;margin-top:3px;font-weight:600;}
+.palace-stop .st-anchor{font-family:Consolas,'Courier New',monospace;font-size:12px;color:#1d4ed8;background:#eff6ff;border:1px solid #bfdbfe;border-radius:6px;padding:0 6px;display:inline-block;margin-top:3px;}
+.palace-stop .st-lead{font-size:12px;color:#9ca3af;margin-top:3px;font-style:italic;}
+.palace-stop.palace-weak{border-color:#f87171;border-left-color:#ef4444;background:#fef2f2;}
+.palace-stop.palace-weak .st-no{background:#ef4444;}
+.palace-arrow{align-self:center;color:#a78bfa;font-weight:700;}
+@media print{.palace-route{gap:4px}.palace-stop{background:#fff;border-color:#9ca3af}.palace-stop .st-anchor{color:#000;background:#fff;border-color:#9ca3af}}
+/* v2.10.0 golden patterns */
+.ptn-table th:first-child{width:34%;}
+.ptn-tpl{color:#92400e;font-weight:700;}
+@media print{.ptn-tpl{color:#000}}
+/* v2.13.0 today / quiz / ladder / workbook / self-check */
+.emm-today{background:#fffbeb;border:1px solid #fcd34d;border-left:4px solid #f59e0b;border-radius:10px;padding:12px 16px;margin:12px 0;font-size:14px;}
+.emm-today table{margin:8px 0;}
+.emm-today th,.emm-today td{font-size:13px;padding:6px 8px;}
+.emm-meta{font-size:12.5px;color:#92400e;}
+.emm-lv{cursor:pointer;border:1px solid #cbd5e1;background:#fff;border-radius:6px;font-size:11px;padding:1px 7px;color:#475569;margin-right:3px;}
+.emm-lv:hover{background:#fef3c7;}
+.emm-lv.emm-lv-on{background:#f59e0b;border-color:#f59e0b;color:#fff;font-weight:700;}
+.emm-lv.emm-lv-locked{background:#f1f5f9;color:#cbd5e1;cursor:not-allowed;border-color:#e2e8f0;}
+.emm-lv.emm-lv-locked:hover{background:#f1f5f9;}
+.emm-donechk{transform:scale(1.2);cursor:pointer;}
+.wb-line{font-size:13.5px;color:#374151;background:#f5f3ff;border:1px dashed #ddd6fe;border-radius:8px;padding:6px 10px;margin:8px 0;}
+.wb-input{display:inline-block;min-width:45%;min-height:1.4em;border-bottom:1px solid #a78bfa;outline:none;font-style:italic;color:#5b21b6;padding:0 4px;}
+.wb-input:focus{background:#fff;}
+.wb-input:empty::before{content:"点此亲手写——自己写过的记得更牢";color:#c4b5fd;font-size:12px;}
+.palace-stop .wb-line{margin:6px 0 0;font-size:12.5px;padding:4px 8px;}
+.emm-quiz1 .sent-zh,.emm-quiz1 .pron{display:none;}
+.emm-quiz1 .sent.revealed .sent-zh,.emm-quiz1 .sent.revealed .pron{display:block;}
+.emm-quiz2 .sent-en .tie{color:inherit!important;font-weight:inherit!important;}
+.emm-quiz2 .sent-en .wk{color:inherit!important;font-style:normal!important;}
+.emm-quiz2 .sent-en .ft{color:inherit!important;font-weight:inherit!important;text-decoration:none!important;}
+.emm-quiz2 .sent-en .hk{color:inherit!important;text-decoration:none!important;}
+.emm-quiz2 .sent-en .term{background:none!important;border-bottom:none!important;}
+.emm-check-rpt{background:#f8fafc;border:1px solid #cbd5e1;border-left:4px solid #64748b;border-radius:10px;padding:12px 16px;margin:12px 0;font-size:13.5px;font-family:Consolas,'Courier New',monospace;white-space:pre-wrap;line-height:1.9;}
+@media print{
+  .emm-today,.emm-check-rpt{display:none!important;}
+  .wb-line{background:#fff;border-color:#bbb;}
+  .wb-input{color:#1f2937!important;font-style:normal!important;}
+  .wb-input:empty::before{content:"";}
+}
+/* v2.14.0 drill mode / interactive cloze */
+.emm-drill .sent{display:none;}
+.emm-drill .sent.rv-weakline{display:block;}
+.emm-drill .wb-line{display:none;}
+.emm-today a{color:#b45309;font-weight:600;text-decoration:none;}
+.emm-clz{border:none;border-bottom:2px solid #94a3b8;outline:none;font-weight:600;text-align:center;font-family:inherit;background:transparent;padding:0 2px;margin:0 2px;font-size:15px;}
+.emm-clz:focus{border-bottom-color:#7c3aed;background:#f5f3ff;}
+.emm-clz.emm-clz-ok{color:#047857;border-bottom-color:#10b981;}
+.emm-clz.emm-clz-bad{color:#b91c1c;border-bottom-color:#ef4444;background:#fef2f2;}
+.emm-clz-mark{font-size:12px;font-weight:700;margin-left:2px;}
+.emm-clz-mark.ok{color:#059669;}
+.emm-clz-mark.bad{color:#b91c1c;}
+@media print{.emm-drill .sent{display:block!important;}.emm-clz{border-bottom:1px solid #333;}.emm-clz-mark{display:none;}}
+/* v2.16.0 mobile adaptation (id marker lives in the component JS below) */
+.emm-tblwrap{overflow-x:auto;-webkit-overflow-scrolling:touch;}
+@media (max-width:720px){
+  .wrap{padding:16px 12px 48px;}
+  header{padding:20px 16px;border-radius:12px;margin-bottom:20px;}
+  header h1{font-size:21px;}
+  h2{font-size:18px;margin:26px 0 10px;}
+  .sent-en{font-size:16px;}
+  .pron{font-size:12.5px;}
+  .legend{font-size:11.5px;}
+  .emm-tblwrap table{min-width:640px;}
+  body.rv-mode .rv-bar,body.emm-drill .rv-bar,body.emm-quiz1 .rv-bar{position:sticky;top:6px;z-index:60;box-shadow:0 2px 12px rgba(16,185,129,.18);}
+  .emm-today table{display:block;border:none;background:transparent;margin:8px 0;}
+  .emm-today thead{display:none;}
+  .emm-today tbody,.emm-today tr{display:block;}
+  .emm-today tr{background:#fff;border:1px solid #fcd34d;border-radius:10px;margin:8px 0;padding:4px 10px;}
+  .emm-today td{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:4px 10px;border:none;padding:5px 0;background:none!important;}
+  .emm-today td::before{content:attr(data-l);flex:0 0 auto;font-size:12px;color:#92400e;font-weight:700;}
+}
+/* v2.18: 首屏折叠 + on-boarding（CSS 部分；锚点见下行 IIFE 注释） */
+.emm-fold-toggle{position:fixed;top:14px;right:14px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:6px 12px;font-size:13px;font-weight:600;color:var(--accent);cursor:pointer;z-index:50;box-shadow:0 2px 8px rgba(0,0,0,.06);font-family:inherit;}
+.emm-fold-toggle:hover{background:var(--accent-bg);}
+.emm-fold-toggle .tag{display:inline-block;font-size:11px;font-weight:400;color:var(--muted);margin-left:6px;}
+body.emm-folded .emm-advanced{display:none!important;}
+.emm-onboarding{background:linear-gradient(135deg,#fef3c7,#fde68a);border:1px solid #f59e0b;border-radius:12px;padding:14px 18px;margin:0 0 18px 0;font-size:14px;line-height:1.85;}
+.emm-onboarding h3{margin:0 0 8px 0;font-size:16px;color:#92400e;}
+.emm-onboarding ol{padding-left:24px;margin:6px 0;}
+.emm-onboarding li{margin:4px 0;}
+.emm-onboarding b{color:#7c2d12;}
+.emm-onboarding-dismiss{background:#fff;border:1px solid #f59e0b;border-radius:8px;padding:6px 14px;cursor:pointer;font-size:13px;font-weight:600;color:#92400e;margin-top:10px;font-family:inherit;}
+.emm-onboarding-dismiss:hover{background:#fffbeb;}
+@media print{.emm-fold-toggle,.emm-onboarding{display:none!important;}}
+@media (max-width:720px){
+  .emm-fold-toggle{top:8px;right:8px;font-size:12px;padding:5px 10px;}
+  .emm-onboarding{font-size:13px;padding:12px 14px;}
+}
+/* v2.29.0 入门减负三件套 CSS（3 步快背卡 / 能力探测横幅 / Anki 导出按钮复用 rv-btn） */
+.emm-quick3{background:linear-gradient(135deg,#ede9fe,#ddd6fe);border:1px solid #8b5cf6;border-left:4px solid #7c3aed;border-radius:12px;padding:14px 18px;margin:0 0 18px 0;font-size:14px;line-height:1.85;}
+.emm-quick3 h3{margin:0 0 8px 0;font-size:16px;color:#5b21b6;}
+.emm-quick3 ol{padding-left:24px;margin:6px 0;}
+.emm-quick3 li{margin:6px 0;}
+.emm-quick3 b{color:#4c1d95;}
+.emm-quick3 .q3-jump{background:#fff;border:1px solid #8b5cf6;border-radius:8px;padding:2px 10px;cursor:pointer;font-size:12px;font-weight:600;color:#6d28d9;margin-left:8px;font-family:inherit;}
+.emm-quick3 .q3-jump:hover{background:#f5f3ff;}
+.emm-quick3 .q3-more{font-size:12.5px;color:#6b7280;margin-top:8px;}
+.emm-cap{background:#fff7ed;border:1px solid #fdba74;border-left:4px solid #f97316;border-radius:12px;padding:12px 16px;margin:0 0 18px 0;font-size:13.5px;line-height:1.8;}
+.emm-cap h3{margin:0 0 6px 0;font-size:15px;color:#9a3412;}
+.emm-cap ul{padding-left:20px;margin:4px 0;}
+.emm-cap .cap-dismiss{background:#fff;border:1px solid #f97316;border-radius:8px;padding:4px 12px;cursor:pointer;font-size:12.5px;font-weight:600;color:#9a3412;margin-top:8px;font-family:inherit;}
+.emm-cap .cap-dismiss:hover{background:#ffedd5;}
+@media print{.emm-quick3,.emm-cap{display:none!important;}}
+@media (max-width:720px){
+  .emm-quick3{font-size:13px;padding:12px 14px;}
+  .emm-cap{font-size:12.5px;padding:10px 14px;}
+}
+/* v2.29.0 记忆宫殿路线引导 CSS */
+.emm-palace-onboard{background:#f5f3ff;border:1px solid #c4b5fd;border-left:4px solid #7c3aed;border-radius:12px;padding:12px 16px;margin:10px 0;font-size:13.5px;line-height:1.8;}
+.emm-palace-editor{background:#fff;border:1px solid #8b5cf6;border-radius:12px;padding:14px 18px;margin:14px 0;font-size:13.5px;line-height:1.8;}
+.emm-palace-editor h3{margin:0 0 6px 0;font-size:15px;color:#5b21b6;}
+@media print{.emm-palace-onboard,.emm-palace-editor,.emm-palace-manage{display:none!important;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+<!-- ① 头部：标题、统计信息、段落徽章（可增删） -->
+<header>
+  <h1>100 句边界压测背诵方案</h1>
+  <p>边界样本 · 5 段 100 句 · 压测</p>
+  <span class="badge">第1段 · {{逻辑角色}}</span>
+  <span class="badge">第2段 · {{逻辑角色}}</span>
+</header>
+
+<!-- ② 整体策略：一句话点出本篇文章的背诵捷径 -->
+<h2>1. 整体策略</h2>
+<div class="card">
+  四步走：<b>拆骨架 → 串关键词 → 三遍法输入 → 间隔复习</b>。
+  {{本篇特有的记忆捷径，如"靠逻辑路标词推进""首尾呼应"等}}。
+  每天约 20 分钟，{{X}}~{{Y}} 天完成。
+</div>
+
+<!-- ③ 结构图：替换图片路径与说明文字 -->
+<h2>2. 文章结构图（背诵地图）</h2>
+<figure>
+  <img src="assets/{{topic}}-structure.svg" alt="100 句边界压测结构图">
+  <figcaption>确定性生成的 100 句合成文章：验证模板在大句数下的渲染与体积上限（性能边界守护样本，tests/perf-boundary.test.mjs 消费）</figcaption>
+</figure>
+
+<!-- ②c 分段进度仪表（v2.12.0 · 仅长文启用）：段名/排期/状态/打卡入口/段薄弱句，状态随打卡自动流转 -->
+<h2>3. 分段进度仪表</h2>
+<div class="card">
+<p style="font-size:14px;color:#374151;margin-bottom:10px;">长文背诵的「导航台」：每段一行，状态随打卡自动流转（该段全部句子评「顺」→ ✅）。排期由「📅 今日任务」卡按开始日期自动计算。</p>
+<table class="seg-table">
+<thead><tr><th style="width:36%">段落</th><th style="width:12%">排期</th><th style="width:12%">状态</th><th style="width:16%">打卡</th><th>段薄弱句</th></tr></thead>
+<tbody>
+{{SEG_ROWS}}
+</tbody>
+</table>
+<p style="font-size:13px;color:#6b7280;margin-top:8px;">📌 总链（先背这个）：{{跨段总链一句话}}。</p>
+</div>
+
+
+
+<!-- ②b 演讲骨架（v2.11.0 · 仅演讲稿启用）：三幕结构站点，每站【作用】+【技巧】，末尾附朗读要点 -->
+<h2>3. 演讲骨架</h2>
+<div class="card">
+<p style="font-size:14px;color:#374151;margin-bottom:10px;">演讲稿专属：先抓<b>演讲骨架</b>再进句子——演讲是线性时间艺术，骨架就是「下一站」导航。</p>
+<div class="tl">
+  <div class="step"><span class="marker">1</span><div><div class="t">开场钩（{{句子范围}}）</div><div class="d"><b>作用</b>：{{功能}}。<b>技巧</b>：{{可迁移手法}}。</div></div></div>
+  <div class="step"><span class="marker">2</span><div><div class="t">论点展开（{{句子范围}}）</div><div class="d"><b>作用</b>：{{功能}}。<b>技巧</b>：{{可迁移手法}}。</div></div></div>
+  <div class="step"><span class="marker">3</span><div><div class="t">升华收尾（{{句子范围}}）</div><div class="d"><b>作用</b>：{{功能}}。<b>技巧</b>：{{可迁移手法}}。</div></div></div>
+</div>
+<p style="font-size:13.5px;color:#6b7280;margin-top:8px;">🗣 <b>演讲朗读要点</b>：{{呼吸群划分}}；{{停顿与升降调要点}}。</p>
+</div>
+
+
+
+<!-- ③b 原文逐句区（v2.1 必需）：每句三层 sent-en（行内语音标记）→ sent-zh（翻译，默认中文，可传参换语种）→ pron（连读注解 ≤6 条） -->
+<h2>4.x 段落单元</h2>
+<div class="legend"><span><b style="color:#d97706">⌒</b> 连读</span><span><i style="color:#9ca3af">灰色斜体</i> 弱读</span><span><b style="color:#b91c1c">t</b> flap t / 失爆</span><span><mark style="background:#fef3c7;border-bottom:2px solid #f59e0b;padding:0 2px">专业词汇</mark></span><span><u style="text-decoration:underline dashed #9ca3af">h</u> h 击穿</span><span><b style="color:#b45309">⇒</b> 因果 · <b style="color:#b45309">↔</b> 转折 · <b style="color:#b45309">→</b> 递进 · <b style="color:#b45309">＋</b> 并列 · <b style="color:#b45309">:</b> 举例（钩子链逻辑桥，见第 15 节）</span><span>翻译默认中文 · 需要其他语言在对话里说一声</span></div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 1 stress-tests the template with a moderately long English clause — item 1 of segment 1 in this synthetic article.</div>
+  <div class="sent-zh">边界句 1：用一条中等长度的英文从句压测模板（第 1 段第 1 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 1 · /ˈsɛntəns 1/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 2 stress-tests the template with a moderately long English clause — item 2 of segment 1 in this synthetic article.</div>
+  <div class="sent-zh">边界句 2：用一条中等长度的英文从句压测模板（第 1 段第 2 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 2 · /ˈsɛntəns 2/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 3 stress-tests the template with a moderately long English clause — item 3 of segment 1 in this synthetic article.</div>
+  <div class="sent-zh">边界句 3：用一条中等长度的英文从句压测模板（第 1 段第 3 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 3 · /ˈsɛntəns 3/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 4 stress-tests the template with a moderately long English clause — item 4 of segment 1 in this synthetic article.</div>
+  <div class="sent-zh">边界句 4：用一条中等长度的英文从句压测模板（第 1 段第 4 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 4 · /ˈsɛntəns 4/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 5 stress-tests the template with a moderately long English clause — item 5 of segment 1 in this synthetic article.</div>
+  <div class="sent-zh">边界句 5：用一条中等长度的英文从句压测模板（第 1 段第 5 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 5 · /ˈsɛntəns 5/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 6 stress-tests the template with a moderately long English clause — item 6 of segment 1 in this synthetic article.</div>
+  <div class="sent-zh">边界句 6：用一条中等长度的英文从句压测模板（第 1 段第 6 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 6 · /ˈsɛntəns 6/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 7 stress-tests the template with a moderately long English clause — item 7 of segment 1 in this synthetic article.</div>
+  <div class="sent-zh">边界句 7：用一条中等长度的英文从句压测模板（第 1 段第 7 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 7 · /ˈsɛntəns 7/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 8 stress-tests the template with a moderately long English clause — item 8 of segment 1 in this synthetic article.</div>
+  <div class="sent-zh">边界句 8：用一条中等长度的英文从句压测模板（第 1 段第 8 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 8 · /ˈsɛntəns 8/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 9 stress-tests the template with a moderately long English clause — item 9 of segment 1 in this synthetic article.</div>
+  <div class="sent-zh">边界句 9：用一条中等长度的英文从句压测模板（第 1 段第 9 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 9 · /ˈsɛntəns 9/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 10 stress-tests the template with a moderately long English clause — item 10 of segment 1 in this synthetic article.</div>
+  <div class="sent-zh">边界句 10：用一条中等长度的英文从句压测模板（第 1 段第 10 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 10 · /ˈsɛntəns 10/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 11 stress-tests the template with a moderately long English clause — item 11 of segment 1 in this synthetic article.</div>
+  <div class="sent-zh">边界句 11：用一条中等长度的英文从句压测模板（第 1 段第 11 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 11 · /ˈsɛntəns 11/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 12 stress-tests the template with a moderately long English clause — item 12 of segment 1 in this synthetic article.</div>
+  <div class="sent-zh">边界句 12：用一条中等长度的英文从句压测模板（第 1 段第 12 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 12 · /ˈsɛntəns 12/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 13 stress-tests the template with a moderately long English clause — item 13 of segment 1 in this synthetic article.</div>
+  <div class="sent-zh">边界句 13：用一条中等长度的英文从句压测模板（第 1 段第 13 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 13 · /ˈsɛntəns 13/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 14 stress-tests the template with a moderately long English clause — item 14 of segment 1 in this synthetic article.</div>
+  <div class="sent-zh">边界句 14：用一条中等长度的英文从句压测模板（第 1 段第 14 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 14 · /ˈsɛntəns 14/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 15 stress-tests the template with a moderately long English clause — item 15 of segment 1 in this synthetic article.</div>
+  <div class="sent-zh">边界句 15：用一条中等长度的英文从句压测模板（第 1 段第 15 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 15 · /ˈsɛntəns 15/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 16 stress-tests the template with a moderately long English clause — item 16 of segment 1 in this synthetic article.</div>
+  <div class="sent-zh">边界句 16：用一条中等长度的英文从句压测模板（第 1 段第 16 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 16 · /ˈsɛntəns 16/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 17 stress-tests the template with a moderately long English clause — item 17 of segment 1 in this synthetic article.</div>
+  <div class="sent-zh">边界句 17：用一条中等长度的英文从句压测模板（第 1 段第 17 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 17 · /ˈsɛntəns 17/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 18 stress-tests the template with a moderately long English clause — item 18 of segment 1 in this synthetic article.</div>
+  <div class="sent-zh">边界句 18：用一条中等长度的英文从句压测模板（第 1 段第 18 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 18 · /ˈsɛntəns 18/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 19 stress-tests the template with a moderately long English clause — item 19 of segment 1 in this synthetic article.</div>
+  <div class="sent-zh">边界句 19：用一条中等长度的英文从句压测模板（第 1 段第 19 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 19 · /ˈsɛntəns 19/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 20 stress-tests the template with a moderately long English clause — item 20 of segment 1 in this synthetic article.</div>
+  <div class="sent-zh">边界句 20：用一条中等长度的英文从句压测模板（第 1 段第 20 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 20 · /ˈsɛntəns 20/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 21 stress-tests the template with a moderately long English clause — item 21 of segment 2 in this synthetic article.</div>
+  <div class="sent-zh">边界句 21：用一条中等长度的英文从句压测模板（第 2 段第 1 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 21 · /ˈsɛntəns 21/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 22 stress-tests the template with a moderately long English clause — item 22 of segment 2 in this synthetic article.</div>
+  <div class="sent-zh">边界句 22：用一条中等长度的英文从句压测模板（第 2 段第 2 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 22 · /ˈsɛntəns 22/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 23 stress-tests the template with a moderately long English clause — item 23 of segment 2 in this synthetic article.</div>
+  <div class="sent-zh">边界句 23：用一条中等长度的英文从句压测模板（第 2 段第 3 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 23 · /ˈsɛntəns 23/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 24 stress-tests the template with a moderately long English clause — item 24 of segment 2 in this synthetic article.</div>
+  <div class="sent-zh">边界句 24：用一条中等长度的英文从句压测模板（第 2 段第 4 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 24 · /ˈsɛntəns 24/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 25 stress-tests the template with a moderately long English clause — item 25 of segment 2 in this synthetic article.</div>
+  <div class="sent-zh">边界句 25：用一条中等长度的英文从句压测模板（第 2 段第 5 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 25 · /ˈsɛntəns 25/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 26 stress-tests the template with a moderately long English clause — item 26 of segment 2 in this synthetic article.</div>
+  <div class="sent-zh">边界句 26：用一条中等长度的英文从句压测模板（第 2 段第 6 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 26 · /ˈsɛntəns 26/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 27 stress-tests the template with a moderately long English clause — item 27 of segment 2 in this synthetic article.</div>
+  <div class="sent-zh">边界句 27：用一条中等长度的英文从句压测模板（第 2 段第 7 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 27 · /ˈsɛntəns 27/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 28 stress-tests the template with a moderately long English clause — item 28 of segment 2 in this synthetic article.</div>
+  <div class="sent-zh">边界句 28：用一条中等长度的英文从句压测模板（第 2 段第 8 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 28 · /ˈsɛntəns 28/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 29 stress-tests the template with a moderately long English clause — item 29 of segment 2 in this synthetic article.</div>
+  <div class="sent-zh">边界句 29：用一条中等长度的英文从句压测模板（第 2 段第 9 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 29 · /ˈsɛntəns 29/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 30 stress-tests the template with a moderately long English clause — item 30 of segment 2 in this synthetic article.</div>
+  <div class="sent-zh">边界句 30：用一条中等长度的英文从句压测模板（第 2 段第 10 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 30 · /ˈsɛntəns 30/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 31 stress-tests the template with a moderately long English clause — item 31 of segment 2 in this synthetic article.</div>
+  <div class="sent-zh">边界句 31：用一条中等长度的英文从句压测模板（第 2 段第 11 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 31 · /ˈsɛntəns 31/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 32 stress-tests the template with a moderately long English clause — item 32 of segment 2 in this synthetic article.</div>
+  <div class="sent-zh">边界句 32：用一条中等长度的英文从句压测模板（第 2 段第 12 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 32 · /ˈsɛntəns 32/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 33 stress-tests the template with a moderately long English clause — item 33 of segment 2 in this synthetic article.</div>
+  <div class="sent-zh">边界句 33：用一条中等长度的英文从句压测模板（第 2 段第 13 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 33 · /ˈsɛntəns 33/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 34 stress-tests the template with a moderately long English clause — item 34 of segment 2 in this synthetic article.</div>
+  <div class="sent-zh">边界句 34：用一条中等长度的英文从句压测模板（第 2 段第 14 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 34 · /ˈsɛntəns 34/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 35 stress-tests the template with a moderately long English clause — item 35 of segment 2 in this synthetic article.</div>
+  <div class="sent-zh">边界句 35：用一条中等长度的英文从句压测模板（第 2 段第 15 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 35 · /ˈsɛntəns 35/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 36 stress-tests the template with a moderately long English clause — item 36 of segment 2 in this synthetic article.</div>
+  <div class="sent-zh">边界句 36：用一条中等长度的英文从句压测模板（第 2 段第 16 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 36 · /ˈsɛntəns 36/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 37 stress-tests the template with a moderately long English clause — item 37 of segment 2 in this synthetic article.</div>
+  <div class="sent-zh">边界句 37：用一条中等长度的英文从句压测模板（第 2 段第 17 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 37 · /ˈsɛntəns 37/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 38 stress-tests the template with a moderately long English clause — item 38 of segment 2 in this synthetic article.</div>
+  <div class="sent-zh">边界句 38：用一条中等长度的英文从句压测模板（第 2 段第 18 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 38 · /ˈsɛntəns 38/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 39 stress-tests the template with a moderately long English clause — item 39 of segment 2 in this synthetic article.</div>
+  <div class="sent-zh">边界句 39：用一条中等长度的英文从句压测模板（第 2 段第 19 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 39 · /ˈsɛntəns 39/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 40 stress-tests the template with a moderately long English clause — item 40 of segment 2 in this synthetic article.</div>
+  <div class="sent-zh">边界句 40：用一条中等长度的英文从句压测模板（第 2 段第 20 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 40 · /ˈsɛntəns 40/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 41 stress-tests the template with a moderately long English clause — item 41 of segment 3 in this synthetic article.</div>
+  <div class="sent-zh">边界句 41：用一条中等长度的英文从句压测模板（第 3 段第 1 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 41 · /ˈsɛntəns 41/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 42 stress-tests the template with a moderately long English clause — item 42 of segment 3 in this synthetic article.</div>
+  <div class="sent-zh">边界句 42：用一条中等长度的英文从句压测模板（第 3 段第 2 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 42 · /ˈsɛntəns 42/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 43 stress-tests the template with a moderately long English clause — item 43 of segment 3 in this synthetic article.</div>
+  <div class="sent-zh">边界句 43：用一条中等长度的英文从句压测模板（第 3 段第 3 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 43 · /ˈsɛntəns 43/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 44 stress-tests the template with a moderately long English clause — item 44 of segment 3 in this synthetic article.</div>
+  <div class="sent-zh">边界句 44：用一条中等长度的英文从句压测模板（第 3 段第 4 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 44 · /ˈsɛntəns 44/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 45 stress-tests the template with a moderately long English clause — item 45 of segment 3 in this synthetic article.</div>
+  <div class="sent-zh">边界句 45：用一条中等长度的英文从句压测模板（第 3 段第 5 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 45 · /ˈsɛntəns 45/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 46 stress-tests the template with a moderately long English clause — item 46 of segment 3 in this synthetic article.</div>
+  <div class="sent-zh">边界句 46：用一条中等长度的英文从句压测模板（第 3 段第 6 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 46 · /ˈsɛntəns 46/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 47 stress-tests the template with a moderately long English clause — item 47 of segment 3 in this synthetic article.</div>
+  <div class="sent-zh">边界句 47：用一条中等长度的英文从句压测模板（第 3 段第 7 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 47 · /ˈsɛntəns 47/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 48 stress-tests the template with a moderately long English clause — item 48 of segment 3 in this synthetic article.</div>
+  <div class="sent-zh">边界句 48：用一条中等长度的英文从句压测模板（第 3 段第 8 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 48 · /ˈsɛntəns 48/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 49 stress-tests the template with a moderately long English clause — item 49 of segment 3 in this synthetic article.</div>
+  <div class="sent-zh">边界句 49：用一条中等长度的英文从句压测模板（第 3 段第 9 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 49 · /ˈsɛntəns 49/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 50 stress-tests the template with a moderately long English clause — item 50 of segment 3 in this synthetic article.</div>
+  <div class="sent-zh">边界句 50：用一条中等长度的英文从句压测模板（第 3 段第 10 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 50 · /ˈsɛntəns 50/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 51 stress-tests the template with a moderately long English clause — item 51 of segment 3 in this synthetic article.</div>
+  <div class="sent-zh">边界句 51：用一条中等长度的英文从句压测模板（第 3 段第 11 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 51 · /ˈsɛntəns 51/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 52 stress-tests the template with a moderately long English clause — item 52 of segment 3 in this synthetic article.</div>
+  <div class="sent-zh">边界句 52：用一条中等长度的英文从句压测模板（第 3 段第 12 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 52 · /ˈsɛntəns 52/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 53 stress-tests the template with a moderately long English clause — item 53 of segment 3 in this synthetic article.</div>
+  <div class="sent-zh">边界句 53：用一条中等长度的英文从句压测模板（第 3 段第 13 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 53 · /ˈsɛntəns 53/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 54 stress-tests the template with a moderately long English clause — item 54 of segment 3 in this synthetic article.</div>
+  <div class="sent-zh">边界句 54：用一条中等长度的英文从句压测模板（第 3 段第 14 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 54 · /ˈsɛntəns 54/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 55 stress-tests the template with a moderately long English clause — item 55 of segment 3 in this synthetic article.</div>
+  <div class="sent-zh">边界句 55：用一条中等长度的英文从句压测模板（第 3 段第 15 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 55 · /ˈsɛntəns 55/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 56 stress-tests the template with a moderately long English clause — item 56 of segment 3 in this synthetic article.</div>
+  <div class="sent-zh">边界句 56：用一条中等长度的英文从句压测模板（第 3 段第 16 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 56 · /ˈsɛntəns 56/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 57 stress-tests the template with a moderately long English clause — item 57 of segment 3 in this synthetic article.</div>
+  <div class="sent-zh">边界句 57：用一条中等长度的英文从句压测模板（第 3 段第 17 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 57 · /ˈsɛntəns 57/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 58 stress-tests the template with a moderately long English clause — item 58 of segment 3 in this synthetic article.</div>
+  <div class="sent-zh">边界句 58：用一条中等长度的英文从句压测模板（第 3 段第 18 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 58 · /ˈsɛntəns 58/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 59 stress-tests the template with a moderately long English clause — item 59 of segment 3 in this synthetic article.</div>
+  <div class="sent-zh">边界句 59：用一条中等长度的英文从句压测模板（第 3 段第 19 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 59 · /ˈsɛntəns 59/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 60 stress-tests the template with a moderately long English clause — item 60 of segment 3 in this synthetic article.</div>
+  <div class="sent-zh">边界句 60：用一条中等长度的英文从句压测模板（第 3 段第 20 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 60 · /ˈsɛntəns 60/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 61 stress-tests the template with a moderately long English clause — item 61 of segment 4 in this synthetic article.</div>
+  <div class="sent-zh">边界句 61：用一条中等长度的英文从句压测模板（第 4 段第 1 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 61 · /ˈsɛntəns 61/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 62 stress-tests the template with a moderately long English clause — item 62 of segment 4 in this synthetic article.</div>
+  <div class="sent-zh">边界句 62：用一条中等长度的英文从句压测模板（第 4 段第 2 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 62 · /ˈsɛntəns 62/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 63 stress-tests the template with a moderately long English clause — item 63 of segment 4 in this synthetic article.</div>
+  <div class="sent-zh">边界句 63：用一条中等长度的英文从句压测模板（第 4 段第 3 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 63 · /ˈsɛntəns 63/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 64 stress-tests the template with a moderately long English clause — item 64 of segment 4 in this synthetic article.</div>
+  <div class="sent-zh">边界句 64：用一条中等长度的英文从句压测模板（第 4 段第 4 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 64 · /ˈsɛntəns 64/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 65 stress-tests the template with a moderately long English clause — item 65 of segment 4 in this synthetic article.</div>
+  <div class="sent-zh">边界句 65：用一条中等长度的英文从句压测模板（第 4 段第 5 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 65 · /ˈsɛntəns 65/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 66 stress-tests the template with a moderately long English clause — item 66 of segment 4 in this synthetic article.</div>
+  <div class="sent-zh">边界句 66：用一条中等长度的英文从句压测模板（第 4 段第 6 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 66 · /ˈsɛntəns 66/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 67 stress-tests the template with a moderately long English clause — item 67 of segment 4 in this synthetic article.</div>
+  <div class="sent-zh">边界句 67：用一条中等长度的英文从句压测模板（第 4 段第 7 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 67 · /ˈsɛntəns 67/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 68 stress-tests the template with a moderately long English clause — item 68 of segment 4 in this synthetic article.</div>
+  <div class="sent-zh">边界句 68：用一条中等长度的英文从句压测模板（第 4 段第 8 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 68 · /ˈsɛntəns 68/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 69 stress-tests the template with a moderately long English clause — item 69 of segment 4 in this synthetic article.</div>
+  <div class="sent-zh">边界句 69：用一条中等长度的英文从句压测模板（第 4 段第 9 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 69 · /ˈsɛntəns 69/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 70 stress-tests the template with a moderately long English clause — item 70 of segment 4 in this synthetic article.</div>
+  <div class="sent-zh">边界句 70：用一条中等长度的英文从句压测模板（第 4 段第 10 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 70 · /ˈsɛntəns 70/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 71 stress-tests the template with a moderately long English clause — item 71 of segment 4 in this synthetic article.</div>
+  <div class="sent-zh">边界句 71：用一条中等长度的英文从句压测模板（第 4 段第 11 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 71 · /ˈsɛntəns 71/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 72 stress-tests the template with a moderately long English clause — item 72 of segment 4 in this synthetic article.</div>
+  <div class="sent-zh">边界句 72：用一条中等长度的英文从句压测模板（第 4 段第 12 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 72 · /ˈsɛntəns 72/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 73 stress-tests the template with a moderately long English clause — item 73 of segment 4 in this synthetic article.</div>
+  <div class="sent-zh">边界句 73：用一条中等长度的英文从句压测模板（第 4 段第 13 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 73 · /ˈsɛntəns 73/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 74 stress-tests the template with a moderately long English clause — item 74 of segment 4 in this synthetic article.</div>
+  <div class="sent-zh">边界句 74：用一条中等长度的英文从句压测模板（第 4 段第 14 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 74 · /ˈsɛntəns 74/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 75 stress-tests the template with a moderately long English clause — item 75 of segment 4 in this synthetic article.</div>
+  <div class="sent-zh">边界句 75：用一条中等长度的英文从句压测模板（第 4 段第 15 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 75 · /ˈsɛntəns 75/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 76 stress-tests the template with a moderately long English clause — item 76 of segment 4 in this synthetic article.</div>
+  <div class="sent-zh">边界句 76：用一条中等长度的英文从句压测模板（第 4 段第 16 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 76 · /ˈsɛntəns 76/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 77 stress-tests the template with a moderately long English clause — item 77 of segment 4 in this synthetic article.</div>
+  <div class="sent-zh">边界句 77：用一条中等长度的英文从句压测模板（第 4 段第 17 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 77 · /ˈsɛntəns 77/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 78 stress-tests the template with a moderately long English clause — item 78 of segment 4 in this synthetic article.</div>
+  <div class="sent-zh">边界句 78：用一条中等长度的英文从句压测模板（第 4 段第 18 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 78 · /ˈsɛntəns 78/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 79 stress-tests the template with a moderately long English clause — item 79 of segment 4 in this synthetic article.</div>
+  <div class="sent-zh">边界句 79：用一条中等长度的英文从句压测模板（第 4 段第 19 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 79 · /ˈsɛntəns 79/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 80 stress-tests the template with a moderately long English clause — item 80 of segment 4 in this synthetic article.</div>
+  <div class="sent-zh">边界句 80：用一条中等长度的英文从句压测模板（第 4 段第 20 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 80 · /ˈsɛntəns 80/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 81 stress-tests the template with a moderately long English clause — item 81 of segment 5 in this synthetic article.</div>
+  <div class="sent-zh">边界句 81：用一条中等长度的英文从句压测模板（第 5 段第 1 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 81 · /ˈsɛntəns 81/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 82 stress-tests the template with a moderately long English clause — item 82 of segment 5 in this synthetic article.</div>
+  <div class="sent-zh">边界句 82：用一条中等长度的英文从句压测模板（第 5 段第 2 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 82 · /ˈsɛntəns 82/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 83 stress-tests the template with a moderately long English clause — item 83 of segment 5 in this synthetic article.</div>
+  <div class="sent-zh">边界句 83：用一条中等长度的英文从句压测模板（第 5 段第 3 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 83 · /ˈsɛntəns 83/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 84 stress-tests the template with a moderately long English clause — item 84 of segment 5 in this synthetic article.</div>
+  <div class="sent-zh">边界句 84：用一条中等长度的英文从句压测模板（第 5 段第 4 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 84 · /ˈsɛntəns 84/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 85 stress-tests the template with a moderately long English clause — item 85 of segment 5 in this synthetic article.</div>
+  <div class="sent-zh">边界句 85：用一条中等长度的英文从句压测模板（第 5 段第 5 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 85 · /ˈsɛntəns 85/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 86 stress-tests the template with a moderately long English clause — item 86 of segment 5 in this synthetic article.</div>
+  <div class="sent-zh">边界句 86：用一条中等长度的英文从句压测模板（第 5 段第 6 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 86 · /ˈsɛntəns 86/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 87 stress-tests the template with a moderately long English clause — item 87 of segment 5 in this synthetic article.</div>
+  <div class="sent-zh">边界句 87：用一条中等长度的英文从句压测模板（第 5 段第 7 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 87 · /ˈsɛntəns 87/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 88 stress-tests the template with a moderately long English clause — item 88 of segment 5 in this synthetic article.</div>
+  <div class="sent-zh">边界句 88：用一条中等长度的英文从句压测模板（第 5 段第 8 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 88 · /ˈsɛntəns 88/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 89 stress-tests the template with a moderately long English clause — item 89 of segment 5 in this synthetic article.</div>
+  <div class="sent-zh">边界句 89：用一条中等长度的英文从句压测模板（第 5 段第 9 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 89 · /ˈsɛntəns 89/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 90 stress-tests the template with a moderately long English clause — item 90 of segment 5 in this synthetic article.</div>
+  <div class="sent-zh">边界句 90：用一条中等长度的英文从句压测模板（第 5 段第 10 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 90 · /ˈsɛntəns 90/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 91 stress-tests the template with a moderately long English clause — item 91 of segment 5 in this synthetic article.</div>
+  <div class="sent-zh">边界句 91：用一条中等长度的英文从句压测模板（第 5 段第 11 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 91 · /ˈsɛntəns 91/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 92 stress-tests the template with a moderately long English clause — item 92 of segment 5 in this synthetic article.</div>
+  <div class="sent-zh">边界句 92：用一条中等长度的英文从句压测模板（第 5 段第 12 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 92 · /ˈsɛntəns 92/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 93 stress-tests the template with a moderately long English clause — item 93 of segment 5 in this synthetic article.</div>
+  <div class="sent-zh">边界句 93：用一条中等长度的英文从句压测模板（第 5 段第 13 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 93 · /ˈsɛntəns 93/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 94 stress-tests the template with a moderately long English clause — item 94 of segment 5 in this synthetic article.</div>
+  <div class="sent-zh">边界句 94：用一条中等长度的英文从句压测模板（第 5 段第 14 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 94 · /ˈsɛntəns 94/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 95 stress-tests the template with a moderately long English clause — item 95 of segment 5 in this synthetic article.</div>
+  <div class="sent-zh">边界句 95：用一条中等长度的英文从句压测模板（第 5 段第 15 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 95 · /ˈsɛntəns 95/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 96 stress-tests the template with a moderately long English clause — item 96 of segment 5 in this synthetic article.</div>
+  <div class="sent-zh">边界句 96：用一条中等长度的英文从句压测模板（第 5 段第 16 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 96 · /ˈsɛntəns 96/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 97 stress-tests the template with a moderately long English clause — item 97 of segment 5 in this synthetic article.</div>
+  <div class="sent-zh">边界句 97：用一条中等长度的英文从句压测模板（第 5 段第 17 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 97 · /ˈsɛntəns 97/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 98 stress-tests the template with a moderately long English clause — item 98 of segment 5 in this synthetic article.</div>
+  <div class="sent-zh">边界句 98：用一条中等长度的英文从句压测模板（第 5 段第 18 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 98 · /ˈsɛntəns 98/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 99 stress-tests the template with a moderately long English clause — item 99 of segment 5 in this synthetic article.</div>
+  <div class="sent-zh">边界句 99：用一条中等长度的英文从句压测模板（第 5 段第 19 句）。</div>
+  <div class="pron"><span class="lbl">连读</span>sentence 99 · /ˈsɛntəns 99/ · 边界样本生成标注</div>
+</div>
+<div class="sent">
+  <div class="sent-en">Boundary sentence 100 stress-tests the template with a moderately long English clause — item 100 of segment 5 in this synthetic article.</div>
+  <div class="sent-zh">边界句 100：用一条中等长度的英文从句压测模板（第 5 段第 20 句）。</div>
+  <div class="pron"><span class="lbl">弱读</span>sentence 100 · /ˈsɛntəns 100/ · 边界样本生成标注</div>
+</div>
+
+<!-- ④ 关键词表：每段一张表，三列 原句|关键词钩子|中文提示 -->
+<h2>4. 关键词串联表（每句一个钩子）</h2>
+<p style="font-size:14px;color:#374151;">每句只抓 1~2 个"钩子词"。合上书，看着中文提示往外说英文，卡住就瞄一眼关键词。</p>
+
+<h3>第 1 段 · {{逻辑角色}}</h3>
+<table>
+<thead><tr><th style="width:44%">原句</th><th style="width:20%">关键词钩子</th><th>中文提示</th></tr></thead>
+<tbody>
+<tr><td>{{原句}}</td><td>{{钩子词}}</td><td>{{中文提示}}</td></tr>
+</tbody>
+</table>
+
+<!-- ⑤ 三遍法（每段 15~20 分钟），三步固定 -->
+<h2>9. 当天"三遍法"（一段约 15~20 分钟）</h2>
+<div class="tl">
+  <div class="step"><span class="marker">1</span><div><div class="t">理解朗读 ×3</div><div class="d">先查清不认识的搭配（{{本段生词搭配示例}}），大声朗读 3 遍。</div></div></div>
+  <div class="step"><span class="marker">2</span><div><div class="t">关键词复述 ×2</div><div class="d">合上书，看着中文提示把英文说出来；卡住就瞄一眼钩子词，两轮后基本顺。</div></div></div>
+  <div class="step"><span class="marker">3</span><div><div class="t">默写 + 红笔纠错</div><div class="d">默写整段，红笔对照改错，错处重点重背。</div></div></div>
+</div>
+
+<!-- ⑥ 艾宾浩斯复习计划，五个时间点固定 -->
+<h2>10. 艾宾浩斯复习计划（按段排期）</h2>
+<div class="tl">
+  <div class="step"><span class="marker">✓</span><div><div class="t">背完后 5 分钟</div><div class="d">合书快速复述一遍。</div></div></div>
+  <div class="step"><span class="marker">✓</span><div><div class="t">当晚睡前</div><div class="d">完整背诵全文 + 默写一遍。</div></div></div>
+  <div class="step"><span class="marker">✓</span><div><div class="t">第 2 天早上</div><div class="d">做第 5 节挖空自测，错句单独标记。</div></div></div>
+  <div class="step"><span class="marker">✓</span><div><div class="t">第 3 天</div><div class="d">只背错句 + 快速过全文。</div></div></div>
+  <div class="step"><span class="marker">✓</span><div><div class="t">第 7 天 / 第 15 天</div><div class="d">各快速背一遍，形成长期记忆。</div></div></div>
+</div>
+
+<!-- ⑦ 挖空自测：每段一个 details，挖 2~5 个关键空，答案放 .answer -->
+<h2>11. 挖空自测（先自己填，再点开对答案）</h2>
+<p class="sec-label">第 1 段 · 边界压测（100 句样本）</p>
+<p style="font-size:15px;margin-top:10px;">This synthetic article carries one ______ sentences in total; every ______ block adds DOM nodes, and the template must stay responsive at this ______. Fill each blank first, then ______ the answers below; the sample exists to keep the ______ honest.</p>
+<details class="answer-toggle"><summary>▶ 查看本段答案</summary>
+<div class="answer">答案：hundred / sent / scale / check / rendering</div>
+</details>
+
+<!-- ⑧ 短语清单：8~15 条，三列表格：短语 | 中文释义 | 真实语料例句（新闻/TED 风格，搭配加粗，无翻译） -->
+<h2>12. 必背短语清单</h2>
+<div class="card">
+<table>
+<thead><tr><th style="width:24%">短语</th><th style="width:26%">中文释义</th><th>例句</th></tr></thead>
+<tbody>
+<tr><td><b>{{搭配}}</b></td><td>{{中文释义}}</td><td>{{真实语料例句，搭配加粗}}</td></tr>
+</tbody>
+</table>
+</div>
+
+<!-- ⑨ 记忆钩子：从文中找头韵/押韵/排比/对比/同义换词/首尾呼应/数字锚点/路标词/金句 -->
+<h2>13. 专业词汇梳理</h2>
+<div class="card">
+<p style="font-size:14px;color:#374151;margin-bottom:10px;">这些词是文章的"地基"——先于背诵掌握。构词拆解是最省力的记忆法：认得词根，生词就变成了熟词的组合。<b>音标默认美音</b>；英音（UK）或印度发音（IN）与美音有差异时，在音标格内另起一行标注。</p>
+<table>
+<thead><tr><th style="width:20%">术语</th><th style="width:26%">构词拆解</th><th style="width:16%">音标</th><th style="width:14%">中文</th><th>记忆钩子</th></tr></thead>
+<tbody>
+{{TERM_ROWS}}
+</tbody>
+</table>
+</div>
+
+<h2>14. 金句句型库</h2>
+<div class="card">
+<p style="font-size:14px;color:#374151;margin-bottom:10px;">从文中精选可直接迁移的句型：<b>实用框架</b>（开场、警告、对比、因果——背了就能套进自己的写作/演讲）与<b>经典修辞</b>（类比、谚语、排比——值得品味与背诵）。「可替换模板」列给出换装示范，换主语换话题即可复用。</p>
+<table class="ptn-table">
+<thead><tr><th>句型（原文摘录 · 加粗为可替换部分）</th><th style="width:20%">中文释义</th><th style="width:24%">可替换模板</th><th>使用场景</th></tr></thead>
+<tbody>
+{{PTN_ROWS}}
+</tbody>
+</table>
+</div>
+
+<h2>15. 记忆钩子（跨段总链）</h2>
+<div class="card">
+<p style="font-size:14px;color:#374151;margin-bottom:8px;">两部分：<b>文内语言钩</b>——作者自己埋的记忆点；<b>三层钩子链</b>——逐句放行的复述轨道。盖住原文，只看链条，从上一钩推出下一钩。</p>
+<ul>
+<li><b>{{钩子类型}}</b>：{{示例}}</li>
+</ul>
+<h3 style="font-size:16px;margin:14px 0 6px;color:#92400e;">三层钩子链（v2.6.0 · 每段一条，逐句放行）</h3>
+<p style="font-size:13.5px;color:#6b7280;margin-bottom:10px;">用法：盖住原文 → 只看链 → 一钩一句往外说。段钩＝这段讲什么；句钩＝该句关键词；桥（⇒因果 / ↔转折 / →递进 / ＋并列 / :举例）解释下一钩为什么接得上；<span style="font-family:Consolas,monospace;color:#1d4ed8;">[方括号]</span>是原句英文锚词——卡壳看锚词，锚词带出原句。卡在哪一钩，就回原文只重背那一句。</p>
+{{HOOK_CHAINS}}
+</div>
+<div class="tip">💡 额外技巧：录音对比法 —— 录下自己的背诵回放对照原文；{{本篇专属建议}}。</div>
+
+<h2>16. 复述技巧包（纯技巧 · 通用）</h2>
+<div class="card">
+<p style="font-size:14px;color:#374151;margin-bottom:10px;">复述 ≠ 背诵原文。以下 10 条技巧篇篇通用：卡壳时用它救场，表达时用它提速。</p>
+<ul>
+<li><b>① 忘词降级法</b>：想不起原词就说 <b>a kind of ... / something like ...</b>——用上位词兜住意思，停顿绝不超过 2 秒</li>
+<li><b>② 连接词续命法</b>：卡住瞬间抛出 <b>and then / what's more / on the other hand</b>——连接词买来 2 秒思考时间，听感依然流畅</li>
+<li><b>③ 跳句保链法</b>：整句想不起来就跳过，直接说下一句——<b>链条完整 &gt; 单句完整</b>，回头补不如继续走</li>
+<li><b>④ 主干优先法</b>：先说主谓宾（谁-干嘛-结果），形容词从句全砍——复述丢修饰不扣分，卡在修饰才扣分</li>
+<li><b>⑤ Paraphrase 合法化</b>：换词是加分不是作弊——big→huge、protect→keep ... safe，意思对就算对</li>
+<li><b>⑥ 顺序词撑骨架</b>：<b>first / then / after that / finally</b>——卡壳时先抛顺序词，句子自动长出来</li>
+<li><b>⑦ 一句一信息</b>：一句话只装一个信息点，说完就停——拆短句永远比拽长句稳</li>
+<li><b>⑧ 三遍降梯法</b>：第 1 遍看钩子说 → 第 2 遍只看问题链/段标题说 → 第 3 遍空手说（对应 6 的 L1→L3，不必每次冲 L5）</li>
+<li><b>⑨ 录音自查法</b>：录一遍回听，只挑 <b>3 个卡壳点</b>——下次专练这 3 处，别全文重来</li>
+<li><b>⑩ 90 秒限时法</b>：全文复述限时 90 秒——限时逼你抓主干、丢细节，复述天然变利落</li>
+</ul>
+</div>
+
+<h2>17. 记忆宫殿映射</h2>
+<div class="card">
+<p style="font-size:14px;color:#374151;margin-bottom:8px;">钩子链是<b>逻辑线索</b>，宫殿是<b>空间线索</b>——两条独立记忆线互为兜底。随机丢句时改走宫殿："走到哪儿"直接提示"该哪句"，<b>空的站点</b>会立刻暴露丢句位置。句钩与锚词直接来自第 15 节钩子链，无需另记内容。</p>
+<p style="font-size:13.5px;color:#6b7280;margin-bottom:6px;"><b>踩点脚本</b>：闭眼从站 1 走到末站，每站停下默念该站句钩与锚词，走完即复习一遍全文顺序。平时走逻辑线（钩子链），卡壳或复习时走空间线（宫殿）。</p>
+<div class="palace-route">
+{{PALACE_STOPS}}
+</div>
+</div>
+
+<footer>English teacher · 背诵方案 · 建议每天 20 分钟，{{X}}~{{Y}} 天完成</footer>
+</div>
+
+<script>/* ===== v2.32.0 EMM_STORE_V232: 进度存储契约（唯一实现）=====
+   keyOf = 进度键前缀 + (h1 文本前 40 字 | title 前 40 字 | 'plan')。
+   main IIFE（keyOf/save/loadState 首行）、SR IIFE（getH1/keyOf/loadProgress/
+   patchSr/patchSrMode）、shadow IIFE（getH1/keyOf/loadProgress/saveProgress）
+   均为同签名薄委托——契约改动只改本块。本块必须是第 1 个脚本块（先于 main）。
+   library-template（v2.34.0）：builder 将本块内版本锚点字面量替换后注入为其
+   第 1 个脚本块；library 的 progKey 以字符串键形态（keyArg）调用 loadRaw/save/patch。 */
+window.EMMProgressStore = (function(){
+  "use strict";
+  function title40(doc) {
+    var d = doc || document;
+    var h = d.querySelector ? d.querySelector('h1') : null;
+    if (h) return h.textContent.trim().slice(0, 40);
+    var t = d.title || '';
+    return t.slice(0, 40) || 'plan';
+  }
+  function keyOf(doc) { return 'emm-progress:' + title40(doc); }
+  // 参数双形态：传 doc → 按 h1/title 派生键；传字符串 → 视为完整键（library 批接入用）
+  function keyArg(x) { return (typeof x === 'string') ? x : keyOf(x); }
+  function load(x) {
+    try { return JSON.parse(localStorage.getItem(keyArg(x)) || '{}'); } catch(e) { return {}; }
+  }
+  function loadRaw(x) {
+    try { return JSON.parse(localStorage.getItem(keyArg(x)) || 'null'); } catch(e) { return null; }
+  }
+  function save(prog, x) {
+    try { localStorage.setItem(keyArg(x), JSON.stringify(prog)); } catch(e){}
+  }
+  function patch(fn, x) {
+    try {
+      var k = keyArg(x);
+      var p = JSON.parse(localStorage.getItem(k) || '{}');
+      fn(p);
+      localStorage.setItem(k, JSON.stringify(p));
+    } catch(e){}
+  }
+  return { title40: title40, keyOf: keyOf, load: load, loadRaw: loadRaw, save: save, patch: patch };
+})();
+</script>
+
+<script>
+/* ===== v2.7.0 Review Loop (self-contained; no deps) ===== */
+(function(){
+  "use strict";
+  var CSS = ''
+  + '.rv-bar{display:flex;flex-wrap:wrap;gap:10px;align-items:center;background:#ecfdf5;border:1px solid #6ee7b7;border-left:4px solid #10b981;border-radius:10px;padding:10px 14px;margin:12px 0;font-size:14px;}'
+  + '.rv-btn{cursor:pointer;border:1px solid #10b981;background:#fff;color:#047857;border-radius:8px;padding:3px 12px;font-size:13px;font-weight:600;}'
+  + '.rv-btn:hover{background:#d1fae5;}'
+  + '.rv-btn.rv-danger{border-color:#f87171;color:#b91c1c;}'
+  + '.rv-btn.rv-danger:hover{background:#fee2e2;}'
+  + '.rv-stat{font-size:13px;color:#065f46;}'
+  + '.rv-dash{background:#f0fdf4;border:1px solid #bbf7d0;border-radius:10px;padding:10px 14px;margin:10px 0;font-size:13.5px;color:#065f46;line-height:1.9;}'
+  + '.rv-dash b{color:#065f46;}'
+  + '.rv-progress{height:8px;background:#d1fae5;border-radius:4px;overflow:hidden;margin:6px 0;}'
+  + '.rv-progress i{display:block;height:100%;background:#10b981;width:0;}'
+  + '.rv-judge{display:none;gap:4px;margin-left:8px;vertical-align:middle;}'
+  + '.sent{position:relative;}'
+  + '.rv-mode .rv-judge{display:inline-flex;}'
+  + '.rv-judge button{cursor:pointer;border:1px solid #cbd5e1;background:#fff;border-radius:6px;font-size:11px;padding:1px 7px;color:#475569;}'
+  + '.rv-judge button.rv-ok-on{background:#10b981;border-color:#10b981;color:#fff;}'
+  + '.rv-judge button.rv-bad-on{background:#ef4444;border-color:#ef4444;color:#fff;}'
+  + '.rv-weakline{border-left:3px solid #ef4444;}'
+  + '.rv-dict{background:#eff6ff;border:1px solid #93c5fd;border-left:4px solid #3b82f6;border-radius:10px;padding:10px 14px;margin:12px 0;font-size:14px;}'
+  + '.rv-dict .d-btn{cursor:pointer;border:1px solid #3b82f6;background:#fff;color:#1d4ed8;border-radius:8px;padding:3px 12px;font-size:13px;font-weight:600;margin-right:6px;}'
+  + '.rv-dict .d-btn:hover{background:#dbeafe;}'
+  + '.rv-dict input.d-input{border:1px solid #93c5fd;border-radius:8px;padding:5px 10px;font-size:14px;width:70%;margin:6px 0;}'
+  + '.rv-dict .d-sent{font-size:15px;margin:8px 0 4px;color:#1e3a8a;font-weight:600;}'
+  + '.rv-dict .w-ok{color:#059669;}'
+  + '.rv-dict .w-bad{background:#fef08a;color:#92400e;border-radius:4px;padding:0 3px;}'
+  + '.rv-dict .w-miss{background:#fee2e2;color:#b91c1c;border-radius:4px;padding:0 3px;text-decoration:line-through;}'
+  + '.rv-dict .w-extra{color:#9ca3af;text-decoration:line-through;}'
+  + '.rv-dict .d-hint{font-size:12.5px;color:#6b7280;margin-top:4px;}'
+  + '@media print{.rv-dict{display:none !important;}}'
+  /* v2.19: 影子跟读（CSS 部分；锚点见下行 IIFE 注释） */
+  + '.rv-shadow{background:#fffbeb;border:1px solid #fcd34d;border-left:4px solid #f59e0b;border-radius:10px;padding:12px 16px;margin:12px 0;font-size:14px;}'
+  + '.rv-shadow .sv-hint{font-size:12.5px;color:#92400e;margin-top:6px;line-height:1.7;}'
+  + '.rv-shadow .sv-row{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:8px 0;}'
+  + '.rv-shadow .sv-btn{cursor:pointer;border:1px solid #f59e0b;background:#fff;color:#92400e;border-radius:8px;padding:5px 12px;font-size:13px;font-weight:600;font-family:inherit;}'
+  + '.rv-shadow .sv-btn:hover{background:#fef3c7;}'
+  + '.rv-shadow .sv-btn:disabled{opacity:.4;cursor:not-allowed;}'
+  + '.rv-shadow .sv-btn.sv-record.recording{background:#ef4444;color:#fff;border-color:#ef4444;}'
+  + '.rv-shadow .sv-btn.sv-auto.listening{background:#3b82f6;color:#fff;border-color:#3b82f6;}'
+  + '.rv-shadow .sv-sent{font-size:15px;margin:8px 0 4px;color:#7c2d12;font-weight:600;font-family:Georgia,"Times New Roman",serif;line-height:1.85;}'
+  + '.rv-shadow .sv-words{display:flex;flex-wrap:wrap;gap:6px;margin:10px 0;line-height:2;}'
+  + '.rv-shadow .sv-w{padding:5px 10px;border:1px solid #fcd34d;border-radius:6px;cursor:pointer;user-select:none;background:#fff;font-family:inherit;font-size:13.5px;transition:all .15s;}'
+  + '.rv-shadow .sv-w.sv-ok{background:#d1fae5;color:#047857;border-color:#10b981;font-weight:600;}'
+  + '.rv-shadow .sv-w.sv-bad{background:#fee2e2;color:#b91c1c;border-color:#ef4444;text-decoration:line-through;}'
+  + '.rv-shadow .sv-w.sv-pending{background:#fffbeb;}'
+  + '.rv-shadow .sv-w:hover{transform:translateY(-1px);box-shadow:0 1px 3px rgba(0,0,0,.08);}'
+  + '.rv-shadow .sv-status{font-size:13px;color:#92400e;font-weight:600;}'
+  + '.rv-shadow .sv-meta{font-size:12px;color:#9ca3af;}'
+  + '.rv-shadow audio{width:100%;margin-top:6px;height:36px;}'
+  + '@media print{.rv-shadow{display:none !important;}}'
+
+  + '@media print{.rv-bar,.rv-dash,.rv-judge,.rv-dict,.rv-shadow{display:none !important;}}'
+  + '';
+
+  function keyOf(){ return EMMProgressStore.keyOf(); }
+
+  function loadState(){
+    var s = EMMProgressStore.loadRaw(keyOf());
+    var f = fresh();
+    if(!s) return f;
+    for(var k in s){ f[k] = s[k]; }
+    f.ladder = f.ladder || {}; f.log = f.log || {};
+    if(!f.wb) f.wb = { main: {}, pal: {} };
+    if(!f.wb.main) f.wb.main = {};
+    if(!f.wb.pal) f.wb.pal = {};
+    f.quiz = f.quiz || 0; f.perDay = f.perDay || 1;
+    return f;
+  }
+  function fresh(){
+    return { done:{}, streak:{}, weak:{}, rounds:[], mode:false, current:null,
+             quiz:0, start:'', perDay:1, ladder:{}, log:{}, wb:{ main:{}, pal:{} },
+             shadow:{},  // v2.19：影子跟读——{sentIdx: {ok, bad, total, marks:[], date}}
+             sr:{},      // v2.20：SM-2 间隔——{sentIdx: {ef, interval, reps, due, lastQ}}
+             srMode:'light',  // v2.20：'light' 默认（连顺 2 轮毕业）；'standard' 走 SM-2
+             fingerprint:'' };
+  }
+  function save(s){ EMMProgressStore.save(s); }
+
+  var state, sentences = [];
+
+  function init(){
+    var style = document.createElement('style');
+    style.textContent = CSS;
+    document.head.appendChild(style);
+
+    state = loadState();
+
+    // v2.22：备份提醒——上次打开距今 > 30 天 → 提示导出（避免 localStorage 数据丢失）
+    (function backupPrompt(){
+      try {
+        var lastKey = 'emm-last-open:' + (document.querySelector('h1') ? document.querySelector('h1').textContent.trim().slice(0, 40) : ((document.title || '').slice(0, 40) || 'plan'));
+        var last = localStorage.getItem(lastKey);
+        var today = todayKey();
+        localStorage.setItem(lastKey, today);  // 更新"最近打开"为今天
+        if(last && last !== today){
+          var diff = Math.round((parseDate(today) - parseDate(last)) / 86400000);
+          if(diff >= 30){
+            var hasProgress = Object.keys(state.done || {}).length || Object.keys(state.weak || {}).length;
+            if(hasProgress && typeof __emmBackupPromptShown === 'undefined'){
+              // 一个 session 只弹一次
+              window.__emmBackupPromptShown = true;
+              if(confirm('⏰ 你已经 ' + diff + ' 天没打开这个方案了。\n\nlocalStorage 数据可能因为浏览器清理而丢失。建议立即导出 JSON 备份。\n\n现在导出吗？')){
+                exportProgress();
+              }
+            }
+          }
+        }
+      } catch(e){}
+    })();
+
+    // collect sentence nodes
+    document.querySelectorAll('.sent').forEach(function(node){
+      var en = node.querySelector('.sent-en');
+      if(!en) return;
+      var idx = sentences.length;
+      node.__emmIdx = idx;
+      sentences.push({ node: node, en: en, text: en.textContent.trim() });
+      var jspan = document.createElement('span');
+      jspan.className = 'rv-judge';
+      jspan.innerHTML = '<button type="button" data-v="ok" title="顺">顺</button><button type="button" data-v="bad" title="卡">卡</button>';
+      node.appendChild(jspan);
+      jspan.querySelector('[data-v=ok]').addEventListener('click', function(){ judge(idx, 'ok'); });
+      jspan.querySelector('[data-v=bad]').addEventListener('click', function(){ judge(idx, 'bad'); });
+    });
+    if(!sentences.length) return;
+
+    checkFingerprint();
+    detectSegments();
+    buildRoundBar();
+    buildDashboard();
+    collectStops();
+    buildDict();
+    applyJudgeState();
+    renderDash();
+    buildTodayCard();
+    buildWorkbook();
+    wireReveal();
+    selfCheck();
+    buildCloze();
+    wrapTables();
+    // v2.24：?jump=0,2,5 — 自动滚动到指定句并高亮（供记忆库轻刷结算页"一键回原方案"用）
+    (function jumpTo(){
+      try {
+        var m = location.search.match(/[?&]jump=([^&]+)/);
+        if(!m) return;
+        var sidxs = decodeURIComponent(m[1]).split(',').map(Number).filter(function(n){ return n >= 0 && n < sentences.length; });
+        if(!sidxs.length) return;
+        // 滚动到第一个句
+        var first = sentences[sidxs[0]];
+        if(first){
+          first.node.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          first.node.style.transition = 'background-color .3s';
+          first.node.style.backgroundColor = '#fef3c7';
+          setTimeout(function(){ first.node.style.backgroundColor = ''; }, 2500);
+        }
+      } catch(e){}
+    })();
+  }
+
+  var stops = [];
+  function collectStops(){
+    stops = Array.prototype.slice.call(document.querySelectorAll('.palace-stop'));
+  }
+
+  function applyWeakStops(){
+    stops.forEach(function(st, i){
+      var idxs = parseSents(st) || [i];
+      var weak = idxs.some(function(ix){ return !!state.weak[ix]; });
+      st.classList.toggle('palace-weak', weak);
+      var no = st.querySelector('.st-no');
+      if(no && weak && !no.getAttribute('title')){
+        no.setAttribute('title', '薄弱站：点击跳到原句');
+      }
+    });
+  }
+
+  function buildRoundBar(){
+    var bar = document.createElement('div');
+    bar.className = 'rv-bar';
+    bar.innerHTML = '<b>🔁 复习打卡</b>'
+      + '<button type="button" class="rv-btn rv-today-go" title="智能跳转：根据你的当前进度，告诉你今天该先做哪个">★ 今天先做这个</button>'
+      + '<button type="button" class="rv-btn rv-round"></button>'
+      + '<button type="button" class="rv-btn rv-quiz"></button>'
+      + '<button type="button" class="rv-btn rv-drill"></button>'
+      + '<button type="button" class="rv-btn rv-segtest" title="60 秒挖空挑战：限时填空，时间到自动批改给 0-100 分">📝 段落测试</button>'
+      + '<button type="button" class="rv-btn rv-shadow-btn">🎙️ 影子跟读</button>'
+      + '<button type="button" class="rv-btn rv-srmode" title="轻量：连顺 2 轮毕业；标准：SM-2 间隔">📚 轻量</button>'
+      + '<button type="button" class="rv-btn rv-goal" title="薄弱句毕业所需的连顺轮次（点切换 2/3/4/5）">🎯 连顺 3 轮</button>'
+      + '<span class="rv-stat rv-count"></span>'
+      + '<button type="button" class="rv-btn rv-export" title="导出当前进度为 JSON 文件（换浏览器 / 换电脑迁移用）">💾 导出</button>'
+      + '<button type="button" class="rv-btn rv-anki" title="导出挖空卡 + 复述卡为 CSV（Anki / Excel 可直接导入）">🗂 Anki</button>'
+      + '<button type="button" class="rv-btn rv-import" title="从 JSON 文件恢复进度">📥 导入</button>'
+      + '<input type="file" class="rv-file-input" accept="application/json,.json" style="display:none;">'
+      + '<button type="button" class="rv-btn rv-danger rv-reset">重置进度</button>';
+    var host = document.querySelector('.sent');
+    if(host && host.parentNode) host.parentNode.insertBefore(bar, host);
+    bar.querySelector('.rv-drill').addEventListener('click', toggleDrill);
+    bar.querySelector('.rv-today-go').addEventListener('click', smartJumpToday);
+    bar.querySelector('.rv-segtest').addEventListener('click', startSegTest);
+    bar.querySelector('.rv-goal').addEventListener('click', function(){
+      var cur = state.streakToGoal || 3;
+      var next = cur === 2 ? 3 : (cur === 3 ? 4 : (cur === 4 ? 5 : 2));
+      state.streakToGoal = next;
+      save(state);
+      renderGoal();
+    });
+    bar.querySelector('.rv-srmode').addEventListener('click', function(){
+      state.srMode = (state.srMode === 'standard') ? 'light' : 'standard';
+      save(state);
+      renderSrMode();
+      renderDash();
+      // v2.20 SR hook：通知 SR IIFE 重新对齐 Ebbinghaus
+      if(typeof __emmDispatch === 'function') __emmDispatch('modeChange');
+    });
+    bar.querySelector('.rv-export').addEventListener('click', exportProgress);
+    // v2.29.0：Anki 导出按钮接线
+    if(bar.querySelector('.rv-anki')) bar.querySelector('.rv-anki').addEventListener('click', exportAnki);
+    bar.querySelector('.rv-import').addEventListener('click', function(){
+      bar.querySelector('.rv-file-input').click();
+    });
+    bar.querySelector('.rv-file-input').addEventListener('change', importProgress);
+    bar.querySelector('.rv-reset').addEventListener('click', function(){
+      if(confirm('确定清空本篇全部复习进度？此操作不可恢复。')){
+        state = fresh(); save(state); applyJudgeState(); renderDash(); renderRound(); applyQuiz(); renderToday(); renderDrill();
+      }
+    });
+    wireQuiz();
+    renderSrMode();
+    renderGoal();
+    renderRound();
+    return bar;
+  }
+  // v2.24：智能跳转 — 根据用户当前状态决定先做哪件事
+  function smartJumpToday(){
+    // 优先级：薄弱 > 待复习轮 > 待升级阶梯 > 首次打卡 > 听写 > 挖空
+    var weakCount = Object.keys(state.weak || {}).length;
+    if(weakCount > 0 && !state.mode){
+      // 有薄弱 + 不在打卡中 → 提示进入快刷
+      toggleDrill();
+      document.querySelector('.rv-drill').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+    if(!state.mode && state.rounds.length === 0){
+      // 首次：开第一轮
+      startRound();
+      return;
+    }
+    if(!state.mode && state.rounds.length > 0){
+      // 已开过轮次但不在轮中 → 再开一轮复习
+      startRound();
+      return;
+    }
+    // 在轮中（state.mode = true）→ 滚到第一条未评卡的句
+    var firstUnjudged = -1;
+    for(var i = 0; i < sentences.length; i++){
+      if(!state.done[i]){ firstUnjudged = i; break; }
+    }
+    if(firstUnjudged >= 0){
+      var t = sentences[firstUnjudged].node;
+      t.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      t.style.transition = 'background-color .3s';
+      t.style.backgroundColor = '#fef3c7';
+      setTimeout(function(){ t.style.backgroundColor = ''; }, 1800);
+      return;
+    }
+    // 都评完了：跳挖空
+    var cloze = document.querySelector('.emm-cloze');
+    if(cloze){
+      cloze.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      return;
+    }
+  }
+
+  function renderSrMode(){
+    var b = document.querySelector('.rv-srmode'); if(!b) return;
+    var m = state.srMode || 'light';
+    b.textContent = m === 'standard' ? '🧠 标准' : '📚 轻量';
+    b.title = m === 'standard' ? 'SM-2 算法升级（Wozniak 1990）：按 ef/interval 调度复习' : '连顺 ' + (state.streakToGoal || 3) + ' 轮毕业规则';
+  }
+  function renderGoal(){
+    var b = document.querySelector('.rv-goal'); if(!b) return;
+    var g = state.streakToGoal || 3;
+    b.textContent = '🎯 连顺 ' + g + ' 轮';
+    b.title = '薄弱句需连顺 ' + g + ' 轮才自动毕业（点切换 2/3/4/5）';
+    var sb = document.querySelector('.rv-srmode');
+    if(sb && state.srMode !== 'standard'){
+      sb.title = '连顺 ' + g + ' 轮毕业规则';
+    }
+  }
+
+  // v2.25：段落测试（60 秒挖空挑战 + 自动批改给 0-100 分）
+  var segTestTimer = null;
+  function startSegTest(){
+    var clozeEl = document.querySelector('.emm-cloze') || document.querySelector('#emm-cloze');
+    if(!clozeEl){
+      alert('本文没有可挖空的段落（缺 §11 挖空自测）。');
+      return;
+    }
+    // inputs 是 live HTML 元素的list，不依赖 clozeEl 容器（h2 内没有 input）
+    var inputs = document.querySelectorAll('input.emm-clz');
+    if(!inputs.length){
+      alert('本篇挖空区为空或失配（?check=1 查看详情）。');
+      return;
+    }
+    // 清空旧结果条 + 移除旧定时器
+    if(segTestTimer){ clearInterval(segTestTimer); segTestTimer = null; }
+    var oldBar = document.querySelector('.seg-test-bar');
+    if(oldBar) oldBar.remove();
+    // 滚动到挖空区
+    clozeEl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    // 计时条
+    var bar = document.createElement('div');
+    bar.className = 'seg-test-bar';
+    bar.style.cssText = 'position:fixed;top:12px;right:12px;z-index:9999;background:#fef3c7;border:2px solid #f59e0b;border-radius:10px;padding:8px 16px;font-size:14px;font-weight:700;color:#b45309;box-shadow:0 4px 12px rgba(0,0,0,.15);';
+    bar.innerHTML = '📝 段落测试 <span class="seg-test-clock">60</span>s · 按提示填词，时间到自动批改';
+    document.body.appendChild(bar);
+    var clockEl = bar.querySelector('.seg-test-clock');
+    var remaining = 60;
+    var startTime = Date.now();
+    segTestTimer = setInterval(function(){
+      remaining--;
+      if(clockEl) clockEl.textContent = remaining;
+      if(remaining <= 10 && bar) bar.style.background = '#fee2e2';
+      if(remaining <= 0){
+        clearInterval(segTestTimer); segTestTimer = null;
+        finishSegTest(inputs, bar, startTime);
+      }
+    }, 1000);
+  }
+  function finishSegTest(inputs, bar, startTime){
+    var total = inputs.length;
+    var okCount = 0;
+    inputs.forEach(function(inp){
+      // 调用 wireClz 已绑定的批改逻辑：通过触发 input 事件
+      // 但 input 事件已被 wireClz 在 'change'/'input' 上处理过；直接读 className
+      if(inp.classList.contains('emm-clz-ok')) okCount++;
+    });
+    var pct = total ? Math.round(okCount / total * 100) : 0;
+    var durationSec = Math.round((Date.now() - startTime) / 1000);
+    if(bar){
+      bar.style.background = pct >= 80 ? '#dcfce7' : (pct >= 60 ? '#fef3c7' : '#fee2e2');
+      bar.style.borderColor = pct >= 80 ? '#16a34a' : (pct >= 60 ? '#f59e0b' : '#b91c1c');
+      bar.innerHTML = '🎯 段落测试结果：<b>' + okCount + ' / ' + total + ' 空正确</b> · 得分 <b>' + pct + '</b> 分 · 用时 ' + durationSec + ' 秒'
+        + '<br><button type="button" onclick="this.parentNode.remove()" style="margin-top:6px;padding:4px 12px;border:1px solid currentColor;background:transparent;border-radius:6px;cursor:pointer;">关闭</button>';
+      setTimeout(function(){ if(bar && bar.parentNode) bar.parentNode.removeChild(bar); }, 8000);
+    }
+    // 写入 state
+    state.segTest = state.segTest || {};
+    state.segTest.last = { score: pct, ok: okCount, total: total, date: todayKey(), durationSec: durationSec };
+    save(state);
+    renderDash();
+  }
+
+  // v2.21：导出/导入进度（换浏览器 / 换电脑 / 备份用）
+  function exportProgress(){
+    var s = null;
+    try { s = JSON.parse(localStorage.getItem(keyOf()) || 'null'); } catch(e){}
+    if(!s){ alert('当前没有可导出的进度。'); return; }
+    var stamp = new Date().toISOString().slice(0,10);
+    var h1 = (document.querySelector('h1') ? document.querySelector('h1').textContent.trim() : (document.title || 'plan')).slice(0, 40);
+    var blob = new Blob([JSON.stringify(s, null, 2)], { type: 'application/json' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = h1.replace(/[^\w\u4e00-\u9fa5-]/g, '_') + '-emm-progress-' + stamp + '.json';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    var weakN = s.weak ? Object.keys(s.weak).length : 0;
+    var roundsN = (s.rounds || []).length;
+    var srN = s.sr ? Object.keys(s.sr).length : 0;
+    alert('已导出：' + a.download + '\n薄弱 ' + weakN + ' 句 / 已完成 ' + roundsN + ' 轮 / SM-2 记录 ' + srN + ' 句');
+  }
+  // v2.29.0 EMM_ANKI_V229：导出 Anki/CSV（挖空卡 + 复述卡）
+  // 卡片来源：① .sent 块（Front=中文翻译 .sent-zh，Back=英文原句 .sent-en 纯文本）
+  //          ② 挖空输入框 .emm-clz（Front=挖空句上下文，Back=答案词）；静态 ______ 形态一并覆盖
+  function csvCell(s){
+    s = String(s == null ? '' : s);
+    if(/[\t"\n\r]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
+    return s;
+  }
+  function exportAnki(){
+    var cards = [];
+    // ① 复述卡：中文提示 → 英文原句
+    document.querySelectorAll('.sent').forEach(function(node){
+      var en = node.querySelector('.sent-en'), zh = node.querySelector('.sent-zh');
+      if(!en || !zh) return;
+      var back = en.textContent.replace(/\s+/g, ' ').trim();
+      var front = zh.textContent.replace(/\s+/g, ' ').trim();
+      if(back && front) cards.push([front, back]);
+    });
+    // ② 挖空卡：带空句子 → 答案
+    document.querySelectorAll('.emm-clz').forEach(function(inp){
+      var ans = inp.getAttribute('data-ans') || '';
+      var host = inp.closest('p, div, li');
+      var ctx = host ? host.textContent.replace(/\s+/g, ' ').trim() : '';
+      if(ans && ctx) cards.push([ctx, ans]);
+    });
+    // 静态挖空（______ 未被组件转换时）：从 .answer-toggle 段提取
+    document.querySelectorAll('details.answer-toggle').forEach(function(dt){
+      var ansDiv = dt.querySelector('.answer'); if(!ansDiv) return;
+      var p = dt.previousElementSibling, hops = 0;
+      while(p && hops < 3 && !/_{3,}/.test(p.textContent || '')){ p = p.previousElementSibling; hops++; }
+      if(!p) return;
+      var ctx = p.textContent.replace(/\s+/g, ' ').trim();
+      var ans = ansDiv.textContent.replace(/^答案：?/, '').trim();
+      if(ctx && ans) cards.push([ctx, ans]);
+    });
+    if(!cards.length){ alert('没有可导出的卡片（本篇似乎还没有逐句区或挖空内容）。'); return; }
+    var lines = ['#separator:Tab', '#html:false', '#notetype:Basic', '#columns:Front\tBack', '#deck:英语背诵::' + ((document.querySelector('h1') ? document.querySelector('h1').textContent.trim() : (document.title || 'plan')).slice(0, 30))];
+    cards.forEach(function(c){ lines.push(csvCell(c[0]) + '\t' + csvCell(c[1])); });
+    var blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    var stamp = new Date().toISOString().slice(0, 10);
+    var h1 = (document.querySelector('h1') ? document.querySelector('h1').textContent.trim() : (document.title || 'plan')).slice(0, 40);
+    a.href = url;
+    a.download = h1.replace(/[^\w\u4e00-\u9fa5-]/g, '_') + '-emm-anki-' + stamp + '.csv';
+    document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+    alert('已导出 ' + cards.length + ' 张卡片：' + a.download + '\n\nAnki 导入：文件 → 导入 → 选择此 CSV（分隔符已设为 Tab，映射第 1 列=Front、第 2 列=Back）。');
+  }
+  function importProgress(ev){
+    var file = ev.target.files && ev.target.files[0];
+    if(!file) return;
+    var reader = new FileReader();
+    reader.onload = function(){
+      try {
+        var obj = JSON.parse(String(reader.result || '{}'));
+        if(typeof obj !== 'object' || !obj || Array.isArray(obj)) throw new Error('不是合法的进度 JSON（期望对象）');
+        if(!obj.fingerprint && !obj.start && !obj.done && !obj.weak) throw new Error('JSON 缺少必备字段（fingerprint/start/done/weak）');
+        if(obj.fingerprint && state.fingerprint && obj.fingerprint !== state.fingerprint){
+          if(!confirm('⚠️ 导入的进度与当前方案指纹不一致。\n\n继续导入可能造成句号错位。\n\n确定要覆盖当前进度吗？')){
+            ev.target.value = ''; return;
+          }
+        }
+        var merged = Object.assign({}, state, obj);
+        save(merged);
+        state = loadState();
+        applyJudgeState(); renderDash(); renderRound(); renderSrMode(); renderGoal(); renderDrill(); applyQuiz(); renderToday();
+        alert('✅ 已导入 ' + file.name + '\n当前进度已替换为导入内容。');
+      } catch(e){
+        alert('❌ 导入失败：' + (e.message || 'JSON 解析错误'));
+      }
+      ev.target.value = '';
+    };
+    reader.readAsText(file);
+  }
+
+  function roundBtn(){ return document.querySelector('.rv-btn.rv-round'); }
+
+  function renderRound(){
+    var b = roundBtn(); if(!b) return;
+    if(state.mode){
+      b.textContent = '✅ 结束本轮（第 ' + (state.rounds.length + 1) + ' 轮）';
+      b.onclick = endRound;
+    } else {
+      var wk = Object.keys(state.weak).length;
+      b.textContent = wk ? ('▶ 开始本轮（第 ' + (state.rounds.length + 1) + ' 轮 · 薄弱 ' + wk + ' 句）') : ('▶ 开始本轮（第 ' + (state.rounds.length + 1) + ' 轮）');
+      b.onclick = startRound;
+    }
+    var c = document.querySelector('.rv-count');
+    if(c){
+      var judged = Object.keys(state.done).length;
+      c.textContent = state.mode ? ('已评 ' + judged + ' / ' + sentences.length + ' 句') : '';
+    }
+  }
+
+  function startRound(){
+    state.mode = true;
+    save(state);
+    document.body.classList.add('rv-mode');
+    renderRound();
+    window.scrollTo({ top: document.querySelector('.rv-bar').getBoundingClientRect().top + window.scrollY - 12, behavior: 'smooth' });
+  }
+
+  function endRound(){
+    // v2.28 修复：把本轮 mutations（mode/rounds/weak/streak）放在 loadState 之后，
+    // 避免 `state = loadState()` 覆盖本轮新写入的字段
+    var d = new Date();
+    var round = { date: d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'), ok: 0, bad: 0 };
+    var goal = state.streakToGoal || 3;
+    // 1. 先算 round 元数据（纯计算，不动 state）
+    Object.keys(state.done).forEach(function(k){
+      if(state.done[k] === 'ok'){ round.ok++; }
+      else { round.bad++; }
+    });
+    // 2. 让 SR IIFE 通过 patchSr 写完 state.sr（先 dispatch → 后 reload）
+    var doneSnapshot = Object.assign({}, state.done);
+    if(typeof __emmDispatch === 'function') __emmDispatch('endRound', round, doneSnapshot);
+    // 3. reload 拿到 SR 的 sr；再 apply 本轮的 mode/rounds/weak/streak mutations
+    state = loadState();
+    state.mode = false;
+    Object.keys(doneSnapshot).forEach(function(k){
+      if(doneSnapshot[k] === 'ok'){
+        if(state.weak[k]){ state.streak[k] = (state.streak[k] || 0) + 1; if(state.streak[k] >= goal){ delete state.weak[k]; delete state.streak[k]; delete state.done[k]; } }
+      } else {
+        state.weak[k] = true; state.streak[k] = 0;
+      }
+    });
+    state.rounds.push(round);
+    state.done = {};
+    save(state);
+    document.body.classList.remove('rv-mode');
+    applyJudgeState(); renderDash(); renderRound();
+    // 再次 loadState 确保渲染时 state.sr 是最新的
+    state = loadState();
+    renderDash();
+  }
+
+  function judge(idx, v){
+    state.done[idx] = v;
+    save(state);
+    var chips = sentences[idx].node.querySelectorAll('.rv-judge button');
+    chips.forEach(function(b){
+      var on = b.getAttribute('data-v') === v ? (v === 'ok' ? 'rv-ok-on' : 'rv-bad-on') : '';
+      b.classList.remove('rv-ok-on', 'rv-bad-on');
+      if(on) b.classList.add(on);
+    });
+    // v2.20 SR hook：仅通知，不立即计算（endRound 时批量算）
+    if(typeof __emmDispatch === 'function') __emmDispatch('judge', idx, v);
+    // 重新加载以拿到 SR IIFE 写入的 state.sr[idx].lastQ
+    state = loadState();
+    renderRound();
+  }
+
+  function applyJudgeState(){
+    sentences.forEach(function(s, idx){
+      var v = state.done[idx];
+      s.node.querySelectorAll('.rv-judge button').forEach(function(b){
+        b.classList.remove('rv-ok-on', 'rv-bad-on');
+        var vv = b.getAttribute('data-v');
+        if(v && vv === v) b.classList.add(v === 'ok' ? 'rv-ok-on' : 'rv-bad-on');
+      });
+      s.node.classList.toggle('rv-weakline', !!state.weak[idx]);
+    });
+    applyWeakStops();
+    renderDrill();
+  }
+
+  function buildDashboard(){
+    var dash = document.createElement('div');
+    dash.className = 'rv-dash';
+    dash.id = 'emm-dash';
+    var bar = document.querySelector('.rv-bar');
+    if(bar && bar.parentNode) bar.parentNode.insertBefore(dash, bar.nextSibling);
+  }
+
+  function renderDash(){
+    var dash = document.querySelector('.rv-dash'); if(!dash) return;
+    var total = sentences.length;
+    var weakList = Object.keys(state.weak).map(Number).sort(function(a,b){ return a-b; });
+    var judged = Object.keys(state.done).length;
+    var pct = total ? Math.round(weakList.length ? ((total - weakList.length) / total * 100) : 100) : 0;
+    var isStd = state.srMode === 'standard';
+    var today = (function(){ var d = new Date(); return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); })();
+    var srDueCount = isStd ? Object.keys(state.sr).filter(function(k){
+      return state.sr[k] && state.sr[k].due && state.sr[k].due <= today;
+    }).length : 0;
+    var html = '<b>📊 复习仪表</b> · 本篇 ' + total + ' 句'
+      + ' · 薄弱句 <b>' + weakList.length + '</b>'
+      + (isStd ? ' · SM-2 待复习 <b>' + srDueCount + '</b>' : '')
+      + ' · 已完成 ' + state.rounds.length + ' 轮'
+      + '<div class="rv-progress"><i style="width:' + pct + '%"></i></div>';
+    if(state.rounds.length){
+      html += '<div>🗓 轮次记录：' + state.rounds.map(function(r, i){
+        return '第' + (i+1) + '轮 ' + r.date + '（顺' + r.ok + '/卡' + r.bad + '）';
+      }).join(' · ') + '</div>';
+    }
+    if(weakList.length){
+      html += '<div style="margin-top:6px;"><b>🎯 薄弱句清单</b>（连顺 2 轮自动毕业）：<br>'
+        + weakList.map(function(idx){
+          var txt = sentences[idx].text.slice(0, 60);
+          return '<a href="#" data-jump="' + idx + '" style="color:#b91c1c;text-decoration:none;display:block;padding:2px 0;">#' + (idx+1) + ' ' + txt + (sentences[idx].text.length > 60 ? '…' : '') + '</a>';
+        }).join('') + '</div>';
+    } else {
+      html += '<div style="margin-top:6px;">✅ 暂无薄弱句——开一轮打卡，卡壳句会自动进清单。</div>';
+    }
+    // v2.23：按段统计（多段才显示）
+    if(segments.length > 1){
+      var segRows = segments.map(function(s, i){
+        var kids = parseSents(s.el) || [i];
+        var sentTotal = kids.length;
+        var sentWeak = kids.filter(function(k){ return state.weak[k]; }).length;
+        var weakRate = sentTotal ? Math.round(sentWeak / sentTotal * 100) : 0;
+        var st = (state.segTimes || {})[i];
+        var minutes = (st && st.startTs && st.lastTs) ? Math.max(1, Math.round((st.lastTs - st.startTs) / 60000)) : null;
+        var rateColor = weakRate > 60 ? '#b91c1c' : (weakRate > 30 ? '#d97706' : '#16a34a');
+        return '<tr><td data-l="段">' + s.name + '</td><td data-l="句数">' + sentTotal + '</td><td data-l="薄弱"><span style="color:' + rateColor + '">' + weakRate + '%</span></td><td data-l="耗时">' + (minutes !== null ? minutes + ' 分钟' : '—') + '</td></tr>';
+      }).join('');
+      html += '<div style="margin-top:10px;"><b>📊 按段统计</b>（段名 / 句数 / 薄弱率 / 耗时）：<br>'
+        + '<div class="emm-tblwrap"><table style="font-size:13px;border-collapse:collapse;margin-top:4px;"><thead><tr><th style="text-align:left;padding:2px 8px;">段</th><th style="padding:2px 8px;">句</th><th style="padding:2px 8px;">薄弱</th><th style="padding:2px 8px;">耗时</th></tr></thead>'
+        + '<tbody>' + segRows + '</tbody></table></div></div>';
+    }
+    // v2.20：标准模式下显示 SM-2 间隔详情
+    if(isStd && Object.keys(state.sr).length){
+      var srKeys = Object.keys(state.sr).map(Number).sort(function(a,b){ return a-b; });
+      html += '<div style="margin-top:10px;"><b>🧠 SM-2 间隔</b>（标准模式 · Wozniak 1990）：<br>'
+        + srKeys.map(function(idx){
+          var sr = state.sr[idx];
+          if(!sr) return '';
+          var txt = sentences[idx].text.slice(0, 50);
+          var overdue = sr.due && sr.due <= today;
+          return '<a href="#" data-jump="' + idx + '" style="display:inline-block;margin:2px 6px 2px 0;padding:3px 8px;border-radius:6px;'
+            + 'background:' + (overdue ? '#fee2e2' : '#f3f4f6') + ';color:' + (overdue ? '#b91c1c' : '#374151') + ';text-decoration:none;">'
+            + '#' + (idx+1) + ' ' + txt + (sentences[idx].text.length > 50 ? '…' : '')
+            + ' · ef=' + sr.ef.toFixed(2)
+            + ' · 间=' + sr.interval + 'd'
+            + ' · ' + (sr.due || '?')
+            + '</a>';
+        }).join('')
+        + '</div>';
+    }
+    dash.innerHTML = html;
+    dash.querySelectorAll('[data-jump]').forEach(function(a){
+      a.addEventListener('click', function(ev){
+        ev.preventDefault();
+        var idx = Number(a.getAttribute('data-jump'));
+        var target = sentences[idx].node;
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        target.style.transition = 'background-color .3s';
+        target.style.backgroundColor = '#fef3c7';
+        setTimeout(function(){ target.style.backgroundColor = ''; }, 1600);
+      });
+    });
+  }
+
+
+  /* ===== v2.9.0 dictation ===== */
+  var dict = { active:false, idx:0, wrong:0, done:0 };
+  var DK = null;
+
+  function norm(s){
+    s = (s || '').toLowerCase().replace(/['’]/g, "'").replace(/[^a-z0-9' ]/g, ' ').replace(/\s+/g, ' ').trim();
+    var exp = { "it's":'it is', "don't":'do not', "can't":'cannot', "won't":'will not', "isn't":'is not', "aren't":'are not', "doesn't":'does not', "didn't":'did not', "i'm":'i am', "you're":'you are', "they're":'they are', "we're":'we are', "there's":'there is', "that's":'that is', "let's":'let us', "i'd":'i would', "i'll":'i will', "we'd":'we would', "he's":'he is', "she's":'she is' };
+    var parts = s.split(' ').map(function(w){ return exp[w] || w; });
+    // split contractions with spaces like "it s"
+    var out = [];
+    parts.forEach(function(w){
+      if(w === 's' || w === 't' || w === 're' || w === 've' || w === 'll' || w === 'd' || w === 'm'){
+        if(out.length){ out[out.length-1] = out[out.length-1]; }
+      }
+      out.push(w);
+    });
+    return out;
+  }
+
+  function align(user, orig){
+    // LCS-based word alignment; returns array of {w, st} for orig words + extras
+    var m = user.length, n = orig.length;
+    var dp = [];
+    for(var i = 0; i <= m; i++){ dp.push(new Array(n + 1).fill(0)); }
+    for(var i = 1; i <= m; i++){
+      for(var j = 1; j <= n; j++){
+        dp[i][j] = (user[i-1] === orig[j-1]) ? dp[i-1][j-1] + 1 : Math.max(dp[i-1][j], dp[i][j-1]);
+      }
+    }
+    var res = [];
+    var i2 = m, j2 = n;
+    while(i2 > 0 || j2 > 0){
+      if(i2 > 0 && j2 > 0 && user[i2-1] === orig[j2-1]){
+        res.push({ w: orig[j2-1], st: 'ok' }); i2--; j2--;
+      } else if(j2 > 0 && (i2 === 0 || dp[i2][j2-1] >= dp[i2-1][j2])){
+        res.push({ w: orig[j2-1], st: 'miss' }); j2--;
+      } else if(i2 > 0){
+        res.push({ w: user[i2-1], st: 'extra' }); i2--;
+      }
+    }
+    return res.reverse();
+  }
+
+  function speak(text, cb){
+    try {
+      if(!('speechSynthesis' in window)){ if(cb) cb(false); return; }
+      speechSynthesis.cancel();
+      var u = new SpeechSynthesisUtterance(text);
+      var vs = speechSynthesis.getVoices();
+      var v = null;
+      for(var i = 0; i < vs.length; i++){
+        if(/en[-_]US/i.test(vs[i].lang)){ v = vs[i]; if(/(natural|google|microsoft)/i.test(vs[i].name)) break; }
+      }
+      if(v) u.voice = v;
+      u.lang = 'en-US';
+      u.rate = 1;
+      if(cb){ u.onend = function(){ cb(true); }; u.onerror = function(){ cb(false); }; }
+      speechSynthesis.speak(u);
+    } catch(e){ if(cb) cb(false); }
+  }
+
+  function dictBarHtml(){
+    return '<b>🎧 听写模式</b>'
+      + '<button type="button" class="d-btn d-toggle">开始听写</button>'
+      + '<span class="d-stat"></span>'
+      + '<div class="d-panel" style="display:none;margin-top:8px;">'
+      + '<div class="d-sent"></div>'
+      + '<div><button type="button" class="d-btn d-play">▶ 播放</button>'
+      + '<button type="button" class="d-btn d-again">🔁 重听</button></div>'
+      + '<input type="text" class="d-input" placeholder="输入你听到的句子…" />'
+      + '<div><button type="button" class="d-btn d-check">✔ 比对</button>'
+      + '<button type="button" class="d-btn d-skip">跳过</button></div>'
+      + '<div class="d-result"></div>'
+      + '<div class="d-hint">全对自动下一句；有错的句子自动进入薄弱清单（与打卡共用），重听不限次。</div>'
+      + '</div>';
+  }
+
+  function curText(){ return sentences[dict.idx].text; }
+
+  function renderDict(){
+    var bar = document.querySelector('.rv-dict'); if(!bar) return;
+    var tog = bar.querySelector('.d-toggle');
+    tog.textContent = dict.active ? '结束听写' : (dict.done ? '继续听写（' + dict.done + '/' + sentences.length + '）' : '开始听写');
+    bar.querySelector('.d-stat').textContent = dict.active ? ('进度 ' + dict.done + '/' + sentences.length + ' · 错 ' + dict.wrong + ' 句') : '';
+    var panel = bar.querySelector('.d-panel');
+    panel.style.display = dict.active ? 'block' : 'none';
+    if(dict.active){
+      if(dict.idx >= sentences.length){ finishDict(); return; }
+      bar.querySelector('.d-sent').textContent = '第 ' + (dict.idx + 1) + ' 句 / 共 ' + sentences.length + ' 句';
+      bar.querySelector('.d-result').innerHTML = '';
+      bar.querySelector('.d-input').value = '';
+      speak(curText());
+    }
+    try { localStorage.setItem(DK, JSON.stringify(dict)); } catch(e){}
+  }
+
+  function finishDict(){
+    dict.active = false;
+    var bar = document.querySelector('.rv-dict');
+    bar.querySelector('.d-result').innerHTML = '<b>🎉 本篇听写完成：错 ' + dict.wrong + ' 句已入薄弱清单，背诵打卡里连顺 2 轮即可毕业。</b>';
+    dict.idx = 0; dict.done = 0;
+    try { localStorage.setItem(DK, JSON.stringify(dict)); } catch(e){}
+    renderDash();
+  }
+
+  function buildDict(){
+    if(!('speechSynthesis' in window)) return; // no TTS, no bar
+    DK = keyOf() + ':dict';
+    try { var saved = JSON.parse(localStorage.getItem(DK) || 'null'); if(saved){ dict = saved; } } catch(e){}
+    var bar = document.createElement('div');
+    bar.className = 'rv-dict';
+    bar.innerHTML = dictBarHtml();
+    var anchor = document.querySelector('.rv-bar');
+    if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(bar, anchor.nextSibling);
+    var tog = bar.querySelector('.d-toggle');
+    tog.addEventListener('click', function(){
+      dict.active = !dict.active;
+      if(dict.active && dict.idx >= sentences.length){ dict.idx = 0; dict.done = 0; }
+      renderDict();
+    });
+    bar.querySelector('.d-play').addEventListener('click', function(){ speak(curText()); });
+    bar.querySelector('.d-again').addEventListener('click', function(){ speak(curText()); });
+    bar.querySelector('.d-skip').addEventListener('click', function(){
+      dict.idx++; renderDict();
+    });
+    bar.querySelector('.d-check').addEventListener('click', function(){
+      var val = bar.querySelector('.d-input').value;
+      var user = norm(val), orig = norm(curText());
+      var res = align(user, orig);
+      var html = res.map(function(r){
+        var cls = r.st === 'ok' ? 'w-ok' : (r.st === 'miss' ? 'w-miss' : 'w-extra');
+        return '<span class="' + cls + '">' + r.w.replace(/</g, '&lt;') + '</span>';
+      }).join(' ');
+      var misses = res.filter(function(r){ return r.st === 'miss'; }).length;
+      var extras = res.filter(function(r){ return r.st === 'extra'; }).length;
+      bar.querySelector('.d-result').innerHTML = html;
+      if(!user.length){ return; }
+      if(!misses && !extras && user.length === orig.length){
+        dict.done++; dict.idx++;
+        setTimeout(renderDict, 500);
+      } else {
+        if(!state.weak[dict.idx]){ state.weak[dict.idx] = true; save(state); applyJudgeState(); renderDash(); }
+        dict.wrong++;
+        bar.querySelector('.d-stat').textContent = '进度 ' + dict.done + '/' + sentences.length + ' · 错 ' + dict.wrong + ' 句';
+      }
+    });
+    renderDict();
+  }
+
+  /* ===== v2.13.0 EMM_TODAY_V213: today view / quiz mode / ladder / workbook / self-check ===== */
+  var segments = [];
+
+  function todayKey(){
+    var d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function parseDate(s){
+    var m = /^(\d{4})-(\d{1,2})-(\d{1,2})$/.exec(s || '');
+    return m ? new Date(+m[1], +m[2]-1, +m[3]) : new Date();
+  }
+  function diffDays(a, b){ return Math.round((b - a) / 86400000); }
+  function addDays(d, n){ return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+  function icsDate(d){
+    return '' + d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
+  }
+  function detectSegments(){
+    segments = [];
+    var cur = null;
+    var nodes = document.querySelectorAll('h2, h3, .sent');
+    Array.prototype.forEach.call(nodes, function(el){
+      if(el.matches('h2, h3')){
+        var t = (el.textContent || '').trim();
+        if(el.tagName === 'H2' && /^4\.\d+/.test(t)){
+          var name = t.replace(/^4\.\d+\s*/, '').replace(/（[^）]*）/g, '').replace(/[·:：\s]+$/g, '').slice(0, 16);
+          cur = { name: name || ('段' + (segments.length + 1)), el: el, idxs: [] };
+          segments.push(cur);
+        }
+      } else {
+        if(!cur){ cur = { name: '全文', el: null, idxs: [] }; segments.push(cur); }
+        cur.idxs.push(el.__emmIdx);
+      }
+    });
+    if(segments.length === 1 && !segments[0].el){
+      var hs = document.querySelectorAll('h2');
+      for(var i = 0; i < hs.length; i++){
+        if(/精读/.test(hs[i].textContent)){ segments[0].el = hs[i]; break; }
+      }
+    }
+  }
+  function dayNumberOf(){ return diffDays(parseDate(state.start || todayKey()), parseDate(todayKey())) + 1; }
+  function learnDayOf(i){ return Math.floor(i / (state.perDay || 1)) + 1; }
+  function planDaysTotal(){
+    if(!segments.length) return 1;
+    return learnDayOf(segments.length - 1) + 15;
+  }
+  var REVIEW_OFF = [[1, '次日自测'], [3, '第3天只背错句'], [7, '第7天快背'], [15, '第15天快背']];
+
+  /* —— 自测模式（P0：盖住复述，防假流利） —— */
+  function wireQuiz(){
+    var b = document.querySelector('.rv-quiz');
+    if(!b) return;
+    b.addEventListener('click', function(){
+      state.quiz = ((state.quiz || 0) + 1) % 3;
+      save(state); applyQuiz();
+    });
+    applyQuiz();
+  }
+  function applyQuiz(){
+    document.body.classList.toggle('emm-quiz1', state.quiz >= 1);
+    document.body.classList.toggle('emm-quiz2', state.quiz >= 2);
+    var b = document.querySelector('.rv-quiz');
+    if(b){
+      b.textContent = '🙈 自测：' + ['关', '遮译文', '全遮'][state.quiz || 0];
+      b.title = '遮住译文与注解复述（防假流利），点句子临时揭开核对；全遮同时隐藏行内标注样式';
+    }
+  }
+  function wireReveal(){
+    sentences.forEach(function(s){
+      s.node.addEventListener('click', function(e){
+        if(!state.quiz) return;
+        if(e.target.closest('button, input, a, .rv-judge, .rv-dict')) return;
+        s.node.classList.toggle('revealed');
+      });
+    });
+  }
+
+  /* —— 今日排期 + 复述阶梯（P0：让艾宾浩斯到期可见，让升级留痕） —— */
+  var todayCard = null;
+  function segHasToday(si){
+    var ld = learnDayOf(si), dayN = dayNumberOf();
+    if(ld === dayN) return true;
+    for(var i = 0; i < REVIEW_OFF.length; i++){ if(ld + REVIEW_OFF[i][0] === dayN) return true; }
+    return false;
+  }
+  function segTodayHtml(si){
+    var ld = learnDayOf(si), dayN = dayNumberOf();
+    if(ld === dayN) return '<b style="color:#b45309">📖 今天新学</b>（当晚睡前再完整背一遍）<a href="#emm-seg' + si + '">去背诵→</a>';
+    for(var i = 0; i < REVIEW_OFF.length; i++){
+      if(ld + REVIEW_OFF[i][0] === dayN){
+        if(REVIEW_OFF[i][0] === 1) return '🔁 今天复习 · 次日自测 <a href="#emm-cloze">去自测→</a>';
+        if(REVIEW_OFF[i][0] === 3) return '🔁 今天复习 · ' + REVIEW_OFF[i][1] + ' <a href="#emm-dash">看薄弱→</a>';
+        return '🔁 今天复习 · ' + REVIEW_OFF[i][1];
+      }
+    }
+    if(ld > dayN) return '🔒 Day ' + ld;
+    return '<span style="color:#9ca3af">已学</span>';
+  }
+  // v2.21：把第 si 段设为「今天新学」——倒推 start 日期
+  function setAsToday(si){
+    if(!segments[si]) return;
+    var today = parseDate(todayKey());
+    var newStart = addDays(today, -(learnDayOf(si) - 1));
+    var newKey = newStart.getFullYear() + '-' + String(newStart.getMonth()+1).padStart(2,'0') + '-' + String(newStart.getDate()).padStart(2,'0');
+    state.start = newKey;
+    save(state);
+    renderToday();
+    if(typeof __emmDispatch === 'function') __emmDispatch('startChange');
+  }
+  function buildTodayCard(){
+    if(!segments.length) return;
+    if(!state.start){ state.start = todayKey(); save(state); }
+    segments.forEach(function(s, i){ if(s.el && !s.el.id){ s.el.id = 'emm-seg' + i; } });
+    todayCard = document.createElement('div');
+    todayCard.className = 'emm-today';
+    todayCard.innerHTML = ''
+      + '<b>📅 今日任务</b> <span class="emm-meta emm-dayline"></span><br>'
+      + '<span class="emm-meta">开始日期 <input type="date" class="emm-start"> '
+      + (segments.length > 1 ? ' · 每天新学 <select class="emm-perday"><option value="1">1 段</option><option value="2">2 段</option></select> ' : '')
+      + '<button type="button" class="rv-btn emm-ics">📥 导出日历(.ics)</button></span>'
+      + '<table><thead><tr><th style="width:26%">段落</th><th style="width:9%">排期</th><th>今日</th><th style="width:30%">🪜 复述阶梯</th><th style="width:6%">✓</th></tr></thead>'
+      + '<tbody class="emm-rows"></tbody></table>'
+      + '<div class="emm-meta">🪜 点你当前能稳定复述到的级别（升级前至少隔一轮复习，跳级=假流利）；✓ 勾掉今天完成的任务。与打卡进度同存本机。</div>';
+    var bar = document.querySelector('.rv-bar');
+    if(bar && bar.parentNode) bar.parentNode.insertBefore(todayCard, bar);
+    var inp = todayCard.querySelector('.emm-start');
+    inp.value = state.start;
+    inp.addEventListener('change', function(){
+      state.start = inp.value || todayKey();
+      save(state); renderToday();
+    });
+    var sel = todayCard.querySelector('.emm-perday');
+    if(sel){
+      sel.value = String(state.perDay || 1);
+      sel.addEventListener('change', function(){ state.perDay = +sel.value; save(state); renderToday(); });
+    }
+    todayCard.querySelector('.emm-ics').addEventListener('click', downloadICS);
+    var rows = todayCard.querySelector('.emm-rows');
+    rows.addEventListener('click', function(e){
+      var b = e.target.closest('.emm-lv'); if(b){
+        var si = +b.getAttribute('data-seg');
+        state.ladder[si] = { lv: +b.getAttribute('data-lv'), date: todayKey() };
+        save(state); renderToday();
+        return;
+      }
+      var s = e.target.closest('.emm-set-today'); if(s){
+        var si2 = +s.getAttribute('data-seg');
+        if(confirm('把第 ' + (si2+1) + ' 段移到今天学？\n\n会修改"开始日期"——其他段也会跟着顺延。')){
+          setAsToday(si2);
+        }
+        return;
+      }
+    });
+    rows.addEventListener('change', function(e){
+      var c = e.target.closest('input.emm-donechk'); if(!c) return;
+      var si = +c.getAttribute('data-seg');
+      var k = todayKey() + '|s' + si;
+      if(c.checked){
+        state.log[k] = 1;
+        // v2.23：记录段耗时（首次勾选=开始，最后一次勾选=结束）
+        state.segTimes = state.segTimes || {};
+        var st = state.segTimes[si] || {};
+        if(!st.startTs){ st.startTs = Date.now(); }
+        st.lastTs = Date.now();
+        state.segTimes[si] = st;
+      } else {
+        delete state.log[k];
+        if(state.segTimes && state.segTimes[si]){ delete state.segTimes[si].startTs; delete state.segTimes[si].lastTs; }
+      }
+      save(state);
+    });
+    renderToday();
+  }
+  function renderToday(){
+    if(!todayCard) return;
+    var dayN = dayNumberOf(), dl = todayCard.querySelector('.emm-dayline');
+    if(dayN < 1){ dl.textContent = '· ⏳ 开始于 ' + state.start + '，还有 ' + (1 - dayN) + ' 天'; }
+    else if(dayN > planDaysTotal()){ dl.textContent = '· 🎉 排期（' + planDaysTotal() + ' 天）已完成，建议每周全文快背一遍保持'; }
+    else { dl.textContent = '· 第 ' + dayN + ' 天 / 计划约 ' + planDaysTotal() + ' 天'; }
+    var html = '';
+    segments.forEach(function(s, i){
+      var lv = (state.ladder[i] || {}).lv || 0;
+      var btns = '';
+      // v2.22 渐进引导：未完成 L1 时锁住 L2-L5（必须先 L1 走通）
+      var guided = lv === 0;
+      for(var k = 1; k <= 5; k++){
+        var disabled = guided && k > 1;
+        btns += '<button type="button" class="emm-lv' + (lv >= k ? ' emm-lv-on' : '') + (disabled ? ' emm-lv-locked' : '') + '" data-seg="' + i + '" data-lv="' + k + '"' + (disabled ? ' disabled' : '') + ' title="' + (disabled ? '先完成 L' + (k-1) + ' 再解锁' : (lv ? '当前 L' + lv + ' · ' + state.ladder[i].date : '未定级')) + '">L' + k + '</button>';
+      }
+      var chk = segHasToday(i)
+        ? '<input type="checkbox" class="emm-donechk" data-seg="' + i + '"' + (state.log[todayKey() + '|s' + i] ? ' checked' : '') + '>'
+        : '';
+      var ld = learnDayOf(i), dayN = dayNumberOf();
+      // v2.21：每段加"设为今天新学"按钮（仅当该段不是今天时显示）
+      var setToday = (ld !== dayN)
+        ? '<button type="button" class="rv-btn emm-set-today" data-seg="' + i + '" title="把这一段移到今天学（会修改开始日期）">📌 设为今天</button>'
+        : '<span style="color:#16a34a;font-size:12px;">✓ 当前</span>';
+      html += '<tr><td data-l="段落">' + s.name + '</td><td data-l="排期">Day ' + learnDayOf(i) + '</td><td data-l="今日">' + segTodayHtml(i) + ' ' + setToday + '</td><td data-l="🪜 阶梯">' + btns + '</td><td data-l="✓">' + chk + '</td></tr>';
+    });
+    todayCard.querySelector('.emm-rows').innerHTML = html;
+  }
+  function escICS(s){ return String(s).replace(/\\/g, '\\\\').replace(/([,;])/g, '\\$1'); }
+  // v2.22：UTC 时间戳（spec 要求带 T 和 Z 后缀）
+  function icsStampUTC(d){
+    var pad = function(n){ return String(n).padStart(2,'0'); };
+    return d.getUTCFullYear() + pad(d.getUTCMonth()+1) + pad(d.getUTCDate()) + 'T' +
+      pad(d.getUTCHours()) + pad(d.getUTCMinutes()) + pad(d.getUTCSeconds()) + 'Z';
+  }
+  function downloadICS(){
+    var title = (document.querySelector('h1') || { textContent: '背诵' }).textContent.replace(/背诵方案.*$/, '').trim() || '背诵';
+    var start = parseDate(state.start || todayKey());
+    // v2.22：X-WR-TIMEZONE 帮助日历 app 正确显示全天事件（避免跨时区/DST 偏移）
+    var tz = (Intl.DateTimeFormat().resolvedOptions().timeZone) || 'UTC';
+    var lines = [
+      'BEGIN:VCALENDAR',
+      'VERSION:2.0',
+      'PRODID:-//english-memory-method//v2.22//CN',
+      'CALSCALE:GREGORIAN',
+      'X-WR-TIMEZONE:' + tz,
+      'X-WR-CALNAME:' + escICS(title) + ' 背诵方案'
+    ];
+    var k = 0;
+    segments.forEach(function(s, i){
+      var ld = learnDayOf(i);
+      var evts = [[ld - 1, '📖 背诵《' + title + '》· ' + s.name + '（当晚睡前再背一遍）']];
+      REVIEW_OFF.forEach(function(r){ evts.push([ld - 1 + r[0], '🔁 复习《' + title + '》· ' + s.name + ' · ' + r[1]]); });
+      evts.forEach(function(e){
+        var dtStart = icsDate(addDays(start, e[0]));
+        var dtEnd   = icsDate(addDays(start, e[0] + 1));  // v2.22：DTEND=下一天（iCal 规范，全天事件 exclusive）
+        lines.push('BEGIN:VEVENT',
+          'UID:emm-' + (k++) + '-' + dtStart + '-' + i + '@local',
+          'DTSTAMP:' + icsStampUTC(new Date()),
+          'DTSTART;VALUE=DATE:' + dtStart,
+          'DTEND;VALUE=DATE:' + dtEnd,
+          'SUMMARY:' + escICS(e[1]),
+          'TRANSP:TRANSPARENT',
+          'END:VEVENT');
+      });
+    });
+    lines.push('END:VCALENDAR');
+    var blob = new Blob([lines.join('\r\n')], { type: 'text/calendar;charset=utf-8' });
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'emm-schedule.ics';
+    document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+  }
+
+  /* —— 亲手改造留白（P0：生成效应落地） —— */
+  function buildWorkbook(){
+    if(!state.wb) state.wb = { main: {}, pal: {} };
+    segments.forEach(function(s, i){
+      if(!s.el) return;
+      var div = document.createElement('div');
+      div.className = 'wb-line';
+      div.innerHTML = '✍️ 我的一句话主线（亲手写，记忆翻倍）：<span class="wb-input" contenteditable="true" data-k="m' + i + '"></span>';
+      s.el.parentNode.insertBefore(div, s.el.nextSibling);
+    });
+    var stops = document.querySelectorAll('.palace-stop');
+    Array.prototype.forEach.call(stops, function(st, i){
+      var div = document.createElement('div');
+      div.className = 'wb-line';
+      div.innerHTML = '🎨 我的画面：<span class="wb-input" contenteditable="true" data-k="p' + i + '"></span>';
+      st.appendChild(div);
+    });
+    var timer = null;
+    document.querySelectorAll('.wb-input').forEach(function(ed){
+      var k = ed.getAttribute('data-k');
+      var store = k.charAt(0) === 'p' ? state.wb.pal : state.wb.main;
+      var idx = k.slice(1);
+      if(store[idx]) ed.textContent = store[idx];
+      ed.addEventListener('input', function(){
+        store[idx] = ed.textContent.trim();
+        clearTimeout(timer);
+        timer = setTimeout(function(){ save(state); }, 400);
+      });
+    });
+  }
+
+  /* —— ?check=1 自检报告（P0：结构对齐可查；原文比对在生成端执行） —— */
+  function selfCheck(){
+    if(!/[?&]check/.test(location.search)) return;
+    var L = ['EMM 自检报告（v2.13.0 · ?check=1）', '─ 分段识别', '句数：' + sentences.length];
+    segments.forEach(function(s, i){
+      L.push('段' + (i + 1) + ' [' + s.name + '] ' + s.idxs.length + ' 句' + (s.idxs.length ? '（第 ' + (s.idxs[0] + 1) + '~' + (s.idxs[s.idxs.length - 1] + 1) + ' 句）' : ''));
+    });
+    L.push('─ 结构对齐');
+    var stops = document.querySelectorAll('.palace-stop');
+    if(!stops.length){ L.push('— 宫殿：本篇未启用'); }
+    else {
+      var withData = Array.prototype.filter.call(stops, function(st){ return st.getAttribute('data-sents'); });
+      var bad = [];
+      Array.prototype.forEach.call(stops, function(st, i){
+        var m = (st.querySelector('.st-no') || { textContent: '' }).textContent.match(/\d+/);
+        if(!m || +m[0] !== i + 1) bad.push('第' + (i + 1) + '站标为' + (m ? m[0] : '?'));
+      });
+      if(withData.length === stops.length){
+        var seen = {}, dups = [], missing = [];
+        Array.prototype.forEach.call(stops, function(st){
+          parseSents(st).forEach(function(ix){
+            if(seen[ix]) dups.push('句' + (ix + 1)); else seen[ix] = true;
+          });
+        });
+        for(var si = 0; si < sentences.length; si++){ if(!seen[si]) missing.push(si + 1); }
+        var cover = (!dups.length && !missing.length) ? '✅' : '⚠';
+        L.push(cover + ' 宫殿 data-sents 覆盖 ' + Object.keys(seen).length + ' / 句数 ' + sentences.length
+          + (dups.length ? '；重复: ' + dups.join(',') : '')
+          + (missing.length ? '；缺句: ' + missing.join(',') : ''));
+      } else {
+        L.push((stops.length === sentences.length ? '✅' : '⚠') + ' 宫殿站数 ' + stops.length + ' / 句数 ' + sentences.length
+          + (stops.length !== sentences.length ? '（同站多物需为每站标注 data-sents）' : ''));
+      }
+      L.push(bad.length ? '⚠ 站号不连续：' + bad.join('、') : '✅ 站号 1..' + stops.length + ' 连续');
+    }
+    var nChain = document.querySelectorAll('.hook-chain').length;
+    if(!nChain){ L.push('— 钩子链：未找到'); }
+    else {
+      var nSeg = document.querySelectorAll('.hook-chain .seg').length;
+      var nBr = document.querySelectorAll('.hook-chain .bridge').length;
+      var nAn = document.querySelectorAll('.hook-chain .anchor').length;
+      L.push((nSeg === sentences.length ? '✅' : '⚠') + ' 句钩总数 ' + nSeg + ' / 句数 ' + sentences.length);
+      L.push((nBr === nSeg - nChain ? '✅' : '⚠') + ' 逻辑桥 ' + nBr + '（期望 ' + (nSeg - nChain) + ' = 句钩数−段钩数）');
+      L.push((nAn >= nSeg ? '✅' : '⚠') + ' 英文锚点 ' + nAn + ' / 句钩 ' + nSeg);
+    }
+    var dts = document.querySelectorAll('details.answer-toggle');
+    if(!dts.length){ L.push('— 挖空：未找到'); }
+    else {
+      dts.forEach(function(dt){
+        var p = dt.previousElementSibling, hops = 0;
+        while(p && hops < 3 && !/_{3,}/.test(p.textContent || '')){ p = p.previousElementSibling; hops++; }
+        var blanks = p ? ((p.textContent || '').match(/_{3,}/g) || []).length : 0;
+        var ans = dt.querySelector('.answer');
+        var words = ans ? (ans.textContent.replace(/^答案：?/, '').split(/[\/、，,]/).filter(function(w){ return w.trim(); })).length : 0;
+        L.push(blanks && blanks === words ? '✅ 挖空：空数 ' + blanks + ' == 答案数 ' + words : '⚠ 挖空：空数 ' + blanks + ' ≠ 答案数 ' + words + '（' + (p ? p.textContent.trim().slice(0, 12) : '?') + '…）');
+      });
+    }
+    // v2.23：内容可疑项（翻译长度比 / 答案词溯源 / 连读覆盖率 / IPA 音标校验）
+    L.push('─ 内容可疑项');
+    var transShort = 0, transLong = 0, pronCov = 0, ipaBad = 0;
+    sentences.forEach(function(s, idx){
+      var en = s.text.replace(/\s+/g, ' ').trim();
+      var zh = (s.node.querySelector('.sent-zh') || { textContent: '' }).textContent.replace(/\s+/g, '').trim();
+      var enLen = en.length, zhLen = zh.length;
+      if(enLen > 0){
+        var ratio = zhLen / enLen;
+        if(ratio < 0.4){ transShort++; L.push('⚠ 句' + (idx+1) + ' 译文偏短（长度比 ' + ratio.toFixed(2) + '，疑似内容缺失）：' + en.slice(0, 30) + '…'); }
+        else if(ratio > 1.8){ transLong++; L.push('⚠ 句' + (idx+1) + ' 译文偏长（长度比 ' + ratio.toFixed(2) + '，疑似翻译走样）：' + en.slice(0, 30) + '…'); }
+      }
+      // 连读覆盖
+      var pron = s.node.querySelector('.pron');
+      if(pron){ pronCov++; }
+      // IPA 校验：所有 /.../ 包裹的字符串内不应含中文字符
+      var pronText = pron ? pron.textContent : '';
+      var ipaMatches = pronText.match(/\/[^\/\n]+\//g) || [];
+      ipaMatches.forEach(function(ipa){
+        if(/[\u4e00-\u9fff]/.test(ipa)){
+          ipaBad++;
+          L.push('⚠ 句' + (idx+1) + ' IPA 含中文（疑似音标写错或位置错乱）：' + ipa);
+        }
+      });
+    });
+    var pronPct = sentences.length ? Math.round(pronCov / sentences.length * 100) : 0;
+    L.push((pronPct >= 50 ? '✅' : '⚠') + ' 连读注解覆盖 ' + pronCov + ' / ' + sentences.length + '（' + pronPct + '%，< 50% 时建议补标）');
+    L.push((transShort + transLong === 0 ? '✅' : '⚠') + ' 译文长度比合理（' + (transShort + transLong) + ' 句可疑，需复核）');
+    L.push((ipaBad === 0 ? '✅' : '⚠') + ' IPA 音标无中文字符（' + ipaBad + ' 处异常）');
+    L.push('');
+    L.push('— 逐句文本==原文、词汇/金句溯源需在生成端执行，见 SKILL.md「内容校验」清单');
+    var rpt = document.createElement('div');
+    rpt.className = 'emm-check-rpt';
+    rpt.textContent = L.join('\n');
+    var w = document.querySelector('.wrap') || document.body;
+    w.insertBefore(rpt, w.firstChild);
+  }
+
+  /* ===== v2.14.0 EMM_DRILL_CLOZE_V214: weak-only drill / interactive cloze ===== */
+  function renderDrill(){
+    var b = document.querySelector('.rv-drill'); if(!b) return;
+    var on = document.body.classList.contains('emm-drill');
+    var n = Object.keys(state.weak).length;
+    b.textContent = on ? '⚡ 快刷中（薄弱 ' + n + '）·退出' : '⚡ 只刷薄弱(' + n + ')';
+    b.title = '只显示薄弱句，配合「开始本轮」5 分钟过完卡壳句；再点退出恢复全文';
+  }
+  function toggleDrill(){
+    if(!document.body.classList.contains('emm-drill')){
+      if(!Object.keys(state.weak).length){
+        var d = document.querySelector('.rv-dash');
+        if(d && typeof d.scrollIntoView === 'function'){
+          d.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          d.style.transition = 'background-color .3s';
+          d.style.backgroundColor = '#fef3c7';
+          setTimeout(function(){ d.style.backgroundColor = ''; }, 1200);
+        }
+        renderDrill(); return;
+      }
+      document.body.classList.add('emm-drill');
+    } else {
+      document.body.classList.remove('emm-drill');
+    }
+    renderDrill();
+  }
+
+  function normJoin(s){ return norm(s).join(' '); }
+  function markWeakByAnswer(ans){
+    var a = normJoin(ans);
+    for(var i = 0; i < sentences.length; i++){
+      if(normJoin(sentences[i].text).indexOf(a) >= 0){
+        if(!state.weak[i]){
+          state.weak[i] = true; state.streak[i] = 0;
+          save(state); applyJudgeState(); renderDash();
+        }
+        return;
+      }
+    }
+  }
+  function buildCloze(){
+    var h2s = document.querySelectorAll('h2');
+    for(var i = 0; i < h2s.length; i++){
+      if(/挖空自测/.test(h2s[i].textContent)){ h2s[i].id = 'emm-cloze'; break; }
+    }
+    document.querySelectorAll('details.answer-toggle').forEach(function(dt){
+      var p = dt.previousElementSibling, hops = 0;
+      while(p && hops < 3 && !/_{3,}/.test(p.textContent || '')){ p = p.previousElementSibling; hops++; }
+      if(!p) return;
+      var ansDiv = dt.querySelector('.answer'); if(!ansDiv) return;
+      var answers = ansDiv.textContent.replace(/^答案：?/, '').split(/[\/、，,]/).map(function(w){ return w.trim(); }).filter(Boolean);
+      if(!answers.length) return;
+      var totalBlanks = (p.textContent.match(/_{3,}/g) || []).length;
+      var textBlanks = 0;
+      Array.prototype.forEach.call(p.childNodes, function(node){
+        if(node.nodeType === 3) textBlanks += (node.textContent.match(/_{3,}/g) || []).length;
+      });
+      if(totalBlanks !== answers.length || textBlanks !== totalBlanks) return; // 失配保护：保持静态
+      var bi = 0;
+      var frag = document.createDocumentFragment();
+      Array.prototype.slice.call(p.childNodes).forEach(function(node){
+        if(node.nodeType === 3){
+          node.textContent.split(/(_{3,})/).forEach(function(pt){
+            if(!pt) return;
+            if(/^_{3,}$/.test(pt)){
+              var ans = answers[bi] || '';
+              var inp = document.createElement('input');
+              inp.type = 'text'; inp.className = 'emm-clz';
+              inp.setAttribute('autocomplete', 'off'); inp.setAttribute('spellcheck', 'false');
+              inp.style.width = Math.max(6, ans.length + 2) + 'ch';
+              inp.setAttribute('aria-label', '第' + (bi + 1) + '空');
+              // 答案落 DOM 属性，供 Anki 导出读取（批改逻辑仍走闭包 ans，不受影响）
+              inp.setAttribute('data-ans', ans);
+              var mk = document.createElement('span'); mk.className = 'emm-clz-mark';
+              wireClz(inp, mk, ans);
+              frag.appendChild(inp); frag.appendChild(mk);
+              bi++;
+            } else {
+              frag.appendChild(document.createTextNode(pt));
+            }
+          });
+        } else {
+          frag.appendChild(node);
+        }
+      });
+      p.innerHTML = ''; p.appendChild(frag);
+    });
+  }
+  function wireClz(inp, mk, ans){
+    function grade(){
+      var v = normJoin(inp.value), a = normJoin(ans);
+      if(!v){
+        inp.classList.remove('emm-clz-ok', 'emm-clz-bad');
+        mk.textContent = ''; mk.className = 'emm-clz-mark';
+        return;
+      }
+      if(v === a){
+        inp.classList.add('emm-clz-ok'); inp.classList.remove('emm-clz-bad');
+        mk.textContent = '✓'; mk.className = 'emm-clz-mark ok';
+      } else {
+        inp.classList.add('emm-clz-bad'); inp.classList.remove('emm-clz-ok');
+        mk.textContent = '✗'; mk.className = 'emm-clz-mark bad';
+        markWeakByAnswer(ans);
+      }
+    }
+    inp.addEventListener('keydown', function(e){ if(e.key === 'Enter'){ e.preventDefault(); grade(); } });
+    inp.addEventListener('blur', grade);
+    inp.addEventListener('input', function(){
+      inp.classList.remove('emm-clz-ok', 'emm-clz-bad');
+      mk.textContent = ''; mk.className = 'emm-clz-mark';
+    });
+  }
+
+  /* ===== v2.15.0 EMM_V215_STABLE: content fingerprint / palace data-sents ===== */
+  function parseSents(st){
+    var d = st.getAttribute('data-sents');
+    if(!d) return null;
+    return d.split(',').map(function(x){ return parseInt(x, 10) - 1; }).filter(function(x){ return !isNaN(x) && x >= 0; });
+  }
+  function contentFingerprint(){
+    return sentences.map(function(s){ return s.text.length + ':' + s.text.slice(0, 32); }).join('|').slice(0, 4000);
+  }
+  function checkFingerprint(){
+    var fp = contentFingerprint();
+    if(!state.fingerprint){
+      state.fingerprint = fp; save(state);
+      return;
+    }
+    if(state.fingerprint === fp) return;
+    var reset = true;
+    try {
+      reset = confirm('检测到方案内容已更新，旧的背诵进度（打卡/薄弱/阶梯）可能与新方案错位。\n\n确定＝重置进度（保留留白与开始日期）\n取消＝暂不处理（保留旧进度）');
+    } catch(e){}
+    if(reset){
+      state.done = {}; state.streak = {}; state.weak = {}; state.rounds = [];
+      state.mode = false; state.ladder = {}; state.log = {}; state.quiz = 0;
+      state.sr = {};  // v2.20：清空 SM-2 间隔
+    }
+    state.fingerprint = fp;
+    save(state);
+  }
+
+  /* ===== v2.16.0 EMM_MOBILE_V216: wrap tables for mobile horizontal scroll ===== */
+  function wrapTables(){
+    document.querySelectorAll('table').forEach(function(t){
+      if(!t.parentNode || !t.parentNode.classList || t.parentNode.classList.contains('emm-tblwrap')) return;
+      var d = document.createElement('div');
+      d.className = 'emm-tblwrap';
+      t.parentNode.insertBefore(d, t);
+      d.appendChild(t);
+    });
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', init);
+  else init();
+})();
+</script>
+
+<script>
+/* ===== v2.20 EMM_SR_V220: SM-2 算法升级（Wozniak 1990）=====
+   设计：self-contained IIFE，不依赖 main IIFE 内部变量；
+   通过 __emmDispatch 钩子接收 'judge'/'endRound' 事件；
+   算法为纯函数 srNext(q, prev)，便于测试；
+   持久化走 main 同 key 的 localStorage，复用同一份 state。 */
+(function(){
+  "use strict";
+
+  // Wozniak 1990 SM-2 算法
+  // q ∈ [0..5]，q<3 重置 reps=0、interval=1
+  // EF：EF' = EF + (0.1 - (5-q) * (0.08 + (5-q) * 0.02))
+  // EF < 1.3 → 钳制到 1.3
+  // 间隔：reps=0 → 1d；reps=1 → 6d；reps=n>1 → round(prev.interval * EF)
+  function srNext(q, prev){
+    prev = prev || {ef: 2.5, interval: 0, reps: 0, due: '', lastQ: null};
+    var ef = prev.ef || 2.5;
+    var reps = prev.reps || 0;
+    var interval;
+    if(q < 3){
+      reps = 0;
+      interval = 1;
+    } else {
+      if(reps === 0) interval = 1;
+      else if(reps === 1) interval = 6;
+      else interval = Math.max(1, Math.round((prev.interval || 1) * ef));
+      reps = reps + 1;
+    }
+    ef = ef + (0.1 - (5 - q) * (0.08 + (5 - q) * 0.02));
+    if(ef < 1.3) ef = 1.3;
+    var dueDate = new Date();
+    dueDate.setDate(dueDate.getDate() + interval);
+    var due = dueDate.getFullYear() + '-' + String(dueDate.getMonth()+1).padStart(2,'0') + '-' + String(dueDate.getDate()).padStart(2,'0');
+    return {ef: ef, interval: interval, reps: reps, due: due, lastQ: q};
+  }
+
+  // v2.32.0：进度键派生与读写收敛到 EMMProgressStore（00-store.js），此处为同签名薄委托
+  // v2.32.0：进度契约收敛到 EMM_PROGRESS store（00-store.js）——同签名薄委托
+  function getH1(){ return EMMProgressStore.getH1(); }
+  function keyOf(){ return EMMProgressStore.keyOf(); }
+  function loadProgress(){ return EMMProgressStore.load(); }
+  // 只 patch sr 字段（不重写整个 state），避免与 main 的 save(state) 写竞态
+  function patchSr(srObj){ EMMProgressStore.patch(function(p){ p.sr = srObj; }); }
+  function patchSrMode(mode){ EMMProgressStore.patch(function(p){ p.srMode = mode; }); }
+
+  // 与 Ebbinghaus 间隔表（1/2/4/7/15）对齐：取 max(SR.due, ebbinghausRound)
+  // 用途：保证标准模式不会让复习频率低于经典 Ebbinghaus 节奏
+  // 输入：reps 已完成的连续正确次数
+  function ebbinghausDueDays(reps){
+    var table = [1, 2, 4, 7, 15];
+    return reps <= 0 ? 0 : (table[Math.min(reps - 1, table.length - 1)] || 15);
+  }
+  function alignWithEbbinghaus(sr){
+    if(!sr) return sr;
+    var ebbDays = ebbinghausDueDays(sr.reps || 0);
+    if(sr.interval < ebbDays){
+      var dueDate = new Date();
+      dueDate.setDate(dueDate.getDate() + ebbDays);
+      sr.interval = ebbDays;
+      sr.due = dueDate.getFullYear() + '-' + String(dueDate.getMonth()+1).padStart(2,'0') + '-' + String(dueDate.getDate()).padStart(2,'0');
+      sr.aligned = 'ebbinghaus';
+    } else {
+      sr.aligned = 'sm2';
+    }
+    return sr;
+  }
+
+  // 当前评分粒度：二档（向后兼容）
+  // ✓ → q=4，✗ → q=2
+  function gradeFromJudge(v){
+    return v === 'ok' ? 4 : 2;
+  }
+
+  // 监听 main IIFE 的钩子，写入 state.sr
+  window.__emmDispatch = function(event, idx, v){
+    if(event === 'judge'){
+      // 单次评分：仅记录 lastQ，endRound 时批量算 srNext
+      var p = loadProgress();
+      p.sr = p.sr || {};
+      var cur = p.sr[idx] || {ef: 2.5, interval: 0, reps: 0, due: '', lastQ: null};
+      cur.lastQ = gradeFromJudge(v);
+      p.sr[idx] = cur;
+      patchSr(p.sr);
+    } else if(event === 'endRound'){
+      // 一轮结束：批量 srNext，按 mode 决定是否与 Ebbinghaus 对齐
+      // 第三个参数是 main 传入的 doneSnapshot（在 state.done 清空前快照）
+      var done = (arguments.length >= 3 && arguments[2]) ? arguments[2] : (loadProgress().done || {});
+      var p = loadProgress();
+      p.sr = p.sr || {};
+      var isStd = p.srMode === 'standard';
+      var keys = Object.keys(done);
+      for(var i = 0; i < keys.length; i++){
+        var k = keys[i];
+        var grade = done[k] === 'ok' ? 4 : 2;
+        var prev = p.sr[k] || {ef: 2.5, interval: 0, reps: 0, due: '', lastQ: null};
+        var next = srNext(grade, prev);
+        if(isStd) next = alignWithEbbinghaus(next);
+        p.sr[k] = next;
+      }
+      patchSr(p.sr);
+    } else if(event === 'modeChange'){
+      // 标准 / 轻量切换：对已有 state.sr 重新对齐 Ebbinghaus
+      var p2 = loadProgress();
+      if(p2.srMode === 'standard'){
+        Object.keys(p2.sr).forEach(function(k){
+          p2.sr[k] = alignWithEbbinghaus(p2.sr[k]);
+        });
+        patchSr(p2.sr);
+      }
+    }
+  };
+})();
+</script>
+
+<script>
+/* ===== v2.19 EMM_SHADOW_V219 + v2.30 EMM_SPEECH_V230: 影子跟读（MediaRecorder 逐词自评 + SpeechRecognition 自动评分）===== */
+(function(){
+  "use strict";
+
+  // v2.19 设计：自给自足——不从 main IIFE 借 state/sentences（strict mode + var 不泄漏）
+  // 直接从 DOM 抽 .sent-en，从 localStorage 抽 state
+  function getSentences(){
+    var nodes = document.querySelectorAll('.sent-en');
+    var out = [];
+    for(var i = 0; i < nodes.length; i++){
+      out.push({ text: nodes[i].textContent.replace(/\s+/g, ' ').trim() });
+    }
+    return out;
+  }
+  // v2.32.0：进度契约收敛到 EMM_PROGRESS store（00-store.js）——同签名薄委托
+  function getH1(){ return EMMProgressStore.getH1(); }
+  function keyOf(){ return EMMProgressStore.keyOf(); }
+  function loadProgress(){ return EMMProgressStore.load(); }
+  function saveProgress(prog){ EMMProgressStore.save(prog); }
+
+  var sents = getSentences();
+  if(!sents.length) return;
+
+  var SH = { active: false, idx: 0, marks: [], blob: null, audioUrl: null, recorder: null, recordedTime: -1 };
+
+  function shadowHtml(){
+    return '<b>🎙️ 影子跟读</b>'
+      + '<button type="button" class="sv-btn sv-toggle">开始</button>'
+      + '<span class="sv-stat"></span>'
+      + '<span class="sv-meta">· 对接光明日报"50 遍传统"，录音后逐词自评</span>'
+      + '<div class="sv-panel" style="display:none;margin-top:10px;">'
+      + '<div class="sv-sent"></div>'
+      + '<div class="sv-row">'
+      + '<button type="button" class="sv-btn sv-play">▶ 听原句</button>'
+      + '<button type="button" class="sv-btn sv-record">🎤 录音</button>'
+      + '<button type="button" class="sv-btn sv-stop" disabled>⏹ 停止</button>'
+      + '<button type="button" class="sv-btn sv-replay" disabled>🔁 回放</button>'
+      + '<button type="button" class="sv-btn sv-auto">🤖 自动评分</button>'
+      + '<span class="sv-status"></span>'
+      + '</div>'
+      + '<div class="sv-words"></div>'
+      + '<div class="sv-row">'
+      + '<button type="button" class="sv-btn sv-clear">清空标注</button>'
+      + '<button type="button" class="sv-btn sv-skip">⏭ 跳过此句</button>'
+      + '<button type="button" class="sv-btn sv-save" disabled>💾 保存并下一句</button>'
+      + '</div>'
+      + '<div class="sv-hint">点击每个词：✓ 正确 / ✗ 读错或漏；至少标 1 个才解锁保存。错词 ≥ 25% 自动入薄弱清单。也可点「🤖 自动评分」：浏览器听你朗读、自动逐词标注（Chrome / Edge 支持，识别走云端服务）。</div>'
+      + '</div>';
+  }
+
+  function wordTokens(sentText){
+    // 拆词：保留撇号/连字符/数字；按非 word 字符拆
+    return (sentText || '').split(/(\s+|[^\w']+)/).filter(function(t){ return t && /\S/.test(t) && /\w/.test(t); });
+  }
+
+  function renderShadowWords(){
+    var bar = document.querySelector('.rv-shadow');
+    if(!bar) return;
+    var sent = sents[SH.idx];
+    var tokens = wordTokens(sent.text);
+    var html = '';
+    for(var i = 0; i < tokens.length; i++){
+      var cls = 'sv-w';
+      if(SH.marks[i] === 1) cls += ' sv-ok';
+      else if(SH.marks[i] === -1) cls += ' sv-bad';
+      else cls += ' sv-pending';
+      html += '<button type="button" class="' + cls + '" data-wi="' + i + '" title="点 1 次=✓ / 2 次=✗ / 3 次=重置">' + tokens[i] + '</button>';
+    }
+    bar.querySelector('.sv-words').innerHTML = html;
+    // 单词评级：🪓 词事件
+    bar.querySelectorAll('.sv-w').forEach(function(b){
+      b.addEventListener('click', function(){
+        var i = +b.getAttribute('data-wi');
+        // 0=未评 / 1=✓ / -1=✗ 循环
+        var cur = SH.marks[i] || 0;
+        SH.marks[i] = cur === 1 ? -1 : (cur === -1 ? 0 : 1);
+        renderShadowWords();
+        updateSaveBtn();
+      });
+    });
+    updateSaveBtn();
+  }
+
+  function updateSaveBtn(){
+    var bar = document.querySelector('.rv-shadow');
+    if(!bar) return;
+    var any = SH.marks.some(function(m){ return m === 1 || m === -1; });
+    bar.querySelector('.sv-save').disabled = !any;
+    var ok = SH.marks.filter(function(m){ return m === 1; }).length;
+    var bad = SH.marks.filter(function(m){ return m === -1; }).length;
+    var tot = SH.marks.filter(function(m){ return m; }).length;
+    bar.querySelector('.sv-status').textContent = tot ? ('✓' + ok + ' / ✗' + bad + ' / 共标 ' + tot + ' 个词') : '点击每个词标注';
+  }
+
+  function renderShadow(){
+    var bar = document.querySelector('.rv-shadow');
+    if(!bar) return;
+    var tog = bar.querySelector('.sv-toggle');
+    var prog = loadProgress();
+    var doneCount = Object.keys(prog.shadow || {}).length;
+    tog.textContent = SH.active ? '结束影子跟读' : (doneCount ? '继续（' + doneCount + '/' + sents.length + '）' : '开始影子跟读');
+    bar.querySelector('.sv-stat').textContent = SH.active ? ('进度 ' + (SH.idx + 1) + '/' + sents.length) : '';
+    var panel = bar.querySelector('.sv-panel');
+    panel.style.display = SH.active ? 'block' : 'none';
+    if(SH.active){
+      var sent = sents[SH.idx];
+      bar.querySelector('.sv-sent').textContent = '第 ' + (SH.idx + 1) + ' 句 / 共 ' + sents.length + ' 句：' + sent.text;
+      // 加载该句的旧 marks
+      var prev = (prog.shadow || {})[SH.idx];
+      SH.marks = prev && prev.marks ? prev.marks.slice() : [];
+      SH.blob = null;
+      if(SH.audioUrl){ URL.revokeObjectURL(SH.audioUrl); SH.audioUrl = null; }
+      var oldAudio = bar.querySelector('audio'); if(oldAudio) oldAudio.remove();
+      bar.querySelector('.sv-record').disabled = false;
+      bar.querySelector('.sv-record').classList.remove('recording');
+      bar.querySelector('.sv-stop').disabled = true;
+      bar.querySelector('.sv-replay').disabled = true;
+      renderShadowWords();
+      // 自动播放原句
+      setTimeout(function(){
+          if(typeof speak === 'function') speak(sent.text);
+        }, 100);
+    }
+  }
+
+  function buildShadow(){
+    if(document.querySelector('.rv-shadow')) return;
+    var div = document.createElement('div');
+    div.className = 'rv-shadow';
+    div.id = 'emm-shadow';
+    div.innerHTML = shadowHtml();
+    // 初始隐藏面板（SH.active = false）
+    div.querySelector('.sv-panel').style.display = 'none';
+    var anchor = document.querySelector('.rv-bar');
+    if(anchor && anchor.parentNode) anchor.parentNode.insertBefore(div, anchor.nextSibling);
+
+    // 接入 rv-bar 按钮
+    var barBtn = document.querySelector('.rv-shadow-btn');
+    if(barBtn) barBtn.addEventListener('click', function(){ SH.active = !SH.active; SH.idx = 0; renderShadow(); });
+
+    div.querySelector('.sv-toggle').addEventListener('click', function(){
+      SH.active = !SH.active;
+      if(SH.active && SH.idx >= sents.length) SH.idx = 0;
+      renderShadow();
+    });
+
+    div.querySelector('.sv-play').addEventListener('click', function(){
+      // 简易 TTS：直接用浏览器原生 speechSynthesis
+      try {
+        var u = new SpeechSynthesisUtterance(sents[SH.idx].text);
+        u.lang = 'en-US';
+        if(speechSynthesis.getVoices().length){
+          var vs = speechSynthesis.getVoices();
+          for(var i=0;i<vs.length;i++) if(/en[-_]US/i.test(vs[i].lang)){ u.voice = vs[i]; break; }
+        }
+        speechSynthesis.cancel();
+        speechSynthesis.speak(u);
+      } catch(e){}
+    });
+
+    var recBtn = div.querySelector('.sv-record');
+    var stopBtn = div.querySelector('.sv-stop');
+    var replayBtn = div.querySelector('.sv-replay');
+    recBtn.addEventListener('click', function(){
+      if(!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia){
+        alert('当前浏览器不支持麦克风录制。请用 Chrome / Edge / Firefox 桌面版。');
+        return;
+      }
+      navigator.mediaDevices.getUserMedia({ audio: true }).then(function(stream){
+        var rec;
+        try { rec = new MediaRecorder(stream); }
+        catch(e){
+          alert('MediaRecorder 不可用：' + e.message + '\n可降级为手动播放 + 自评。');
+          stream.getTracks().forEach(function(t){ t.stop(); });
+          return;
+        }
+        var chunks = [];
+        rec.ondataavailable = function(e){ if(e.data.size > 0) chunks.push(e.data); };
+        rec.onstop = function(){
+          SH.blob = new Blob(chunks, { type: chunks[0] && chunks[0].type || 'audio/webm' });
+          if(SH.audioUrl) URL.revokeObjectURL(SH.audioUrl);
+          SH.audioUrl = URL.createObjectURL(SH.blob);
+          // 插入 <audio> 元素
+          var bar = document.querySelector('.rv-shadow');
+          var oldA = bar.querySelector('audio'); if(oldA) oldA.remove();
+          var au = document.createElement('audio');
+          au.src = SH.audioUrl; au.controls = true;
+          bar.querySelector('.sv-status').after(au);
+          stopBtn.disabled = true;
+          recBtn.classList.remove('recording');
+          replayBtn.disabled = false;
+          stream.getTracks().forEach(function(t){ t.stop(); });
+          bar.querySelector('.sv-status').textContent = '录音完成，回放比对后逐词标注';
+        };
+        rec.start();
+        SH.recorder = rec;
+        recBtn.classList.add('recording');
+        recBtn.disabled = true;
+        stopBtn.disabled = false;
+        bar.querySelector('.sv-status').textContent = '正在录音…大声朗读';
+      }).catch(function(err){
+        alert('麦克风权限被拒：' + err.message + '\n可继续手动自评每词。');
+      });
+    });
+    stopBtn.addEventListener('click', function(){
+      if(SH.recorder && SH.recorder.state !== 'inactive') SH.recorder.stop();
+    });
+    replayBtn.addEventListener('click', function(){
+      if(SH.audioUrl) {
+        var au = div.querySelector('audio'); if(au) au.play();
+      }
+    });
+    // v2.30 语音识别自动评分：浏览器听朗读 → 转写 → LCS 对齐 → 自动填 marks（可手动修正后保存）
+    var autoBtn = div.querySelector('.sv-auto');
+    var recog = null;
+    autoBtn.addEventListener('click', function(){
+      var SRClass = window.SpeechRecognition || window.webkitSpeechRecognition;
+      if(!SRClass){
+        alert('当前浏览器不支持语音识别（Chrome / Edge 桌面版支持）。\n可继续手动播放 + 自评。');
+        return;
+      }
+      if(recog){ try { recog.stop(); } catch(e){} return; }
+      var r;
+      try { r = new SRClass(); } catch(e){ alert('语音识别初始化失败：' + e.message); return; }
+      r.lang = 'en-US'; r.interimResults = false; r.maxAlternatives = 1;
+      recog = r;
+      var bar = document.querySelector('.rv-shadow');
+      autoBtn.classList.add('listening');
+      autoBtn.textContent = '👂 正在听…点此结束';
+      bar.querySelector('.sv-status').textContent = '正在聆听，请大声朗读当前句…';
+      r.onresult = function(ev){
+        var said = (ev.results && ev.results[0] && ev.results[0][0] && ev.results[0][0].transcript) || '';
+        var origTokens = wordTokens(sents[SH.idx].text);
+        var saidTokens = String(said).toLowerCase().replace(/[^a-z0-9'\s]/gi, ' ').split(/\s+/).filter(Boolean);
+        if(!saidTokens.length){
+          bar.querySelector('.sv-status').textContent = '没听清，请靠近麦克风重试，或手动标注。';
+          return;
+        }
+        var norm = function(t){ return String(t).toLowerCase(); };
+        var m = saidTokens.length, n = origTokens.length;
+        var dp = [];
+        for(var i = 0; i <= m; i++){ dp.push(new Array(n + 1).fill(0)); }
+        for(var i = 1; i <= m; i++){
+          for(var j = 1; j <= n; j++){
+            dp[i][j] = (saidTokens[i-1] === norm(origTokens[j-1])) ? dp[i-1][j-1] + 1 : Math.max(dp[i-1][j], dp[i][j-1]);
+          }
+        }
+        var marks = []; for(var j = 0; j < n; j++) marks.push(0);
+        var i2 = m, j2 = n;
+        while(i2 > 0 || j2 > 0){
+          if(i2 > 0 && j2 > 0 && saidTokens[i2-1] === norm(origTokens[j2-1])){ marks[j2-1] = 1; i2--; j2--; }
+          else if(j2 > 0 && (i2 === 0 || dp[i2][j2-1] >= dp[i2-1][j2])){ j2--; }
+          else if(i2 > 0){ i2--; }
+        }
+        var matched = 0; for(var k2 = 0; k2 < n; k2++){ if(marks[k2] === 1) matched++; }
+        if(!matched){
+          bar.querySelector('.sv-status').textContent = '识别结果与原句无匹配词（识别：「' + said + '」），请重试或手动标注。';
+          return;
+        }
+        for(var k = 0; k < n; k++){ if(marks[k] === 0) marks[k] = -1; }
+        SH.marks = marks;
+        renderShadowWords();
+        bar.querySelector('.sv-status').textContent = '识别：「' + said + '」——已自动标注 ✓' + matched + ' / ✗' + (n - matched) + '，可手动修正后 💾 保存';
+      };
+      r.onerror = function(ev){
+        bar.querySelector('.sv-status').textContent = '识别失败：' + ((ev && ev.error) || '未知错误') + '（可手动自评）';
+      };
+      r.onend = function(){
+        recog = null;
+        autoBtn.classList.remove('listening');
+        autoBtn.textContent = '🤖 自动评分';
+      };
+      try { r.start(); } catch(e){ recog = null; autoBtn.classList.remove('listening'); autoBtn.textContent = '🤖 自动评分'; alert('语音识别启动失败：' + e.message); }
+    });
+    div.querySelector('.sv-clear').addEventListener('click', function(){
+      SH.marks = [];
+      renderShadowWords();
+      div.querySelector('.sv-status').textContent = '已清空标注';
+    });
+    div.querySelector('.sv-skip').addEventListener('click', function(){
+      SH.idx = Math.min(SH.idx + 1, sents.length - 1);
+      renderShadow();
+    });
+    div.querySelector('.sv-save').addEventListener('click', function(){
+      var ok = SH.marks.filter(function(m){ return m === 1; }).length;
+      var bad = SH.marks.filter(function(m){ return m === -1; }).length;
+      var total = ok + bad;
+      // 错误率 ≥ 25% → 加入薄弱清单（直接更新 localStorage，与 main IIFE 的 weak 同源）
+      var prog = loadProgress();
+      prog.shadow = prog.shadow || {};
+      prog.weak = prog.weak || {};
+      prog.streak = prog.streak || {};
+      if(bad / Math.max(total, 1) >= 0.25 && !prog.weak[SH.idx]){
+        prog.weak[SH.idx] = true;
+        prog.streak[SH.idx] = 0;
+      }
+      prog.shadow[SH.idx] = {
+        ok: ok, bad: bad, total: total,
+        marks: SH.marks.slice(),
+        date: (new Date()).toISOString().slice(0, 10)
+      };
+      saveProgress(prog);
+      // 下一句
+      SH.idx++;
+      if(SH.idx >= sents.length){
+        SH.active = false;
+        div.querySelector('.sv-status').textContent = '🎉 全篇影子跟读完成！薄弱句已自动入清单。';
+        renderShadow();
+      } else {
+        renderShadow();
+      }
+    });
+  }
+
+  if(document.readyState === 'loading') document.addEventListener('DOMContentLoaded', buildShadow);
+  else buildShadow();
+})();
+</script>
+
+<script>
+/* ===== v2.21 EMM_PROGRESS_V221: 进度导出/导入 + 段间切换 =====
+   设计：exportProgress / importProgress / setAsToday 都嵌入 main IIFE（§v2.20 之前定义），
+   本节仅作为锚点标记，不引入新代码。 */
+
+/* ===== v2.22 EMM_QA_V222: 工程卫生大礼包 =====
+   设计：所有改动嵌入 main IIFE（icsDate 增 UTC 格式、init() 备份提醒、renderToday 阶梯渐进引导），
+   本节仅作为锚点标记，不引入新代码。 */
+
+/* ===== v2.23 EMM_QUALITY_V223: 内容质量大礼包 =====
+   设计：按段统计在 renderDash 加表格、?check=1 在 selfCheck 加 3 项可疑检查、模式向导在 SKILL.md Step 0。 */
+
+/* ===== v2.25 EMM_ASSESS_V225: 评估优化 =====
+   设计：startSegTest 60 秒倒计时 + finishSegTest 批改评分 + rv-goal 切换 2/3/4/5 + state.streakToGoal。 */
+
+/* ===== v2.26 EMM_FIXTURE_V226: 工程卫生 =====
+   设计：bin/sync-fixtures.mjs（独立工具）从真实生成方案回填 fixture-success.html。
+   本节仅作为锚点标记，不引入新代码。 */
+
+/* ===== v2.27 EMM_BROWSER_V227: 跨浏览器测试矩阵 =====
+   设计：bin/check-browser-compat.mjs（独立工具）静态扫描模板用到的 Web API，
+   对照 Chrome/Firefox/Safari/Edge 兼容性矩阵。docs/CROSS-BROWSER.md 配档。
+   本节仅作为锚点标记，不引入新代码。 */
+
+/* ===== v2.28 EMM_E2E_V228: 端到端测试 =====
+   设计：bin/e2e-flow.mjs（独立工具）在 jsdom 里完整跑 35 步用户流。
+   顺带修复 endRound() 持久化 bug + build-samples.mjs 多句插入 bug。
+   配档 docs/E2E.md。
+   本节仅作为锚点标记，不引入新代码。 */
+</script>
+
+<script>
+/* ===== v2.18 EMM_FOLD_V218: 首屏折叠 + on-boarding ===== */
+(function(){
+  "use strict";
+
+  // 1. 标记"进阶章节"：h2 编号 ≥ 9 整段作为 advanced
+  document.querySelectorAll('h2').forEach(function(h2){
+    var m = /^\s*(\d+)\./.exec(h2.textContent || '');
+    if(!m || +m[1] < 9) return;
+    h2.classList.add('emm-advanced');
+    var n = h2.nextElementSibling;
+    while(n && n.tagName !== 'H2'){
+      n.classList.add('emm-advanced');
+      n = n.nextElementSibling;
+    }
+  });
+
+  // 2. 浮动切换按钮
+  var btn = document.createElement('button');
+  btn.type = 'button';
+  btn.className = 'emm-fold-toggle';
+  btn.id = 'emm-fold-toggle';
+  btn.innerHTML = '≡ 进阶内容 <span class="tag"></span>';
+  document.body.appendChild(btn);
+
+  function syncBtn(){
+    var folded = document.body.classList.contains('emm-folded');
+    btn.querySelector('.tag').textContent = folded ? '（已折叠，点开）' : '（全部展开）';
+    btn.setAttribute('title', folded ? '显示所有章节' : '折叠至核心 4 节');
+  }
+
+  btn.addEventListener('click', function(){
+    document.body.classList.toggle('emm-folded');
+    syncBtn();
+    try { localStorage.setItem('emm-fold-state', document.body.classList.contains('emm-folded') ? '1' : '0'); } catch(e){}
+  });
+
+  // 3. 应用持久化状态
+  try {
+    var saved = localStorage.getItem('emm-fold-state');
+    if(saved === '1') document.body.classList.add('emm-folded');
+    // 没有过任何记录的用户：默认折叠（降低首屏信息密度）
+    if(localStorage.getItem('emm-fold-state') === null) document.body.classList.add('emm-folded');
+  } catch(e){}
+  syncBtn();
+
+  // 4. 首次访问 on-boarding
+  try {
+    if(!localStorage.getItem('emm-onboarding-shown')){
+      var wrap = document.querySelector('.wrap');
+      if(wrap){
+        var ob = document.createElement('div');
+        ob.className = 'emm-onboarding';
+        ob.id = 'emm-onboarding';
+        ob.innerHTML = '<h3>🎓 第一次用？60 秒引导</h3>'
+          + '<ol>'
+          + '<li>读 <b>1. 整体策略</b>——知道主题、要背几天</li>'
+          + '<li>看 <b>2. 文章结构图</b>——5 秒看整体</li>'
+          + '<li>读 <b>4. 原文逐句精读</b>——听读 3 遍</li>'
+          + '<li>点 <b>📅 今日任务</b> 的「开始本轮」做第一次复述</li>'
+          + '<li>卡壳 → 仪表盘薄弱清单 → 第二天自测</li>'
+          + '</ol>'
+          + '<button type="button" class="emm-onboarding-dismiss">我知道了，下次不再显示</button>';
+        wrap.insertBefore(ob, wrap.firstChild);
+        ob.querySelector('.emm-onboarding-dismiss').addEventListener('click', function(){
+          try { localStorage.setItem('emm-onboarding-shown', '1'); } catch(e){}
+          ob.remove();
+        });
+      }
+    }
+  } catch(e){}
+})();
+</script>
+
+<script>
+/* ===== v2.29.0 EMM_QUICK3_V229 + EMM_CAP_V229 + EMM_PALACE_V229：入门减负——3 步快背入口 + 能力探测横幅 + 记忆宫殿路线引导 ===== */
+(function(){
+  "use strict";
+  // 页脚版本戳唯一来源；与模板顶部注释保持一致（RELEASE-CHECKLIST：每份生成方案打开即见"我跑的是哪版"）
+  var EMM_VERSION = 'v2.30.0';
+
+  // 1. 页脚版本戳
+  try {
+    var ft = document.querySelector('footer');
+    if(ft && !/v\d+\.\d+\.\d+/.test(ft.textContent)){
+      var vs = document.createElement('span');
+      vs.className = 'emm-ver-stamp';
+      vs.textContent = ' · ' + EMM_VERSION;
+      ft.appendChild(vs);
+    }
+  } catch(e){}
+
+  // 2. 3 步快背入口卡（插在 header 之后、第 1 节之前；折叠态下同样首屏可见）
+  try {
+    var header = document.querySelector('header');
+    var wrap = document.querySelector('.wrap');
+    if(header && wrap && header.parentNode === wrap && !document.getElementById('emm-quick3')){
+      var q3 = document.createElement('div');
+      q3.className = 'emm-quick3';
+      q3.id = 'emm-quick3';
+      q3.innerHTML = '<h3>🚀 3 步快背（只想背完一篇？跟着走）</h3>'
+        + '<ol>'
+        + '<li><b>听读 3 遍</b>——到原文逐句区，看着 .sent-en 逐句跟读，听不懂的回第 13 节查词 <button type="button" class="q3-jump" data-q3="sent">跳到原文</button></li>'
+        + '<li><b>钩子链过 2 轮</b>——看第 15 节三层钩子链：盖住原文，一钩一句往外说，卡壳看 [锚词] <button type="button" class="q3-jump" data-q3="hook">跳到钩子链</button></li>'
+        + '<li><b>复述打卡毕业</b>——点复习条「▶ 开始本轮」评顺/卡，薄弱句连顺 3 轮即毕业 <button type="button" class="q3-jump" data-q3="round">跳到复习条</button></li>'
+        + '</ol>'
+        + '<div class="q3-more">只用这 3 步就能背完一篇；其余章节已折叠，点右上角「≡ 进阶内容」按需展开。卡壳急救技巧见第 16 节复述技巧包。</div>';
+      header.parentNode.insertBefore(q3, header.nextSibling);
+      function jumpTo(sel, fallbackText){
+        var el = document.querySelector(sel);
+        if(!el && fallbackText){
+          var h2s = document.querySelectorAll('h2');
+          for(var i = 0; i < h2s.length; i++){
+            if(h2s[i].textContent.indexOf(fallbackText) >= 0){ el = h2s[i]; break; }
+          }
+        }
+        if(el && typeof el.scrollIntoView === 'function') el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      q3.querySelectorAll('.q3-jump').forEach(function(btn){
+        btn.addEventListener('click', function(){
+          var t = btn.getAttribute('data-q3');
+          if(t === 'sent') jumpTo('.sent', '逐句');
+          else if(t === 'hook') jumpTo('.hook-chain', '记忆钩子');
+          else jumpTo('.rv-bar', '');
+        });
+      });
+    }
+  } catch(e){}
+
+  // 3. 能力探测横幅：TTS / 录音 / 存储不可用时显式告知 + 替代做法（替代静默 try/catch 降级）
+  try {
+    var dismissed = false;
+    try { dismissed = localStorage.getItem('emm-cap-dismissed') === '1'; } catch(e){}
+    if(!dismissed){
+      var caps = [];
+      var hasTTS = ('speechSynthesis' in window) && typeof window.speechSynthesis !== 'undefined';
+      var hasRec = typeof window.MediaRecorder !== 'undefined';
+      var hasGum = !!(navigator.mediaDevices && navigator.mediaDevices.getUserMedia);
+      var secure = (window.isSecureContext !== false); // file:// 在 Safari 下 getUserMedia 失败
+      var hasStore = (function(){ try { localStorage.setItem('emm-cap-probe', '1'); localStorage.removeItem('emm-cap-probe'); return true; } catch(e){ return false; } })();
+      var hasSR = !!(window.SpeechRecognition || window.webkitSpeechRecognition);
+      if(!hasTTS) caps.push(['🎧 听写 / 朗读', '当前浏览器不支持语音合成（speechSynthesis），听写模式不发声', '替代：自己朗读 + 对照原文；用第 11 节挖空自测验证记效果。']);
+      if(!hasRec || !hasGum) caps.push(['🎙️ 影子跟读', '当前浏览器不支持录音（MediaRecorder / getUserMedia）', '替代：第 16 节「⑨ 录音自查法」——用手机录音机录背诵回放，对照原文挑 3 个卡壳点专练。']);
+      else if(!secure) caps.push(['🎙️ 影子跟读', '当前页面非安全上下文（本地 file:// 在 Safari 下禁用麦克风）', '替代：用 Chrome/Edge 打开，或起本地服务（如 npm run preview）再开；也可用手机录音机。']);
+      if(!hasSR) caps.push(['🤖 影子跟读自动评分', '当前浏览器不支持语音识别（SpeechRecognition，Chrome / Edge 支持）', '替代：影子跟读手动自评（▶ 听原句 + 逐词点 ✓/✗），或用听写模式验证辨音。']);
+      if(!hasStore) caps.push(['💾 进度保存', '当前浏览器不给本页存储（localStorage 被禁或无 file:// 存储权限）', '打卡 / 薄弱清单 / SM-2 进度无法保存：用完点「💾 导出」手动备份 JSON，换环境后「📥 导入」恢复。']);
+      if(caps.length){
+        var wrap2 = document.querySelector('.wrap');
+        if(wrap2){
+          var cap = document.createElement('div');
+          cap.className = 'emm-cap';
+          cap.id = 'emm-cap';
+          var html = '<h3>⚠️ 当前环境能力提示（' + caps.length + ' 项互动不可用）</h3><ul>';
+          caps.forEach(function(c){ html += '<li><b>' + c[0] + '</b>不可用：' + c[1] + '。<b>替代做法</b>：' + c[2] + '</li>'; });
+          html += '</ul><button type="button" class="cap-dismiss">知道了（本设备不再提示）</button>';
+          cap.innerHTML = html;
+          var q3El = document.getElementById('emm-quick3');
+          if(q3El && q3El.parentNode) q3El.parentNode.insertBefore(cap, q3El.nextSibling);
+          else wrap2.insertBefore(cap, wrap2.firstChild);
+          cap.querySelector('.cap-dismiss').addEventListener('click', function(){
+            try { localStorage.setItem('emm-cap-dismissed', '1'); } catch(e){}
+            cap.remove();
+          });
+        }
+      }
+    }
+  } catch(e){}
+
+  // 4. 记忆宫殿路线引导：首次使用引导定义个人 25 站动线并持久化；
+  //    之后每篇方案自动套用（换篇不用重记路线），可随时重新定义
+  try {
+    var stops = document.querySelectorAll('.palace-stop');
+    if(stops.length){
+      var ROUTE_KEY = 'emm-palace-route';
+      function readRoute(){
+        try {
+          var raw = localStorage.getItem(ROUTE_KEY);
+          if(!raw) return null;
+          var arr = JSON.parse(raw);
+          return Array.isArray(arr) ? arr : null;
+        } catch(e){ return null; }
+      }
+      function applyRoute(route){
+        if(!route) return;
+        for(var i = 0; i < stops.length && i < route.length; i++){
+          var name = String(route[i] || '').trim();
+          if(!name) continue;
+          var el = stops[i].querySelector('.st-name');
+          if(el) el.textContent = name;
+        }
+      }
+      // 4a. 已保存的路线：静默套用
+      applyRoute(readRoute());
+      // 4b. 宫殿区常驻管理入口（§17 卡片内）
+      var palaceCard = stops[0].closest('.card');
+      if(palaceCard && !palaceCard.querySelector('.emm-palace-manage')){
+        var manage = document.createElement('p');
+        manage.className = 'emm-palace-manage';
+        manage.style.cssText = 'font-size:12.5px;color:#6b7280;margin:8px 0 0;';
+        manage.innerHTML = '🏛 站点名用的是<b>你本机的个人路线</b>（换电脑/换浏览器不跟着走）。<button type="button" class="emm-palace-edit" style="background:#fff;border:1px solid #8b5cf6;border-radius:8px;padding:1px 10px;cursor:pointer;font-size:12px;font-weight:600;color:#6d28d9;margin-left:6px;font-family:inherit;">✏️ 重新定义我的路线</button>';
+        palaceCard.appendChild(manage);
+      }
+      function openEditor(){
+        var old = document.getElementById('emm-palace-editor');
+        if(old){ old.remove(); }
+        // 打开编辑器时确保 §17 可见（新用户默认折叠进阶章节）
+        document.body.classList.remove('emm-folded');
+        try { localStorage.setItem('emm-fold-state', '0'); } catch(e){}
+        var cur = readRoute() || Array.prototype.map.call(stops, function(s){ var n = s.querySelector('.st-name'); return n ? n.textContent.trim() : ''; });
+        var ed = document.createElement('div');
+        ed.className = 'emm-palace-editor';
+        ed.id = 'emm-palace-editor';
+        ed.innerHTML = '<h3>🏛 我的记忆宫殿路线（' + stops.length + ' 站）</h3>'
+          + '<p style="font-size:13px;color:#6b7280;margin-bottom:8px;">每行一个站点名，按你每天真实的动线排（如：家门 → 鞋柜 → 客厅沙发 → 茶几 → 电视柜 → 书桌 ……）。保存后所有方案的宫殿都会套用这条路线。</p>'
+          + '<textarea class="emm-palace-ta" rows="8" style="width:100%;box-sizing:border-box;font-size:13px;line-height:1.7;padding:8px;border:1px solid #c4b5fd;border-radius:8px;font-family:inherit;">' + cur.map(function(s){ return String(s).replace(/</g, '&lt;'); }).join('\n') + '</textarea>'
+          + '<div style="margin-top:8px;">'
+          + '<button type="button" class="emm-palace-save" style="background:#7c3aed;border:none;border-radius:8px;padding:5px 16px;cursor:pointer;font-size:13px;font-weight:600;color:#fff;font-family:inherit;">💾 保存路线</button> '
+          + '<button type="button" class="emm-palace-reset" style="background:#fff;border:1px solid #d1d5db;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:12.5px;color:#374151;margin-left:6px;font-family:inherit;">恢复模板默认</button> '
+          + '<button type="button" class="emm-palace-cancel" style="background:#fff;border:1px solid #d1d5db;border-radius:8px;padding:5px 12px;cursor:pointer;font-size:12.5px;color:#374151;margin-left:6px;font-family:inherit;">取消</button>'
+          + '</div>';
+        var host = palaceCard || document.querySelector('.wrap');
+        if(host) host.appendChild(ed);
+        ed.querySelector('.emm-palace-cancel').addEventListener('click', function(){ ed.remove(); });
+        ed.querySelector('.emm-palace-reset').addEventListener('click', function(){
+          try { localStorage.removeItem(ROUTE_KEY); } catch(e){}
+          location.reload();
+        });
+        ed.querySelector('.emm-palace-save').addEventListener('click', function(){
+          var lines = ed.querySelector('.emm-palace-ta').value.split('\n').map(function(s){ return s.trim(); }).filter(Boolean);
+          if(!lines.length){ alert('至少填写 1 个站点名。'); return; }
+          try { localStorage.setItem(ROUTE_KEY, JSON.stringify(lines)); } catch(e){}
+          applyRoute(lines);
+          ed.remove();
+          var tipEl = document.getElementById('emm-palace-onboard');
+          if(tipEl) tipEl.remove();
+          alert('✅ 路线已保存（' + lines.length + ' 站），本篇及以后的方案都会套用。');
+        });
+      }
+      document.querySelectorAll('.emm-palace-edit').forEach(function(b){
+        b.addEventListener('click', openEditor);
+      });
+      // 4c. 首次访问引导条（无路线且未关闭过时）——插在首屏快背卡之后，避免被进阶折叠藏掉
+      var dismissed = false;
+      try { dismissed = localStorage.getItem('emm-palace-onboard-dismissed') === '1'; } catch(e){}
+      if(!readRoute() && !dismissed){
+        var wrap3 = document.querySelector('.wrap');
+        var q3El2 = document.getElementById('emm-quick3');
+        if(wrap3){
+          var tip = document.createElement('div');
+          tip.className = 'emm-palace-onboard';
+          tip.id = 'emm-palace-onboard';
+          tip.innerHTML = '🏛 <b>第一次见记忆宫殿？</b>25 站动线不必死记模板示例——换成你每天走的真实路线（家门→沙发→书桌→床），记忆强度更高，且一次定义、所有方案通用。'
+            + '<div style="margin-top:6px;">'
+            + '<button type="button" class="emm-palace-go" style="background:#7c3aed;border:none;border-radius:8px;padding:4px 14px;cursor:pointer;font-size:12.5px;font-weight:600;color:#fff;font-family:inherit;">✏️ 花 1 分钟定义我的路线</button>'
+            + '<button type="button" class="emm-palace-skip" style="background:#fff;border:1px solid #d1d5db;border-radius:8px;padding:4px 12px;cursor:pointer;font-size:12.5px;color:#374151;margin-left:6px;font-family:inherit;">先用模板默认路线</button>'
+            + '</div>';
+          if(q3El2 && q3El2.parentNode) q3El2.parentNode.insertBefore(tip, q3El2.nextSibling);
+          else wrap3.insertBefore(tip, wrap3.firstChild);
+          tip.querySelector('.emm-palace-go').addEventListener('click', openEditor);
+          tip.querySelector('.emm-palace-skip').addEventListener('click', function(){
+            try { localStorage.setItem('emm-palace-onboard-dismissed', '1'); } catch(e){}
+            tip.remove();
+          });
+        }
+      }
+    }
+  } catch(e){}
+})();
+</script>
+
+</body>
+</html>
