@@ -7,7 +7,7 @@
 Paste any English article, and it produces a complete memorization plan (**15 sections** regular · **16** speech incl. skeleton · **17** longform incl. segment dashboard; self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.39.0-blue)
+![Version](https://img.shields.io/badge/version-2.40.0-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-15-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -43,7 +43,7 @@ sentence-by-sentence linking marks, hooks welded into question chains, a retelli
 | 📅 | **Today card** | Per-segment Ebbinghaus computes today's work; "set as today's new" reshuffles |
 | 🌐 | **Online samples** | Try before installing: real generated plans on GitHub Pages — check-in / dictation / shadowing, just open |
 | 🗣 | **Chat drill protocol** | One question at a time, reveal only after you answer, three-level honest grading; debrief names your weakest sentence + next due date |
-| 🧪 | **762 automated tests** | Smoke + runtime + 35-step E2E + browser matrix + perf boundary + optional real-browser suite + SKILL.md/installer/platform-drift/SM-2/FSRS scheduling contracts, one `npm test` |
+| 🧪 | **778 automated tests** | Smoke + runtime + 35-step E2E + browser matrix + perf boundary + optional real-browser suite + SKILL.md/installer/platform-drift/SM-2/FSRS scheduling/Feynman mode contracts, one `npm test` |
 | 🚦 | **Delivery gate** | `node bin/verify-plan.mjs` runs six hard rules before delivery — non-zero exit blocks it |
 | 🔒 | **Collapsed self-tests** | Fill the blanks first; answers hide behind "▶ 查看本段答案" toggles, auto-hidden when printing |
 | 🖥 | **16+ platforms, one command** | Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi / MiniMax… |
@@ -224,6 +224,8 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 **v2.39.0**: 🧮 one-click FSRS-5 scheduling — `01b-fsrs.js` is a line-by-line port of ts-fsrs v6.0.0's FSRS-5 (19-parameter DSR model, ~20% fewer reviews than SM-2 at equal retention); the review bar gains a 🧮 SM-2 ↔ FSRS toggle with heuristic bidirectional state migration, SM-2 stays the default; qa-v239 locks mathematical equivalence with 7 golden-value groups measured against real ts-fsrs (±1e-6). Total tests **762**.
 
+**v2.40.0**: 🎤 segment-level Feynman mode — three-question deep-dive (plain-language retell / logic bridges / new context + counterexample) → self-assessment → reveal the segment and enroll hand-picked stuck sentences into the weak list; HTML-side 🎤 button + a dialogue-side protocol chain in SKILL.md. Total tests **778**.
+
 **Installer fix & executable-chain cleanup** (v2.37.1)
 
 **v2.37.1**: 🔧 fixed a real bug — all three installers omitted `assets/library-template.html`, so "build my memory library" always failed for one-command / npx / offline-bundle installs (the release zip did contain it, but tests only checked the zip, never the installed directory); `bin/install.mjs` now uses a single file manifest, plus an 8-assertion contract test that actually runs the installer. 🗣 the chat-drill due-first chain was unexecutable (the host agent cannot read browser `localStorage`); it is now a **static default** (zero-dependency, works on L1/L2/L3) plus an **optional dynamic tier** triggered when the user pastes exported progress JSON, with a new 7th "capability honesty" rule. 🔄 all 7 L2 platform adapters now carry the drill protocol and review-discipline rules, guarded by a new drift gate. 🧠 SM-2 "standard" is explicitly labeled a **visualization mode, not a scheduler** (graduation still follows the light-mode streak rule). Also aligned the stale library-template header version (stuck since v2.30.0). Total tests **691**.
@@ -396,7 +398,7 @@ Progress is saved in the browser `localStorage`: **it is isolated per browser an
 - Install sources default to `raw.githubusercontent.com` and jsDelivr; if your network is unreliable, use a reachable mirror or an offline package.
 
 ### Output quality depends on the host model
-Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 762 tests cover the **template and runtime**, not the quality of any specific model's generated content.
+Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 778 tests cover the **template and runtime**, not the quality of any specific model's generated content.
 
 ### Who this is NOT for
 - Absolute beginners who want a 5-minute quick-memorize flow (this method is methodology-heavy with a higher onboarding cost).

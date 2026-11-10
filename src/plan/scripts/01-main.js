@@ -192,6 +192,7 @@
       + '<button type="button" class="rv-btn rv-srmode" title="轻量：连顺 2 轮毕业；标准：SM-2 间隔">📚 轻量</button>'
       + '<button type="button" class="rv-btn rv-goal" title="薄弱句毕业所需的连顺轮次（点切换 2/3/4/5）">🎯 连顺 3 轮</button>'
       + '<button type="button" class="rv-btn rv-algo" title="复习调度算法：SM-2（默认）↔ FSRS-5。切换会按启发式转换现有排期状态">🧮 SM-2</button>'
+      + '<button type="button" class="rv-btn rv-feynman" title="段级费曼追问：三连深挖 → 自评 → 卡句点名入薄弱（需该段阶梯打到 L4 解锁 L5）">🎤 Feynman</button>'
       + '<span class="rv-stat rv-count"></span>'
       + '<button type="button" class="rv-btn rv-export" title="导出当前进度为 JSON 文件（换浏览器 / 换电脑迁移用）">💾 导出</button>'
       + '<button type="button" class="rv-btn rv-anki" title="导出挖空卡 + 复述卡为 CSV（Anki / Excel 可直接导入）">🗂 Anki</button>'
@@ -233,6 +234,8 @@
       renderAlgo();
       renderDash();
     });
+    // v2.40.0：段级费曼追问模式（三连深挖 → 自评 → 卡句点名入薄弱）
+    bar.querySelector('.rv-feynman').addEventListener('click', startFeynman);
     bar.querySelector('.rv-export').addEventListener('click', exportProgress);
     // v2.29.0：Anki 导出按钮接线
     if(bar.querySelector('.rv-anki')) bar.querySelector('.rv-anki').addEventListener('click', exportAnki);
@@ -252,6 +255,93 @@
     renderRound();
     return bar;
   }
+  /* ===== v2.40.0 段级费曼追问模式（对标 /learn teach-back；纯前端引导，无 AI 依赖）=====
+     资格：段阶梯 lv ≥ 4（L5 解锁）；流程：三连追问 → 自评 → 卡段揭示原文、点名卡句入薄弱。
+     记录：state.feynman[segIdx] = { tries, passes, last }；对话版追问见 SKILL.md 陪练协议。 */
+  var feynmanState = null;
+  function startFeynman(){
+    detectSegments();
+    state.feynman = state.feynman || {};
+    var eligible = [];
+    segments.forEach(function(s, i){
+      if(((state.ladder[i] || {}).lv || 0) >= 4) eligible.push(i);
+    });
+    if(!eligible.length){ alert('还没有可 Feynman 的段落：先把某段的阶梯打到 L4（解锁 L5）再回来。'); return; }
+    var old = document.querySelector('.feynman-panel'); if(old) old.remove();
+    feynmanState = { list: eligible, pos: 0, pass: 0, stuck: 0, enrolled: 0 };
+    var panel = document.createElement('div');
+    panel.className = 'feynman-panel';
+    panel.style.cssText = 'position:fixed;right:12px;bottom:12px;z-index:9999;width:320px;max-width:92vw;background:#fff;border:2px solid #7c3aed;border-radius:12px;padding:12px;font-size:13px;box-shadow:0 8px 24px rgba(0,0,0,.2);';
+    document.body.appendChild(panel);
+    renderFeynmanStep();
+  }
+  function feynmanPrompts(segIdx){
+    var n = segments[segIdx].idxs.length;
+    return '<b>🎤 Feynman · 段 ' + segIdx + '：' + segments[segIdx].name + '（' + n + ' 句）</b>'
+      + '<ol style="margin:6px 0 6px 18px;padding:0;">'
+      + '<li>不看原文，用大白话说这段在讲什么；</li>'
+      + '<li>钩子链的逻辑桥是怎么衔接的？</li>'
+      + '<li>换个场景还成立吗？举一个反例。</li>'
+      + '</ol>'
+      + '<div style="color:#6b7280;font-size:12px;">对着空气说出来，然后自评。</div>';
+  }
+  function renderFeynmanStep(){
+    var panel = document.querySelector('.feynman-panel'); if(!panel) return;
+    if(feynmanState.pos >= feynmanState.list.length){
+      panel.innerHTML = '<b>🎤 Feynman 小结</b><br>过了 <b>' + feynmanState.pass + '</b> 段 · 卡住 <b>' + feynmanState.stuck + '</b> 段 · 新入薄弱 <b>' + feynmanState.enrolled + '</b> 句'
+        + '<br><button type="button" class="feynman-close" style="margin-top:8px;padding:4px 12px;border:1px solid currentColor;background:transparent;border-radius:6px;cursor:pointer;">关闭</button>';
+      panel.querySelector('.feynman-close').addEventListener('click', closeFeynman);
+      save(state); applyJudgeState(); renderDash();
+      return;
+    }
+    var segIdx = feynmanState.list[feynmanState.pos];
+    panel.innerHTML = feynmanPrompts(segIdx)
+      + '<div style="margin-top:8px;display:flex;gap:6px;flex-wrap:wrap;">'
+      + '<button type="button" class="feynman-pass" style="padding:4px 10px;border:1px solid #16a34a;background:#dcfce7;border-radius:6px;cursor:pointer;">✅ 过了</button>'
+      + '<button type="button" class="feynman-stuck" style="padding:4px 10px;border:1px solid #dc2626;background:#fee2e2;border-radius:6px;cursor:pointer;">❌ 卡住了</button>'
+      + '<button type="button" class="feynman-skip" style="padding:4px 10px;border:1px solid #9ca3af;background:transparent;border-radius:6px;cursor:pointer;">⏭ 跳过</button>'
+      + '</div><div class="feynman-chips" style="margin-top:8px;"></div><div style="margin-top:6px;color:#6b7280;font-size:12px;">第 ' + (feynmanState.pos + 1) + ' / ' + feynmanState.list.length + ' 段</div>';
+    panel.querySelector('.feynman-pass').addEventListener('click', function(){
+      var rec = state.feynman[segIdx] || { tries: 0, passes: 0, last: '' };
+      rec.tries++; rec.passes++; rec.last = todayKey();
+      state.feynman[segIdx] = rec; save(state);
+      feynmanState.pos++; feynmanState.pass++; renderFeynmanStep();
+    });
+    panel.querySelector('.feynman-skip').addEventListener('click', function(){
+      feynmanState.pos++; renderFeynmanStep();
+    });
+    panel.querySelector('.feynman-stuck').addEventListener('click', function(){
+      var chips = panel.querySelector('.feynman-chips');
+      chips.innerHTML = '点选卡住的句子：' + segments[segIdx].idxs.map(function(idx){
+        var t = sentences[idx] && sentences[idx].node ? sentences[idx].node.textContent.trim().slice(0, 26) : ('句' + idx);
+        return '<button type="button" class="feynman-chip" data-idx="' + idx + '" style="margin:2px;padding:3px 8px;border:1px solid #9ca3af;background:#fff;border-radius:6px;cursor:pointer;font-size:12px;">' + idx + '. ' + t + '…</button>';
+      }).join('')
+        + '<br><button type="button" class="feynman-enroll" style="margin-top:6px;padding:4px 10px;border:1px solid #dc2626;background:#fee2e2;border-radius:6px;cursor:pointer;">确认入薄弱</button>';
+      chips.querySelectorAll('.feynman-chip').forEach(function(ch){
+        ch.addEventListener('click', function(){
+          ch.classList.toggle('feynman-chip-on');
+          ch.style.background = ch.classList.contains('feynman-chip-on') ? '#fecaca' : '#fff';
+        });
+      });
+      chips.querySelector('.feynman-enroll').addEventListener('click', function(){
+        var picked = chips.querySelectorAll('.feynman-chip-on');
+        if(!picked.length){ alert('先点选至少一句卡住的句子（或返回点「✅ 过了」）。'); return; }
+        picked.forEach(function(ch){
+          var idx = +ch.getAttribute('data-idx');
+          state.weak[idx] = true; state.streak[idx] = 0; feynmanState.enrolled++;
+        });
+        var rec = state.feynman[segIdx] || { tries: 0, passes: 0, last: '' };
+        rec.tries++; rec.last = todayKey();
+        state.feynman[segIdx] = rec; save(state);
+        feynmanState.pos++; feynmanState.stuck++; renderFeynmanStep();
+      });
+    });
+  }
+  function closeFeynman(){
+    var panel = document.querySelector('.feynman-panel'); if(panel) panel.remove();
+    feynmanState = null;
+  }
+
   // v2.24：智能跳转 — 根据用户当前状态决定先做哪件事
   function smartJumpToday(){
     // 优先级：薄弱 > 待复习轮 > 待升级阶梯 > 首次打卡 > 听写 > 挖空

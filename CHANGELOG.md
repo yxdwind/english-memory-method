@@ -4,6 +4,11 @@
 > `SKILL.md` 正文已于 v2.28.2 后"剥离变更日志"——只保留行为规则,版本噪音迁出至此,以减少生成上下文占用。
 > 章节编号以 `assets/plan-template.html` 的 h2 顺序为唯一真相源(记忆钩子=15 / 复述技巧包=16 / 记忆宫殿=17)。
 
+## [2.40.0] (段级费曼追问模式 · 2026-11-10)
+- **🎤 Feynman 模式（HTML 侧）**：复习条新增「🎤 Feynman」按钮（对标调研 #2，/learn skill 的 teach-back 循环）——资格=段阶梯 lv≥4（L5 解锁）；三连追问（大白话复述 / 钩子链逻辑桥 / 换场景+反例）→ 自评「过了/卡住了」→ 卡段揭示原文、**点名具体卡句入薄弱**（不是整段入）→ 全部段走完出小结（过了/卡住/新入薄弱句数）；记录 state.feynman[segIdx]={tries,passes,last}。纯前端引导，无 AI 依赖。
+- **对话版 Feynman 深挖**：SKILL.md 陪练协议新增段级三连追问链（对话侧只列句号不落盘，与「陪练不写 localStorage」分工一致）；HTML 与对话双轨互补。
+- **测试**：总测试数 **778**（+16，29 套件；qa-v240 16 项）。
+
 ## [2.39.0] (FSRS-5 调度一键切换 · 2026-11-10)
 - **FSRS-5 调度核心（EMM_FSRS_V239）**：`src/plan/scripts/01b-fsrs.js` 逐公式移植 open-spaced-repetition/ts-fsrs v6.0.0 models/fsrs-5（MIT）——19 个默认参数、DSR 三变量、遗忘曲线 R(t,S)=(1+FACTOR·t/S)^-0.5、同日复习 short-term 分支、Again 稳定度下限钳制，全部与 ts-fsrs 输出 ±1e-6 一致（qa-v239 固化 7 组黄金值）。
 - **一键切换**：复习条新增「🧮 SM-2 ↔ 🧮 FSRS」按钮（confirm 确认），`switchAlgo` 按启发式双向迁移既有状态（ef→D/S、S→interval），空壳种子清理；FSRS 模式下轻量/标准档的 Ebbinghaus 对齐跳过（FSRS 自管排期）；评分映射 顺=Good(3)、卡=Again(1)。默认仍为 SM-2，行为零变化。
