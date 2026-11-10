@@ -128,6 +128,8 @@
     if(!sentences.length) return;
 
     checkFingerprint();
+    // v2.38.0：标准模式打开页面即把 SM-2 到期句回炉 weak（跨天不需要先打一轮卡）
+    syncDueIntoWeak();
     detectSegments();
     buildRoundBar();
     buildDashboard();
@@ -189,6 +191,7 @@
       + '<button type="button" class="rv-btn rv-shadow-btn">🎙️ 影子跟读</button>'
       + '<button type="button" class="rv-btn rv-srmode" title="轻量：连顺 2 轮毕业；标准：SM-2 间隔">📚 轻量</button>'
       + '<button type="button" class="rv-btn rv-goal" title="薄弱句毕业所需的连顺轮次（点切换 2/3/4/5）">🎯 连顺 3 轮</button>'
+      + '<button type="button" class="rv-btn rv-algo" title="复习调度算法：SM-2（默认）↔ FSRS-5。切换会按启发式转换现有排期状态">🧮 SM-2</button>'
       + '<span class="rv-stat rv-count"></span>'
       + '<button type="button" class="rv-btn rv-export" title="导出当前进度为 JSON 文件（换浏览器 / 换电脑迁移用）">💾 导出</button>'
       + '<button type="button" class="rv-btn rv-anki" title="导出挖空卡 + 复述卡为 CSV（Anki / Excel 可直接导入）">🗂 Anki</button>'
@@ -214,6 +217,21 @@
       renderDash();
       // v2.20 SR hook：通知 SR IIFE 重新对齐 Ebbinghaus
       if(typeof __emmDispatch === 'function') __emmDispatch('modeChange');
+      // v2.38.0：切到标准模式时立刻把到期句回炉（不必等下一轮或刷新）
+      state = loadState();
+      syncDueIntoWeak();
+      renderGoal(); renderDash(); applyJudgeState(); renderRound();
+    });
+    // v2.39.0：调度算法切换（SM-2 ↔ FSRS-5），状态转换在 02-sr 的 switchAlgo
+    bar.querySelector('.rv-algo').addEventListener('click', function(){
+      var next = (EMMSR.currentAlgo() === 'fsrs') ? 'sm2' : 'fsrs';
+      var msg = next === 'fsrs'
+        ? '切换到 FSRS-5 调度？\n· 现有 SM-2 排期将按启发式转换为 FSRS 状态（难度 D / 稳定度 S）\n· 之后「下次复习」由 FSRS 决定，轻量/标准档的连顺规则不再驱动排期\n· 随时可切回 SM-2'
+        : '切回 SM-2 调度？\n· 现有 FSRS 状态将按启发式转回 ef/interval';
+      if(!confirm(msg)) return;
+      EMMSR.switchAlgo(next);
+      renderAlgo();
+      renderDash();
     });
     bar.querySelector('.rv-export').addEventListener('click', exportProgress);
     // v2.29.0：Anki 导出按钮接线
@@ -229,6 +247,7 @@
     });
     wireQuiz();
     renderSrMode();
+    renderAlgo();
     renderGoal();
     renderRound();
     return bar;
@@ -278,13 +297,27 @@
     var b = document.querySelector('.rv-srmode'); if(!b) return;
     var m = state.srMode || 'light';
     b.textContent = m === 'standard' ? '🧠 标准' : '📚 轻量';
-    b.title = m === 'standard' ? 'SM-2 算法升级（Wozniak 1990）：按 ef/interval 调度复习' : '连顺 ' + (state.streakToGoal || 3) + ' 轮毕业规则';
+    b.title = m === 'standard'
+      ? 'SM-2 调度（Wozniak 1990）：到期句自动回炉薄弱清单，评「顺」按 ef/interval 排期毕业'
+      : '连顺 ' + (state.streakToGoal || 3) + ' 轮毕业规则';
+  }
+  function renderAlgo(){
+    var b = document.querySelector('.rv-algo'); if(!b) return;
+    var p = (typeof EMMProgressStore !== 'undefined') ? EMMProgressStore.load() : {};
+    var algo = (p.srAlgo === 'fsrs') ? 'fsrs' : 'sm2';
+    b.textContent = algo === 'fsrs' ? '🧮 FSRS' : '🧮 SM-2';
+    b.title = algo === 'fsrs'
+      ? 'FSRS-5 调度（DSR 三变量，请求保持率 90%）——点切回 SM-2'
+      : 'SM-2 调度（Wozniak 1990，默认）——点切换到 FSRS-5';
   }
   function renderGoal(){
     var b = document.querySelector('.rv-goal'); if(!b) return;
     var g = state.streakToGoal || 3;
+    var isStd = state.srMode === 'standard';
     b.textContent = '🎯 连顺 ' + g + ' 轮';
-    b.title = '薄弱句需连顺 ' + g + ' 轮才自动毕业（点切换 2/3/4/5）';
+    // v2.38.0：标准模式由 SR 驱动，连顺阈值不生效——禁用并说明，避免误导
+    b.disabled = isStd;
+    b.title = isStd ? '标准模式由 SM-2 到期驱动，连顺阈值不生效（切回轻量档可配置）' : '薄弱句需连顺 ' + g + ' 轮才自动毕业（点切换 2/3/4/5）';
     var sb = document.querySelector('.rv-srmode');
     if(sb && state.srMode !== 'standard'){
       sb.title = '连顺 ' + g + ' 轮毕业规则';
@@ -493,13 +526,23 @@
     // 3. reload 拿到 SR 的 sr；再 apply 本轮的 mode/rounds/weak/streak mutations
     state = loadState();
     state.mode = false;
+    var isStd = state.srMode === 'standard';
     Object.keys(doneSnapshot).forEach(function(k){
-      if(doneSnapshot[k] === 'ok'){
+      if(isStd){
+        // v2.38.0：标准模式由 SM-2 驱动——「顺」已由 srNext 排期到未来，直接毕业；
+        // 「卡」留在 weak；到期句随后由 syncDueIntoWeak 统一回炉。streakToGoal 不参与。
+        if(doneSnapshot[k] === 'ok'){
+          delete state.weak[k]; delete state.streak[k]; delete state.done[k];
+        } else {
+          state.weak[k] = true; state.streak[k] = 0;
+        }
+      } else if(doneSnapshot[k] === 'ok'){
         if(state.weak[k]){ state.streak[k] = (state.streak[k] || 0) + 1; if(state.streak[k] >= goal){ delete state.weak[k]; delete state.streak[k]; delete state.done[k]; } }
       } else {
         state.weak[k] = true; state.streak[k] = 0;
       }
     });
+    if(isStd) syncDueIntoWeak();
     state.rounds.push(round);
     state.done = {};
     save(state);
@@ -570,7 +613,8 @@
       }).join(' · ') + '</div>';
     }
     if(weakList.length){
-      html += '<div style="margin-top:6px;"><b>🎯 薄弱句清单</b>（连顺 2 轮自动毕业）：<br>'
+      html += '<div style="margin-top:6px;"><b>🎯 薄弱句清单</b>'
+        + (isStd ? '（标准模式：SM-2 到期自动回炉，评「顺」按 ef/interval 排期毕业）' : '（连顺 2 轮自动毕业）') + '：<br>'
         + weakList.map(function(idx){
           var txt = sentences[idx].text.slice(0, 60);
           return '<a href="#" data-jump="' + idx + '" style="color:#b91c1c;text-decoration:none;display:block;padding:2px 0;">#' + (idx+1) + ' ' + txt + (sentences[idx].text.length > 60 ? '…' : '') + '</a>';
@@ -790,6 +834,31 @@
   }
   function diffDays(a, b){ return Math.round((b - a) / 86400000); }
   function addDays(d, n){ return new Date(d.getFullYear(), d.getMonth(), d.getDate() + n); }
+
+  /* ===== v2.38.0 EMM_SR_SCHED_V238: SM-2 真正驱动调度 =====
+     标准模式下 state.weak 语义 = 「刚评卡的句」∪「SM-2 到期句」；
+     评「顺」由 SR 排期到未来即从 weak 毕业（不再靠连顺 N 轮），到期自动回炉。
+     复用 weak 作为下游总线，快刷 / 宫殿红站 / 仪表盘 / 听写 / 影子跟读零改动。
+     轻量模式完全不走这一层，行为与 v2.37 逐字一致。 */
+  function srDueKeys(){
+    if(!window.EMMSR || !window.EMMSR.dueKeys) return [];
+    return window.EMMSR.dueKeys(state.sr || {}, todayKey());
+  }
+  function validDueCount(){
+    return srDueKeys().filter(function(k){ var n = +k; return n >= 0 && n < sentences.length; }).length;
+  }
+  // 把到期句回炉进 weak；返回到期句数。只在标准模式生效。
+  function syncDueIntoWeak(){
+    if(state.srMode !== 'standard') return 0;
+    var changed = 0;
+    srDueKeys().forEach(function(k){
+      var n = +k;
+      if(n < 0 || n >= sentences.length) return;
+      if(!state.weak[n]){ state.weak[n] = true; state.streak[n] = 0; changed++; }
+    });
+    if(changed) save(state);
+    return validDueCount();
+  }
   function icsDate(d){
     return '' + d.getFullYear() + String(d.getMonth()+1).padStart(2,'0') + String(d.getDate()).padStart(2,'0');
   }
@@ -897,6 +966,7 @@
       + '<span class="emm-meta">开始日期 <input type="date" class="emm-start"> '
       + (segments.length > 1 ? ' · 每天新学 <select class="emm-perday"><option value="1">1 段</option><option value="2">2 段</option></select> ' : '')
       + '<button type="button" class="rv-btn emm-ics">📥 导出日历(.ics)</button></span>'
+      + '<div class="emm-meta emm-order"></div>'
       + '<table><thead><tr><th style="width:26%">段落</th><th style="width:9%">排期</th><th>今日</th><th style="width:30%">🪜 复述阶梯</th><th style="width:6%">✓</th></tr></thead>'
       + '<tbody class="emm-rows"></tbody></table>'
       + '<div class="emm-meta">🪜 点你当前能稳定复述到的级别（升级前至少隔一轮复习，跳级=假流利）；✓ 勾掉今天完成的任务。与打卡进度同存本机。</div>';
@@ -914,6 +984,13 @@
       sel.addEventListener('change', function(){ state.perDay = +sel.value; save(state); renderToday(); });
     }
     todayCard.querySelector('.emm-ics').addEventListener('click', downloadICS);
+    // v2.38.0：今日卡「SM-2 到期」直达快刷（到期句已在 weak，快刷天然可见）
+    todayCard.addEventListener('click', function(e){
+      if(!e.target.closest || !e.target.closest('.emm-due-drill')) return;
+      if(!document.body.classList.contains('emm-drill')) toggleDrill();
+      var bar = document.querySelector('.rv-bar');
+      if(bar && typeof bar.scrollIntoView === 'function') bar.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    });
     var rows = todayCard.querySelector('.emm-rows');
     rows.addEventListener('click', function(e){
       var b = e.target.closest('.emm-lv'); if(b){
@@ -977,6 +1054,34 @@
       html += '<tr><td data-l="段落">' + s.name + '</td><td data-l="排期">Day ' + learnDayOf(i) + '</td><td data-l="今日">' + segTodayHtml(i) + ' ' + setToday + '</td><td data-l="🪜 阶梯">' + btns + '</td><td data-l="✓">' + chk + '</td></tr>';
     });
     todayCard.querySelector('.emm-rows').innerHTML = html;
+    renderTodayOrder(dayN);
+  }
+  // v2.37 复习优先：显式给出今日执行顺序（借鉴 m98/fluent 的 review-before-new + interleaving）。
+  // 只加提示、不重排 tr——段号与 data-seg 的映射被多处测试与打卡逻辑依赖，重排会错位。
+  function renderTodayOrder(dayN){
+    var ord = todayCard && todayCard.querySelector('.emm-order');
+    if(!ord) return;
+    var reviews = [], learns = [];
+    segments.forEach(function(s, i){
+      var ld = learnDayOf(i);
+      if(ld === dayN) learns.push(i);
+      else if(REVIEW_OFF.some(function(r){ return ld + r[0] === dayN; })) reviews.push(i);
+    });
+    // v2.38.0：标准模式把 SR 到期句也并入今日任务（句级调度，与段级排期并存）
+    var srDue = (state.srMode === 'standard') ? validDueCount() : 0;
+    if(!reviews.length && !learns.length && !srDue){ ord.textContent = ''; return; }
+    var html = '';
+    if(reviews.length || learns.length){
+      html += '<b>⏱ 今日顺序</b>：先复习到期段（' + reviews.length + '）→ 再新学（' + learns.length + '）'
+        + (reviews.length + learns.length > 2 ? ' · 多段到期按 A→B→C→A 交错，别一段刷完再下一段' : '')
+        + ' · 复习会话短于初学会话；忘掉 20~40% 是正常甜区';
+    }
+    if(srDue){
+      html += (html ? '<br>' : '')
+        + '🧠 SM-2 今日到期 <b>' + srDue + '</b> 句（已自动进薄弱清单，评「顺」按 ef/interval 排期毕业）'
+        + ' <button type="button" class="rv-btn emm-due-drill">⚡ 开始快刷</button>';
+    }
+    ord.innerHTML = html;
   }
   function escICS(s){ return String(s).replace(/\\/g, '\\\\').replace(/([,;])/g, '\\$1'); }
   // v2.22：UTC 时间戳（spec 要求带 T 和 Z 后缀）

@@ -369,7 +369,8 @@
    - **数据 schema**：每句 `state.sr[si] = {ef, interval, reps, due, lastQ, aligned}`，`state.srMode ∈ 'light' | 'standard'`。跨 session 持久化到 localStorage。
    - **钩子设计**：self-contained SR IIFE，通过 `window.__emmDispatch('judge' | 'endRound' | 'modeChange', ...)` 接收事件；不侵入 main IIFE 的判卡与 streak 逻辑。`patchSr()` 只写 `sr` 字段（避免与 main 的 `save(state)` 写竞态）。
    - **41/41 运行时测试**：覆盖 srNext 算法（Wozniak spec 各项）、Ebbinghaus 对齐边界、UI 切换、judge/endRound 钩子集成、跨 session 持久化、重置清空。完整测试 144 + 12 + 24 + 41 = **221/221 全绿，零回归**。
-   - **未做**：标准模式下让 SR 真正替代 streak 驱动 `state.weak` 增删（目前 SR.due 与 weak 列表共存，标准模式只是「显示 SR」，未真正用 SR 替代 streak 规则）；SR.due 到期句未自动加入今日任务卡。两者留作 v2.21.0+ 迭代。
+   - ~~**未做**：标准模式下让 SR 真正替代 streak 驱动 `state.weak` 增删（目前 SR.due 与 weak 列表共存，标准模式只是「显示 SR」，未真正用 SR 替代 streak 规则）；SR.due 到期句未自动加入今日任务卡。两者留作 v2.21.0+ 迭代。~~
+   - ✅ **已闭环（v2.38.0，2026-11-09）**：标准模式改为句级调度器——`dueKeys(sr, today)` 纯函数判到期；评「顺」由 `srNext()` 排期毕业、评「卡」留清单、到期句在 init/endRound/切模式三处自动回炉 `state.weak`；今日任务卡新增「🧠 SM-2 今日到期 N 句」+ 一键快刷；「🎯 连顺 N 轮」在标准模式禁用。复用 `state.weak` 作下游总线，快刷/宫殿红站/仪表盘/听写/影子跟读零改动；轻量模式路径逐字不变，`tests/sr-scheduling.test.mjs`（29 项）用 `streakToGoal=3` 连跑 3 轮做回归护栏。设计取舍见 `SKILL.md`「SM-2 算法升级」。
 3. **教师/班级模式**——单 user 模式已经够用，但加"教师演示中 AI 帮全班生成 → 学生各自打卡 → 教师仪表盘"会打开 B 端市场（B 端学习社群/语言培训机构）。
 
 ### 3.3 一件可选做（如果有精力）

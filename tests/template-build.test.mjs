@@ -6,7 +6,7 @@
  *   b. src/library 5 个源码模块齐全
  *   c. node bin/build-template.mjs --check → plan/library 重建都必须与已提交产物逐字节一致
  *      （拦两类漂移：改了 src 忘构建；直接手改产物）
- *   d. 产物健全性：plan 7 个 script 块 + 占位符；library 2 个 script 块（store 注入 + 主脚本）
+ *   d. 产物健全性：plan 8 个 script 块 + 占位符；library 2 个 script 块（store 注入 + 主脚本）
  *   e. 双副本逐字节一致（assets ≡ skills）
  *
  * 跑：node tests/template-build.test.mjs
@@ -47,7 +47,7 @@ try {
 ok(checkOk, 'build --check：plan/library 重建 === 已提交产物（无漂移）');
 
 const plan = fs.readFileSync(path.join(ROOT, 'assets', 'plan-template.html'), 'utf8');
-ok((plan.match(/<script>/g) || []).length === 7, 'plan 产物为 7 个 script 块（00-store + 6 原有）');
+ok((plan.match(/<script>/g) || []).length === 8, 'plan 产物为 8 个 script 块（00-store + 01b-fsrs + 6 原有）');
 ok(plan.includes('{{TITLE}}'), 'plan 产物保留 {{TITLE}} 占位符');
 
 const lib = fs.readFileSync(path.join(ROOT, 'assets', 'library-template.html'), 'utf8');

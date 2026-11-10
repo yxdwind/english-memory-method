@@ -22,7 +22,7 @@ REPO="yxdwind/english-memory-method"
 BRANCH="main"
 SKILL="english-memory-method"
 RAW="https://raw.githubusercontent.com/$REPO/$BRANCH"
-FILES=("SKILL.md" "assets/plan-template.html")
+FILES=("SKILL.md" "assets/plan-template.html" "assets/library-template.html")
 
 # 本地模式：脚本所在目录即离线发布包根（含 SKILL.md/assets/）→ 直接拷贝，全程不联网
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"

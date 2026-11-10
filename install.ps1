@@ -34,7 +34,7 @@ $Repo   = "yxdwind/english-memory-method"
 $Branch = "main"
 $Skill  = "english-memory-method"
 $Raw    = "https://raw.githubusercontent.com/$Repo/$Branch"
-$Files  = @("SKILL.md", "assets/plan-template.html")
+$Files  = @("SKILL.md", "assets/plan-template.html", "assets/library-template.html")
 
 # download sources with fallback: raw -> jsdelivr CDN (China-friendly)
 $Sources = @(

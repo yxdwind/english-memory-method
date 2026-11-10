@@ -32,11 +32,21 @@ const PLATFORMS = {
   minimax: ".minimax/skills",
 };
 
+// v2.37.1：集中文件清单——SKILL.md 的「个人记忆库」流程依赖 assets/library-template.html，
+// 此前三个安装器都只装 2 个文件，导致一键安装/npx/离线包用户触发「生成记忆库」时找不到模板。
+// 新增模板时只需改这一处；tests/install-contract.test.mjs 会实跑本脚本校验产物齐全。
+const FILES = [
+  "SKILL.md",
+  "assets/plan-template.html",
+  "assets/library-template.html",
+];
+
 function installTo(dir) {
   const dest = join(dir, SKILL);
   mkdirSync(join(dest, "assets"), { recursive: true });
-  cpSync(join(PKG_ROOT, "SKILL.md"), join(dest, "SKILL.md"));
-  cpSync(join(PKG_ROOT, "assets", "plan-template.html"), join(dest, "assets", "plan-template.html"));
+  for (const rel of FILES) {
+    cpSync(join(PKG_ROOT, rel), join(dest, rel));
+  }
   return dest;
 }
 

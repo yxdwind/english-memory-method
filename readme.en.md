@@ -7,7 +7,7 @@
 Paste any English article, and it produces a complete memorization plan (**15 sections** regular · **16** speech incl. skeleton · **17** longform incl. segment dashboard; self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.36.0-blue)
+![Version](https://img.shields.io/badge/version-2.39.0-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-15-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -34,7 +34,7 @@ sentence-by-sentence linking marks, hooks welded into question chains, a retelli
 | 💎 | **Golden Patterns** | 5–9 transferable patterns per article (bold replaceable part + swappable template) — straight into your writing/speeches |
 | 🎤 | **Speech mode** | Detects the three-act skeleton (hook / argument / crescendo) with delivery guidance; question chain & ladder retooled for speeches |
 | 📜 | **Longform mode** | 500–2000 words auto-enabled: segment progress dashboard (🔒▶✅ flows with check-ins) + per-segment units + per-segment spaced review |
-| 🧠 | **SM-2 spacing** | Light/standard modes: standard tracks per-sentence ef/interval/due with overdue highlights (Wozniak 1990) |
+| 🧠 | **SM-2 / FSRS-5 dual scheduling** | Light/standard modes: standard **auto-schedules** due sentences back into the weak list and today card (one-click drill), and graduates on "OK" via ef/interval (Wozniak 1990); light mode keeps the streak rule; **🧮 one-click FSRS-5** (DSR model, ~20% fewer reviews at equal retention, heuristic state migration both ways) |
 | 🎙 | **Shadowing** | TTS playback → record & self-judge, or 🤖 speech-recognition auto-assessment; ≥25% wrong flows into the weak list |
 | 📚 | **Personal library** | All plans on one bookshelf page: search / quick-drill / live progress / today-overview / vocabulary notebook, one HTML for everything |
 | 🙈 | **Self-test modes** | Off → hide translation → hide all; tap a sentence to peek |
@@ -42,7 +42,8 @@ sentence-by-sentence linking marks, hooks welded into question chains, a retelli
 | 🛡 | **Progress fingerprint** | Plan changed? Auto-detected — progress never grafts onto the wrong version |
 | 📅 | **Today card** | Per-segment Ebbinghaus computes today's work; "set as today's new" reshuffles |
 | 🌐 | **Online samples** | Try before installing: real generated plans on GitHub Pages — check-in / dictation / shadowing, just open |
-| 🧪 | **654 automated tests** | Smoke + runtime + 35-step E2E + browser matrix + perf boundary + optional real-browser suite, one `npm test` |
+| 🗣 | **Chat drill protocol** | One question at a time, reveal only after you answer, three-level honest grading; debrief names your weakest sentence + next due date |
+| 🧪 | **762 automated tests** | Smoke + runtime + 35-step E2E + browser matrix + perf boundary + optional real-browser suite + SKILL.md/installer/platform-drift/SM-2/FSRS scheduling contracts, one `npm test` |
 | 🚦 | **Delivery gate** | `node bin/verify-plan.mjs` runs six hard rules before delivery — non-zero exit blocks it |
 | 🔒 | **Collapsed self-tests** | Fill the blanks first; answers hide behind "▶ 查看本段答案" toggles, auto-hidden when printing |
 | 🖥 | **16+ platforms, one command** | Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi / MiniMax… |
@@ -217,6 +218,20 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 > Full version history (including historical bug fixes and CI self-check anchors `EMM_*`) has been moved to [CHANGELOG.md](CHANGELOG.md).
 
+**SM-2 actually drives scheduling** (v2.38.0)
+
+**v2.38.0**: 🧠 closed the item `ANALYSIS.md §3.2` left open since v2.20 — the 🧠 standard mode is no longer a read-only ef/interval/due display, it is now a **sentence-level scheduler**: `dueKeys(sr, today)` finds overdue sentences; grading "OK" graduates a sentence as soon as `srNext()` schedules it into the future (the streak threshold no longer applies, and the 🎯 streak button is disabled in standard mode); "stuck" stays in the weak list; due sentences re-enter that list **on open / end-of-round / switching to standard** and surface in the today card as "🧠 SM-2 due today: N" with a one-click drill. `state.weak` is reused as the downstream bus, so quick-drill / palace red stations / dashboard / dictation / shadowing and segment-level `REVIEW_OFF` scheduling need zero changes; **light-mode behavior is byte-identical**, guarded by a new 29-assertion `sr-scheduling` suite (including a 3-round `streakToGoal=3` regression). Total tests **721**.
+
+**v2.39.0**: 🧮 one-click FSRS-5 scheduling — `01b-fsrs.js` is a line-by-line port of ts-fsrs v6.0.0's FSRS-5 (19-parameter DSR model, ~20% fewer reviews than SM-2 at equal retention); the review bar gains a 🧮 SM-2 ↔ FSRS toggle with heuristic bidirectional state migration, SM-2 stays the default; qa-v239 locks mathematical equivalence with 7 golden-value groups measured against real ts-fsrs (±1e-6). Total tests **762**.
+
+**Installer fix & executable-chain cleanup** (v2.37.1)
+
+**v2.37.1**: 🔧 fixed a real bug — all three installers omitted `assets/library-template.html`, so "build my memory library" always failed for one-command / npx / offline-bundle installs (the release zip did contain it, but tests only checked the zip, never the installed directory); `bin/install.mjs` now uses a single file manifest, plus an 8-assertion contract test that actually runs the installer. 🗣 the chat-drill due-first chain was unexecutable (the host agent cannot read browser `localStorage`); it is now a **static default** (zero-dependency, works on L1/L2/L3) plus an **optional dynamic tier** triggered when the user pastes exported progress JSON, with a new 7th "capability honesty" rule. 🔄 all 7 L2 platform adapters now carry the drill protocol and review-discipline rules, guarded by a new drift gate. 🧠 SM-2 "standard" is explicitly labeled a **visualization mode, not a scheduler** (graduation still follows the light-mode streak rule). Also aligned the stale library-template header version (stuck since v2.30.0). Total tests **691**.
+
+**Evidence-based scheduling & chat drill** (v2.37.0)
+
+**v2.37.0**: 🗣 Read 8 comparable GitHub skills (with A/B/C credibility ratings and URLs) and filled the methodology gaps — new **chat drill protocol** (one question at a time / reveal only after answering / three-level honest grading / source files as sole ground truth / due-first / three-item debrief, closing the assessment gap), **7 review-discipline rules** (review before new learning / daily new-item cap / interleaving / forgetting sweet spot / honest grading / scoring discipline), **burnout detection & method-switch threshold** (after 3 rounds below 60% retention, re-weld the hook chain instead of repeating a 4th time), and an **L5 Feynman check**. The 639-char feature-dump description became a 220-char trigger-first one; the today card gained a "⏱ today's order" hint (rows deliberately not reordered); the footer version stamp, stale since v2.30.0, now tracks `package.json`. New 16-assertion SKILL.md contract gate. Total tests **670**.
+
 **Architecture review, batch 5** (v2.33.0)
 
 **v2.33.0**: 🏗 library-template source split — the 40KB monolith source now lives as 5 modules under src/library/; build-template becomes a dual-template builder (plan + library, each dual-written to both copies, --check validates both); purely mechanical — the artifact is byte-identical (CRLF endings preserved). Total tests **639**.
@@ -374,12 +389,14 @@ Self-test, dictation, and shadowing rely on `speechSynthesis` / `MediaRecorder` 
 
 Progress is saved in the browser `localStorage`: **it is isolated per browser and per profile** — if you check in on Chrome and then open the plan in Edge (or on another machine), progress shows empty; that is not data loss. The official migration path is the plan page's 💾/📥 JSON export/import. Safari / iOS have smaller quotas and may fail to write when many plans accumulate (handled with `try/catch`; export backups regularly). **Recommended: stick to one desktop browser for all check-ins; mobile is limited.**
 
+**Chat drill cannot read local progress**: the conversation is isolated from the browser page, so the AI **cannot read `localStorage`** — by default it quizzes from the plan file's content. Only when you paste the 💾-exported JSON or a weak-sentence list into the chat does it switch to due-first ordering. 🧠 standard SM-2 scheduling runs **inside that HTML page only** (synced on open / end-of-round / switching to standard); it does not cross browsers or devices and does not push to your system calendar — use 💾/📥 JSON export/import for that.
+
 ### Install & network
 - One-line install executes a remote script (`irm | iex` / `curl | bash`). In security-sensitive environments, **download and review the script first**, or use `npx` / the plugin marketplace.
 - Install sources default to `raw.githubusercontent.com` and jsDelivr; if your network is unreliable, use a reachable mirror or an offline package.
 
 ### Output quality depends on the host model
-Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 654 tests cover the **template and runtime**, not the quality of any specific model's generated content.
+Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 762 tests cover the **template and runtime**, not the quality of any specific model's generated content.
 
 ### Who this is NOT for
 - Absolute beginners who want a 5-minute quick-memorize flow (this method is methodology-heavy with a higher onboarding cost).

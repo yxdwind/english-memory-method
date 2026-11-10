@@ -4,6 +4,38 @@
 > `SKILL.md` 正文已于 v2.28.2 后"剥离变更日志"——只保留行为规则,版本噪音迁出至此,以减少生成上下文占用。
 > 章节编号以 `assets/plan-template.html` 的 h2 顺序为唯一真相源(记忆钩子=15 / 复述技巧包=16 / 记忆宫殿=17)。
 
+## [2.39.0] (FSRS-5 调度一键切换 · 2026-11-10)
+- **FSRS-5 调度核心（EMM_FSRS_V239）**：`src/plan/scripts/01b-fsrs.js` 逐公式移植 open-spaced-repetition/ts-fsrs v6.0.0 models/fsrs-5（MIT）——19 个默认参数、DSR 三变量、遗忘曲线 R(t,S)=(1+FACTOR·t/S)^-0.5、同日复习 short-term 分支、Again 稳定度下限钳制，全部与 ts-fsrs 输出 ±1e-6 一致（qa-v239 固化 7 组黄金值）。
+- **一键切换**：复习条新增「🧮 SM-2 ↔ 🧮 FSRS」按钮（confirm 确认），`switchAlgo` 按启发式双向迁移既有状态（ef→D/S、S→interval），空壳种子清理；FSRS 模式下轻量/标准档的 Ebbinghaus 对齐跳过（FSRS 自管排期）；评分映射 顺=Good(3)、卡=Again(1)。默认仍为 SM-2，行为零变化。
+- **测试**：总测试数 **762**（+41，28 套件；qa-v239 41 项）。
+
+## [2.38.0] (SM-2 真正驱动调度 · 2026-11-09)
+- **闭环 `ANALYSIS.md §3.2` 从 v2.20 拖到 v2.37 的未做项**：此前「🧠 标准」只显示 ef/interval/due，`state.weak` 增删仍由轻量档「连顺 N 轮毕业」驱动，`sr.due` 到期句也不进今日任务卡。本版把标准模式升级为**句级调度器**：
+  - `02-sr.js` 新增纯函数 `dueKeys(sr, today)`，经 `window.EMMSR` 暴露给 main（算法职责留在 SR 模块）；
+  - `01-main.js` 新增 `srDueKeys()` / `validDueCount()` / `syncDueIntoWeak()`，在 **init / endRound / 切到标准模式** 三个时机把 `due ≤ today` 的句自动回炉 `state.weak`；
+  - `endRound()` 标准分支：评「顺」→ `srNext()` 已排期到未来即**从 weak 毕业**（不再受 `streakToGoal` 影响），评「卡」→ 留清单；轻量分支**逐字不变**（静态 gate 依赖的 `state.streakToGoal || 3` / `streak[k] >= goal` 两个字面量原样保留）；
+  - 今日任务卡新增「🧠 SM-2 今日到期 N 句」+「⚡ 开始快刷」直达按钮；仪表盘薄弱清单文案按模式切换；「🎯 连顺 N 轮」在标准模式禁用并提示阈值不生效；模式按钮 title 改为真实调度语义。
+  - **设计取舍**：复用 `state.weak` 作下游总线，快刷 / 宫殿红站 / 仪表盘 / 听写 / 影子跟读 / 段级 `REVIEW_OFF=[1,3,7,15]` 全部零改动，句级调度与段级排期并存。
+- **回归护栏**：新增 `tests/sr-scheduling.test.mjs`（29 项）——`dueKeys` 边界、init/切模式到期回炉、今日卡到期数与快刷入口、标准模式 1 次「顺」即毕业（`streakToGoal=5` 也不生效）、q=2 重置、**轻量模式 `streakToGoal=3` 连跑 3 轮才毕业**的完整回归。26 个存量套件 691 项断言零回归。
+- **文档**：SKILL.md「SM-2 算法升级」由「仅可视化」改写为句级调度器、「复习调度硬规则」补句级/段级并存说明；`ANALYSIS.md §3.2` 未做项标为已闭环并保留原文；双语 readme 功能表 / 已知局限 / 版本历史同步；页脚版本戳、两个模板头部版本随发版对齐。
+- **测试**：总测试数 **721**（+30，27 套件）。
+
+## [2.37.1] (安装器修复 + 链路可执行性收口 · 2026-11-09)
+- **P0 安装器漏装模板（真 bug）**：`install.ps1` / `install.sh` / `bin/install.mjs` 三处文件清单都只有 `SKILL.md` + `assets/plan-template.html`，漏 `assets/library-template.html`；而 SKILL.md「个人记忆库」流程明确要求复制该模板 → 一键安装 / npx / 离线包用户说「生成记忆库」必然缺文件。发布 zip 里其实含该文件，`release-build.test.mjs` 只校验 zip 内容、管不到「安装后目录」，所以 670 项测试全绿仍没拦住。修复：三处清单补全；`bin/install.mjs` 收敛为单一 `FILES` 数组循环拷贝（新增模板只改一处）；新增 `tests/install-contract.test.mjs`（8 项，含**实跑安装器到临时目录**并逐字比对 3 个产物）。
+- **P0 陪练协议 due-first 链路不可执行**：v2.37.0 写出题顺序要读 `state.weak` / SM-2 `due`，但宿主 Agent 读不到浏览器 `localStorage`（`file://` 与对话进程隔离）。改为**静态档（默认）**：只用方案文件可见内容出题、按段交错、零依赖，L1/L2/L3 通吃；**动态档（可选）**：用户主动贴「💾 导出」进度 JSON 或薄弱清单后才按 due-first 排序。新增第 7 条硬规则「能力诚实」，显式禁止虚构句号/到期日冒充「你的进度」；结算模板的「下次到期」改为按艾宾浩斯表推算。
+- **P1 七份 L2 平台适配文件同步**：v2.37.0 改了 SKILL.md 却没同步 `platforms/`（Cursor / Copilot / Gemini / Cline / Aider / Qoder / Roo），SKILL.md 写「L2/L3 照常可用陪练协议」但注入规则里根本没该节。7 份文件统一补入「对话陪练协议」+「复习调度硬规则」+ 触发语，`platforms/README.md` 补能力例外声明；新增 `tests/platforms-drift.test.mjs`（8 项，14 个关键词 × 7 份文件 + 分组细查），落实 `ANALYSIS.md §2.2.3` 早先提出的 drift 风险。
+- **P1 SM-2 标准档语义澄清**：`ANALYSIS.md §3.2` 标注「让 SR 真正替代 streak 驱动 weak / due 进今日任务卡」从 v2.20 拖到 v2.37 未做，但 SKILL.md 原文写「替代固定阈值」、功能表叫「间隔算法」，容易读成自动调度。现明确标注「🧠 标准」是**可视化模式、不是调度器**：薄弱句毕业仍由轻量档连顺规则驱动，`sr.due` 不自动进今日任务卡；SKILL.md + 双语 readme 功能表 + 已知局限四处同步。
+- **顺带修 P2 版本漂移**：`library-template.html` 头部版本声明自 v2.30.0 起没跟上（`version-check` 只要求「头部 ≥ 锚点」，查不出陈旧）；本次对齐 v2.37.1 并注明原因。
+- **测试**：总测试数 **691**（+21，26 套件；新 2 套件 16 项 + skill-contract 16→21）。
+
+## [2.37.0] (循证调度与对话陪练 · 2026-11-09)
+- **横向读取 GitHub 同类 skill 后的方法论补齐**（信源 + A/B/C 可信度评级见 `SKILL.md`「同类 skill 借鉴与信源」）：① 新增「对话陪练协议」——一次一问 / 等答再揭 / 三档诚实评分 / 原文唯一真相源 / due-first 出题 / 结算三要素，补上 `ANALYSIS.md` 指出的「评估与反馈位置空缺」；明确陪练不写 localStorage、不冒充打卡，与记忆库「轻刷不落盘」同构。② 新增「复习调度硬规则」7 条——复习优先于新学、每日新学量上限、跨段交错、复习短于初学、20-40% 遗忘甜区、诚实评卡、评分纪律；只约束执行顺序与负荷，不改 `REVIEW_OFF=[1,3,7,15]` 与 SM-2 到期算法。③ 新增「倦怠检测与换法阈值」——连卡 3 句 / 连续 2 轮降分 / 说累即降档；3 轮后保留率 <60% 判定方法失配，回 Step 2 重焊钩子链而非再背第 4 遍。④ **L5 费曼检验**替代「说够 90 秒即算过」：连续 2 轮 ≥90% + 费曼三问（逻辑角色 / 抽句断链 / 换词转述）。借鉴自 `source-to-skill`(skill-study)、`RetainCraft`、`memory-retrieval-learning`、`vocab-coach`、`m98/fluent`、`grimoire-core`。
+- **description 瘦身**：639 字符的功能清单 → 220 字符的「能力 + 触发语」，去掉版本号与工程流水账（Agent Skills 规范：description 写「何时用」，是每轮常驻上下文的元数据）；功能细节留在正文。新增陪练触发语「考我 / 陪我练 / 抽查 / 复述给你听」。
+- **代码层**：今日任务卡新增「⏱ 今日顺序」条（先复习到期段 → 再新学；多段到期给 A→B→C→A 交错提示），只加提示**不重排 `tr`**——段号与 `data-seg` 映射被打卡/测试依赖，重排会错位。
+- **版本戳漂移修复**：`EMM_VERSION` 自 v2.30.0 起未跟随发版，页脚一直显示旧版；改为 `v2.37.0` 并由 `tests/skill-contract.test.mjs` 断言对齐 `package.json`，`qa-v229` 断言同步。
+- **契约门禁**：新增 `tests/skill-contract.test.mjs`（16 项）——description 长度/无版本戳/触发语、四个新章节硬规则、信源 URL 与评级、二手线索禁用声明、模板顺序条、版本戳、双副本一致。
+- **测试**：总测试数 **670**（+16，24 套件）。
+
 ## [2.36.0] (可选真浏览器套件 · 2026-11-04)
 - **playwright-core + 系统 Chrome/Edge**（devDependency，不影响消费者零依赖）：新增 `tests/browser-optional.test.mjs`——本地找得到系统浏览器时跑真实渲染冒烟（store 注入块真实执行 / getty 10 句 / 仪表盘统计 / 自测开关真实点击 / boundary 100 句 / 内联 SVG 结构图 / 全程无 pageerror 与 console.error，共 7 项），找不到时整组跳过（CI exit 0）。`npm run test:browser` 可单独强制运行。
 - **jsdom --no-save 剪除教训**：`npm i -D` 会把 extraneous 的 jsdom@16 剪掉——恢复命令 `npm i --no-save jsdom@16`（测试报错信息有引导）。

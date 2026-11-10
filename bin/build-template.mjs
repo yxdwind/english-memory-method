@@ -20,7 +20,7 @@ const NL = String.fromCharCode(10);
 const S = (...p) => readFileSync(join(ROOT, 'src/plan', ...p), 'utf8');
 const L = (...p) => readFileSync(join(ROOT, 'src/library', ...p), 'utf8');
 
-const PLAN_SCRIPTS = ['00-store', '01-main', '02-sr', '03-shadow', '04-fold', '05-onboard', '06-markers'];
+const PLAN_SCRIPTS = ['00-store', '01b-fsrs', '01-main', '02-sr', '03-shadow', '04-fold', '05-onboard', '06-markers'];
 // v2.34.0：store 单点 —— plan 产物带锚点（version-check 扫描），library 产物剥离锚点行后注入
 const STORE_SRC = S('scripts', '00-store.js');
 const LIB_STORE_SRC = STORE_SRC.split('EMM_STORE_V232').join('EMM_STORE');

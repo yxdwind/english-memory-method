@@ -81,7 +81,7 @@ ok(/⇒/.test(template) && /↔/.test(template) && /→/.test(template), '图例
   try { jumps.forEach(b => b.click()); } catch (e) { threw = true; }
   ok(!threw, '跳转按钮点击不抛错（scrollIntoView 在 jsdom 缺省时被守卫）');
   const ft = doc.querySelector('footer');
-  ok(!!ft && /v2\.30\.0/.test(ft.textContent), '页脚自动渲染版本戳 v2.30.0');
+  ok(!!ft && /v2\.39\.0/.test(ft.textContent), '页脚自动渲染版本戳 v2.39.0（v2.37 起随 package.json 同步，消除 v2.30.0 陈旧漂移）');
 }
 
 // ── B. 能力横幅：缺录音 → 出现 + 可关闭 + 持久化 ──
