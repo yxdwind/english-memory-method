@@ -1,9 +1,10 @@
 <!DOCTYPE html>
 <!--
-  English Memory Method · 背诵方案模板（plan-template.html · v2.40.0 当前生效）
+  English Memory Method · 背诵方案模板（plan-template.html · v2.41.0 当前生效）
   v2.38.0 组件新增：🧠 标准模式成为句级调度器——dueKeys 判到期、评「顺」由 srNext 排期毕业、
   v2.39.0 组件新增：🧮 FSRS-5 调度一键切换（SM-2 默认不变；01b-fsrs 纯数学核心，与 ts-fsrs 等价）
   v2.40.0 组件新增：🎤 段级费曼追问模式（三连深挖 → 自评 → 卡句点名入薄弱；需该段阶梯 L4+）
+  v2.41.0 组件新增：🔀 记忆库跨方案交错轻刷（链回忆轮转混排 A→B→C→A；结算按方案分组回链）
   到期句在 init/endRound/切模式三处自动回炉 weak、今日卡显示到期句数 + 一键快刷；
   「🎯 连顺 N 轮」在标准模式禁用。轻量模式路径逐字不变（sr-scheduling.test.mjs 29 项护栏）。
   v2.37.0 组件新增：今日任务卡「⏱ 今日顺序」条（复习优先于新学 + 多段交错提示，只加提示不重排段号）；
@@ -3119,7 +3120,7 @@ window.EMMFSRS = (function(){
 (function(){
   "use strict";
   // 页脚版本戳唯一来源；与模板顶部注释保持一致（RELEASE-CHECKLIST：每份生成方案打开即见"我跑的是哪版"）
-  var EMM_VERSION = 'v2.40.0';
+  var EMM_VERSION = 'v2.41.0';
 
   // 1. 页脚版本戳
   try {

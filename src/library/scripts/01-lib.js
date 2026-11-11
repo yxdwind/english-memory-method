@@ -121,7 +121,17 @@
       shown++;
       html += '<div class="lib-card" data-idx="' + i + '">' + cardHtml(a, st) + '</div>';
     });
-    shelf.innerHTML = html;
+    // v2.41.0：跨方案交错轻刷入口（≥2 篇有链回忆数据时显示）
+    var interIdxs = [];
+    LIB.articles.forEach(function(a, i){
+      var hasSteps = (a.chain || []).some(function(c){ return (c.steps || []).length; });
+      if(hasSteps) interIdxs.push(i);
+    });
+    var toolbar = '';
+    if(interIdxs.length >= 2){
+      toolbar = '<div class="lib-inter" style="margin-bottom:12px;"><button type="button" class="lib-btn" id="emm-lib-inter">🔀 交错轻刷（' + interIdxs.length + ' 篇 · 链回忆混排）</button> <span style="color:#6b7280;font-size:12px;">按 A→B→C→A 轮转混排各篇钩子步，对抗块状复习（interleaving）</span></div>';
+    }
+    shelf.innerHTML = toolbar + html;
     emptyBox.hidden = !(n === 0 || (q && !shown));
     emptyBox.innerHTML = n === 0
       ? '<p><b>记忆库还是空的。</b></p><p>先用背诵法生成第一篇方案（<b>&lt;topic&gt;-memorization-plan.html</b>），</p><p>然后对 AI 说「<b>更新记忆库</b>」，它会把所有方案汇进这里。</p>'
@@ -134,6 +144,95 @@
         for(var i = 0; i < LIB.articles.length; i++){ if(LIB.articles[i].key === key){ openSession(i); return; } }
       });
     });
+    var inter = shelf.querySelector('#emm-lib-inter');
+    if(inter) inter.addEventListener('click', function(){ openInterleaved(interIdxs); });
+  }
+
+  /* —— v2.41.0 跨方案交错轻刷（链回忆混排；结果不落盘）——
+     池 = 有 chain 数据的方案；顺序 = 轮转混排（第 r 轮取每篇第 r 个 step）：A1→B1→C1→A2→B2→C2，
+     对抗块状复习（Rohrer & Taylor 2007 interleaving）；结算按方案分组 + 各自 ?jump= 回链。 */
+  var curI = null; /* { arts, seq:[{ai,a,step}], pos, mi:{'ai:sidx':true} } */
+  function openInterleaved(idxs){
+    var arts = idxs.map(function(i){ return LIB.articles[i]; });
+    var flat = arts.map(function(a){
+      var steps = [];
+      (a.chain || []).forEach(function(c){ (c.steps || []).forEach(function(s){ steps.push(s); }); });
+      return steps;
+    });
+    var maxLen = 0;
+    flat.forEach(function(s){ if(s.length > maxLen) maxLen = s.length; });
+    var seq = [];
+    for(var r = 0; r < maxLen; r++){
+      for(var i = 0; i < arts.length; i++){
+        if(flat[i][r]) seq.push({ ai: i, a: arts[i], step: flat[i][r] });
+      }
+    }
+    if(!seq.length){ alert('所选方案没有链回忆数据。'); return; }
+    curI = { arts: arts, seq: seq, pos: 0, mi: {} };
+    renderInterStep();
+    sessionBox.hidden = false;
+    shelf.hidden = true;
+    emptyBox.hidden = true;
+    sessionBox.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+  function renderInterStep(){
+    if(!curI) return;
+    var it = curI.seq[curI.pos];
+    var s = it.step;
+    var last = curI.pos === curI.seq.length - 1;
+    var html = '<div class="ls-head"><button type="button" class="ls-back" id="emm-lib-inter-back">← 返回书架</button>'
+      + '<h2>🔀 交错轻刷（' + curI.arts.length + ' 篇）</h2><span class="ls-stage">第 ' + (curI.pos + 1) + ' / ' + curI.seq.length + ' 步</span></div>'
+      + '<p class="ls-hint">跨方案混排：刚想完 A 篇，马上切 B 篇——切换语境本身就是在练提取。结果不落盘。</p>'
+      + '<div class="ls-step"><div class="ls-hook">'
+      + '<span class="ls-no">' + esc(s.sidx || '?') + '</span>'
+      + '<span class="ls-hw">' + esc(s.h) + '</span>'
+      + (s.b ? '<span class="ls-bridge">' + esc(s.b) + '</span>' : '')
+      + (s.a ? '<span class="ls-anchor">[' + esc(s.a) + ']</span>' : '')
+      + '<span class="ls-see">点看原句</span>'
+      + '<button type="button" class="ls-mark" data-mi="' + it.ai + ':' + esc(s.sidx || '') + '">卡了</button></div>'
+      + '<div class="ls-en">' + esc(s.en || ('（缺原句数据：' + esc(s.h) + '）')) + '</div></div>'
+      + '<div style="margin:8px 0;color:#6b7280;font-size:12px;">来自《' + esc(it.a.title) + '》</div>'
+      + '<div class="ls-actions"><button type="button" class="ls-next" id="emm-lib-inter-next">' + (last ? '查看结算 ▶' : '下一位 ▶') + '</button></div>';
+    sessionBox.innerHTML = html;
+    sessionBox.querySelector('#emm-lib-inter-back').addEventListener('click', closeSession);
+    var hook = sessionBox.querySelector('.ls-hook');
+    hook.addEventListener('click', function(e){
+      if(e.target.closest('.ls-mark')) return;
+      hook.parentNode.classList.toggle('open');
+    });
+    var mark = sessionBox.querySelector('.ls-mark');
+    mark.addEventListener('click', function(){
+      mark.classList.toggle('on');
+      var sid = mark.getAttribute('data-mi');
+      if(mark.classList.contains('on')) curI.mi[sid] = true; else delete curI.mi[sid];
+    });
+    sessionBox.querySelector('#emm-lib-inter-next').addEventListener('click', function(){
+      curI.pos++;
+      if(curI.pos >= curI.seq.length) renderInterSummary(); else renderInterStep();
+    });
+  }
+  function renderInterSummary(){
+    if(!curI) return;
+    var nMi = Object.keys(curI.mi).length;
+    var html = '<div class="ls-head"><button type="button" class="ls-back" id="emm-lib-inter-back">← 返回书架</button>'
+      + '<h2>🔀 交错轻刷 · 结算</h2><span class="ls-stage">③ 结算</span></div>';
+    html += '<div class="ls-sum">🔁 链回忆：自判卡壳 <b>' + nMi + '</b> 步（共 ' + curI.seq.length + ' 步）'
+      + (nMi ? '' : ' —— 全部顺畅，记忆保持得很好 🎉') + '</div>';
+    if(nMi){
+      html += '<div class="ls-miss"><b>建议回原方案补打卡的句子</b>（轻刷不落盘，打卡/薄弱清单以原方案为准）：</br>';
+      curI.arts.forEach(function(a, ai){
+        var sids = Object.keys(curI.mi).filter(function(k){ return k.indexOf(ai + ':') === 0; }).map(function(k){ return k.split(':')[1]; });
+        if(!sids.length) return;
+        html += '· 《' + esc(a.title) + '》第 ' + esc(sids.join(', ')) + ' 句';
+        if(a.file) html += ' <a class="lib-btn" style="padding:2px 8px;font-size:12px;" href="' + esc(a.file) + '?jump=' + encodeURIComponent(sids.slice(0, 5).join(',')) + '">🎯 补打卡</a>';
+        html += '<br>';
+      });
+      html += '</div>';
+    }
+    html += '<div class="ls-actions"><button type="button" class="ls-back" id="emm-lib-done">完成</button></div>';
+    sessionBox.innerHTML = html;
+    sessionBox.querySelector('#emm-lib-inter-back').addEventListener('click', closeSession);
+    sessionBox.querySelector('#emm-lib-done').addEventListener('click', closeSession);
   }
   function headerSub(){ return document.querySelector('header .lib-sub'); }
 
@@ -365,6 +464,7 @@
   }
   function closeSession(){
     cur = null;
+    curI = null;
     sessionBox.hidden = true;
     sessionBox.innerHTML = '';
     shelf.hidden = false;
