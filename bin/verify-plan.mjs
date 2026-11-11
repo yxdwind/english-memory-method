@@ -403,6 +403,83 @@ function rule6_termAndPatternSourceability(html) {
   };
 }
 
+// ── v2.42.0 质量评测（--eval）：E 规则（ advisory，不阻断交付）────────────────
+// 与方案页 ?check=1 同阈值同口径（en 含空格 / zh 去空格 / 0.4~1.8 / 覆盖率 50% / IPA CJK）。
+const E_GENERIC = new Set(["the", "a", "an", "and", "or", "but", "this", "that", "it", "is", "are", "was", "were", "of", "to", "in", "on", "for", "with", "so", "then", "here", "there"]);
+function evalE1_hookSpecificity(html) {
+  const chains = extractHookChains(html);
+  const items = [];
+  let hooks = 0;
+  chains.forEach(c => c.segs.forEach(h => {
+    hooks++;
+    const t = h.trim();
+    if (!t) { items.push({ ok: false, msg: "空钩子（seg 为空）" }); return; }
+    if (/^[\W_]+$/.test(t)) { items.push({ ok: false, msg: `纯符号钩子「${t}」——钩子应是具体的词或短语` }); return; }
+    const first = t.split(/\s+/)[0].toLowerCase().replace(/[^a-z']/g, "");
+    if (E_GENERIC.has(first) && t.split(/\s+/).length <= 2) {
+      items.push({ ok: false, msg: `泛化钩子「${t}」——首词是虚词且过短，应换成句中实词/短语` });
+    }
+  }));
+  return { id: "E1", name: "钩子具体性", status: items.length ? "warn" : "pass", msg: `钩子 ${hooks} 个`, items };
+}
+function evalE2_zhRatio(html) {
+  const en = extractSentences(html), zhRaw = matches(/<div class="sent-zh"[^>]*>([\s\S]*?)<\/div>/g, html).map(s => stripTags(s).replace(/\s+/g, "").trim());
+  const items = [];
+  const n = Math.min(en.length, zhRaw.length);
+  for (let i = 0; i < n; i++) {
+    if (!en[i]) continue;
+    const ratio = zhRaw[i].length / en[i].length;
+    if (zhRaw[i].length && (ratio < 0.4 || ratio > 1.8)) {
+      items.push({ ok: false, msg: `第 ${i + 1} 句译文长度比 ${ratio.toFixed(2)}（<0.4 偏短 / >1.8 偏长，与方案页 ?check=1 同阈值）` });
+    }
+  }
+  return { id: "E2", name: "译文长度比", status: items.length ? "warn" : "pass", msg: `${n} 句对照`, items };
+}
+function evalE3_pronCoverage(html) {
+  const sents = extractSentCount(html);
+  const prons = extractPronBlocks(html);
+  const items = [];
+  if (sents > 0) {
+    const cov = prons.length / sents;
+    if (cov < 0.5) items.push({ ok: false, msg: `连读/弱读标注覆盖 ${(cov * 100).toFixed(0)}%（<50%，与方案页 ?check=1 同阈值）` });
+  }
+  return { id: "E3", name: "连读标注覆盖", status: items.length ? "warn" : "pass", msg: `标注 ${prons.length} / 句 ${sents}`, items };
+}
+function evalE4_ipaCjk(html) {
+  const prons = extractPronBlocks(html);
+  const items = [];
+  prons.forEach((p, i) => {
+    const ipas = p.match(/\/[^\/\n]+\//g) || [];
+    ipas.forEach(ipa => {
+      if (/[\u4e00-\u9fff]/.test(ipa)) items.push({ ok: false, msg: `IPA 含中文（疑似音标写错或位置错乱）：${ipa}` });
+    });
+  });
+  return { id: "E4", name: "IPA 音标规范", status: items.length ? "fail" : "pass", msg: `音标段 ${prons.length} 个`, items };
+}
+function evalFile(filePath) {
+  const html = readFileSync(filePath, "utf8");
+  const relPath = rel(PKG_ROOT, filePath) || filePath;
+  const results = [
+    evalE1_hookSpecificity(html),
+    evalE2_zhRatio(html),
+    evalE3_pronCoverage(html),
+    evalE4_ipaCjk(html),
+  ];
+  let score = 100;
+  results.forEach(r => { if (r.status === "warn") score -= 10; if (r.status === "fail") score -= 25; });
+  score = Math.max(0, score);
+  console.log("");
+  console.log(paint("bold", `▸ [eval] ${relPath}`));
+  results.forEach(r => {
+    const sev = r.status;
+    const color = sev === "fail" ? "red" : sev === "warn" ? "yellow" : "green";
+    console.log(`  ${paint(color, ICON[sev])}  ${paint("bold", `${r.id} ${r.name}`)}  ${paint(color, r.msg)}`);
+    r.items.forEach(it => { if (it.ok === false) console.log(paint("red", `    ✗ ${it.msg}`)); });
+  });
+  console.log(paint("bold", `  质量分：${score}/100`));
+  return { file: filePath, results, score };
+}
+
 // ── 颜色 ──────────────────────────────────────────────────────────────────
 const useColor = !process.argv.includes("--no-color") && process.stdout.isTTY;
 const col_ = useColor ? {
@@ -462,6 +539,7 @@ function printHelp() {
 
 选项：
   --source <s>     原文文本或文件路径。提供后可执行规则 1 逐句对比
+  --eval           质量评测模式：4 条 E 规则（钩子具体性/译文长度比/连读覆盖/IPA 规范）+ 100 分制质量分；advisory，退出码恒 0
   --no-color       关闭彩色输出（适合 CI / 管道）
   --verbose        打印失败项的 detail JSON
   --all            目录扫描时包含所有 .html 文件（默认仅匹配 *-memorization-plan.html）
@@ -503,6 +581,12 @@ function main(argv) {
   if (positional.length === 0) { console.error("错误：缺少文件/目录参数"); printHelp(); return 2; }
   const files = collectFiles(resolve(positional[0]), argv);
   if (files.length === 0) { console.error("错误：未找到匹配的文件（要求：*-memorization-plan.html）"); return 2; }
+  if (argv.includes("--eval")) {
+    console.log(paint("bold", "english-memory-method · 质量评测（--eval，4 条 E 规则，advisory）"));
+    files.forEach(f => evalFile(f));
+    console.log(paint("dim", "（--eval 只输出发现与分数，不影响交付硬门禁；规则 1-6 请去掉 --eval 运行）"));
+    return 0;
+  }
   console.log(paint("bold", "english-memory-method · 内容校验（6 条硬规则）"));
   console.log(paint("dim", `目标: ${files.length} 个文件${sourceText ? "（含原文对比）" : "（未提供 --source，跳过规则 1 逐字符对比）"}`));
   let totalFail = 0, totalWarn = 0;

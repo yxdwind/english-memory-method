@@ -3,7 +3,7 @@
 (function(){
   "use strict";
   // 页脚版本戳唯一来源；与模板顶部注释保持一致（RELEASE-CHECKLIST：每份生成方案打开即见"我跑的是哪版"）
-  var EMM_VERSION = 'v2.41.0';
+  var EMM_VERSION = 'v2.42.0';
 
   // 1. 页脚版本戳
   try {

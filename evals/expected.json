@@ -1,0 +1,7 @@
+{
+  "_说明": "verify-plan --eval 质量评测期望值。E1 钩子具体性 / E2 译文长度比（en 含空格、zh 去空格、0.4~1.8，与方案页 ?check=1 同阈值）/ E3 连读覆盖（≥50%）/ E4 IPA 无中文。分数 = 100 − warn×10 − fail×25，下限 0。tests/evals.test.mjs 逐案例比对。",
+  "eval-good.html": { "E1": "pass", "E2": "pass", "E3": "pass", "E4": "pass", "score": 100 },
+  "eval-bad-hooks.html": { "E1": "warn", "E2": "pass", "E3": "pass", "E4": "pass", "score": 90 },
+  "eval-bad-zh.html": { "E1": "pass", "E2": "warn", "E3": "pass", "E4": "pass", "score": 90 },
+  "eval-bad-ipa.html": { "E1": "pass", "E2": "pass", "E3": "pass", "E4": "fail", "score": 75 }
+}
