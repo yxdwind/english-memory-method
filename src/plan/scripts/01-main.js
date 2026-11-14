@@ -75,6 +75,7 @@
              shadow:{},  // v2.19：影子跟读——{sentIdx: {ok, bad, total, marks:[], date}}
              sr:{},      // v2.20：SM-2 间隔——{sentIdx: {ef, interval, reps, due, lastQ}}
              srMode:'light',  // v2.20：'light' 默认（连顺 2 轮毕业）；'standard' 走 SM-2
+             srAlgo:'sm2',  // v2.39.0：调度算法 'sm2'（默认）| 'fsrs'——必须常驻 state，否则 save(state) 会抹掉 store 里的该字段
              fingerprint:'' };
   }
   function save(s){ EMMProgressStore.save(s); }
@@ -393,13 +394,21 @@
   }
   function renderAlgo(){
     var b = document.querySelector('.rv-algo'); if(!b) return;
-    var p = (typeof EMMProgressStore !== 'undefined') ? EMMProgressStore.load() : {};
-    var algo = (p.srAlgo === 'fsrs') ? 'fsrs' : 'sm2';
+    var algo = state.srAlgo || 'sm2';
     b.textContent = algo === 'fsrs' ? '🧮 FSRS' : '🧮 SM-2';
     b.title = algo === 'fsrs'
       ? 'FSRS-5 调度（DSR 三变量，请求保持率 90%）——点切回 SM-2'
       : 'SM-2 调度（Wozniak 1990，默认）——点切换到 FSRS-5';
   }
+  // v2.39.0：02-sr.switchAlgo 经此钩子同步主内存（state.srAlgo + 转换后的 state.sr），
+  // 否则 main 的 save(state) 全量覆写会把 store 里的 srAlgo/转换态抹掉（真机演示抓到的 bug）
+  window.__emmAlgoSync = function(algo, srObj){
+    state.srAlgo = algo;
+    if (srObj) state.sr = srObj;
+    save(state);
+    renderAlgo();
+    renderDash();
+  };
   function renderGoal(){
     var b = document.querySelector('.rv-goal'); if(!b) return;
     var g = state.streakToGoal || 3;

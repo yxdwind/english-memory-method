@@ -4,6 +4,11 @@
 > `SKILL.md` 正文已于 v2.28.2 后"剥离变更日志"——只保留行为规则,版本噪音迁出至此,以减少生成上下文占用。
 > 章节编号以 `assets/plan-template.html` 的 h2 顺序为唯一真相源(记忆钩子=15 / 复述技巧包=16 / 记忆宫殿=17)。
 
+## [2.42.1] (FSRS 切换持久化修复 · 2026-11-11)
+- **真机演示抓到的 bug**：🧮 切到 FSRS 后，任意 main 侧 `save(state)`（如阶梯点击）会用内存快照全量覆写进度，抹掉 02-sr patch 写入的 `srAlgo`/转换后的 `sr`。
+- **修复**：① `fresh()` 常驻 `srAlgo:'sm2'` 字段；② 02-sr 的 `switchAlgo` 改经 `window.__emmAlgoSync(algo, srObj)` 钩子同步主内存并走主 save 全量写（无 main 环境退回 patch）。真机复验：切换 → 阶梯保存 → 重载，FSRS 模式完整幸存。
+- **回归护栏**：qa-v239 新增 2 项（main save 后 srAlgo 幸存 + ladder 同次写入）。**测试**：总测试数 **831**（+2）。
+
 ## [2.42.0] (生成质量评测集 · 2026-11-11)
 - **verify-plan --eval**（对标调研 #5，academic-vocabulary-anki 的 evals 思路）：六条硬规则管结构完整性之外，新增 4 条 E 规则评测生成质量——E1 钩子具体性（虚词表/纯符号/空钩子）、E2 译文长度比（与方案页 ？check=1 同阈值同口径）、E3 连读覆盖（≥50%）、E4 IPA 音标无中文（fail 级）；100 分制质量分（warn−10/fail−25），advisory 不阻断交付。
 - **evals/ 目录**：4 个固定样本（好基线 + 三类人为缺陷）+ expected.json 期望值；tests/evals.test.mjs 逐案例比对状态与精确分数（40 项），口径漂移立即拦下。任何 *-memorization-plan.html 都可跑 --eval 拿质量分。

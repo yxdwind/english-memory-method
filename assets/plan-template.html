@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  English Memory Method · 背诵方案模板（plan-template.html · v2.42.0 当前生效）
+  English Memory Method · 背诵方案模板（plan-template.html · v2.42.1 当前生效）
   v2.38.0 组件新增：🧠 标准模式成为句级调度器——dueKeys 判到期、评「顺」由 srNext 排期毕业、
   v2.39.0 组件新增：🧮 FSRS-5 调度一键切换（SM-2 默认不变；01b-fsrs 纯数学核心，与 ts-fsrs 等价）
   v2.40.0 组件新增：🎤 段级费曼追问模式（三连深挖 → 自评 → 卡句点名入薄弱；需该段阶梯 L4+）
@@ -577,6 +577,7 @@ window.EMMFSRS = (function(){
              shadow:{},  // v2.19：影子跟读——{sentIdx: {ok, bad, total, marks:[], date}}
              sr:{},      // v2.20：SM-2 间隔——{sentIdx: {ef, interval, reps, due, lastQ}}
              srMode:'light',  // v2.20：'light' 默认（连顺 2 轮毕业）；'standard' 走 SM-2
+             srAlgo:'sm2',  // v2.39.0：调度算法 'sm2'（默认）| 'fsrs'——必须常驻 state，否则 save(state) 会抹掉 store 里的该字段
              fingerprint:'' };
   }
   function save(s){ EMMProgressStore.save(s); }
@@ -895,13 +896,21 @@ window.EMMFSRS = (function(){
   }
   function renderAlgo(){
     var b = document.querySelector('.rv-algo'); if(!b) return;
-    var p = (typeof EMMProgressStore !== 'undefined') ? EMMProgressStore.load() : {};
-    var algo = (p.srAlgo === 'fsrs') ? 'fsrs' : 'sm2';
+    var algo = state.srAlgo || 'sm2';
     b.textContent = algo === 'fsrs' ? '🧮 FSRS' : '🧮 SM-2';
     b.title = algo === 'fsrs'
       ? 'FSRS-5 调度（DSR 三变量，请求保持率 90%）——点切回 SM-2'
       : 'SM-2 调度（Wozniak 1990，默认）——点切换到 FSRS-5';
   }
+  // v2.39.0：02-sr.switchAlgo 经此钩子同步主内存（state.srAlgo + 转换后的 state.sr），
+  // 否则 main 的 save(state) 全量覆写会把 store 里的 srAlgo/转换态抹掉（真机演示抓到的 bug）
+  window.__emmAlgoSync = function(algo, srObj){
+    state.srAlgo = algo;
+    if (srObj) state.sr = srObj;
+    save(state);
+    renderAlgo();
+    renderDash();
+  };
   function renderGoal(){
     var b = document.querySelector('.rv-goal'); if(!b) return;
     var g = state.streakToGoal || 3;
@@ -2099,7 +2108,13 @@ window.EMMFSRS = (function(){
       }
     }
     p.srAlgo = algo;
-    EMMProgressStore.patch(function(p2){ p2.sr = p.sr; p2.srAlgo = algo; });
+    // v2.39.0 真机修复：优先经 main 的 __emmAlgoSync 同步主内存并走主 save 全量写，
+    // 避免后续任意 save(state) 用旧内存快照抹掉 srAlgo/转换后的 sr；无 main 环境（测试直呼）退回 patch。
+    if (typeof window.__emmAlgoSync === 'function') {
+      window.__emmAlgoSync(algo, p.sr);
+    } else {
+      EMMProgressStore.patch(function(p2){ p2.sr = p.sr; p2.srAlgo = algo; });
+    }
   }
 
   // v2.32.0：进度键派生与读写收敛到 EMMProgressStore（00-store.js），此处为同签名薄委托
@@ -2626,7 +2641,7 @@ window.EMMFSRS = (function(){
 (function(){
   "use strict";
   // 页脚版本戳唯一来源；与模板顶部注释保持一致（RELEASE-CHECKLIST：每份生成方案打开即见"我跑的是哪版"）
-  var EMM_VERSION = 'v2.42.0';
+  var EMM_VERSION = 'v2.42.1';
 
   // 1. 页脚版本戳
   try {

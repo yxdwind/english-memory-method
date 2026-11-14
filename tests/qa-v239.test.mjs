@@ -161,5 +161,16 @@ const fakeArticle = `
   ok(!!btn && btn.textContent.indexOf('SM-2') >= 0, '工具栏 🧮 按钮渲染且默认 SM-2');
 }
 
+// v2.42.1 回归护栏：switchAlgo 后任意 main save(state)（如阶梯点击）不得抹掉 srAlgo
+// （真机演示抓到：02-sr patch 写入的 srAlgo 被 main 全量 save 覆盖丢失）
+{
+  const { w, doc } = await bootCore({ replaceWrap: fakeArticle });
+  w.EMMSR.switchAlgo('fsrs');
+  const lv1 = doc.querySelector('.emm-lv[data-seg="0"][data-lv="1"]');
+  if (lv1) lv1.click(); // 触发 main 的 save(state)
+  ok(w.EMMProgressStore.load().srAlgo === 'fsrs', '回归：main save 后 srAlgo=fsrs 幸存（__emmAlgoSync 钩子）');
+  ok(w.EMMProgressStore.load().ladder && w.EMMProgressStore.load().ladder['0'], '同一次 save 正常携带 ladder（两写互不覆盖）');
+}
+
 console.log('\n结果: ' + passed + ' 通过, ' + failed + ' 失败');
 process.exit(failed > 0 ? 1 : 0);

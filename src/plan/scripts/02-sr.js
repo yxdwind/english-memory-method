@@ -91,7 +91,13 @@
       }
     }
     p.srAlgo = algo;
-    EMMProgressStore.patch(function(p2){ p2.sr = p.sr; p2.srAlgo = algo; });
+    // v2.39.0 真机修复：优先经 main 的 __emmAlgoSync 同步主内存并走主 save 全量写，
+    // 避免后续任意 save(state) 用旧内存快照抹掉 srAlgo/转换后的 sr；无 main 环境（测试直呼）退回 patch。
+    if (typeof window.__emmAlgoSync === 'function') {
+      window.__emmAlgoSync(algo, p.sr);
+    } else {
+      EMMProgressStore.patch(function(p2){ p2.sr = p.sr; p2.srAlgo = algo; });
+    }
   }
 
   // v2.32.0：进度键派生与读写收敛到 EMMProgressStore（00-store.js），此处为同签名薄委托
