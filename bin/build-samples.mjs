@@ -85,11 +85,65 @@ for (let i = 1; i <= 100; i++) {
   const lbl = (i % 2 === 1) ? '连读' : '弱读';
   boundarySents.push('<div class="sent">\n  <div class="sent-en">' + en + '</div>\n  <div class="sent-zh">' + zh + '</div>\n  <div class="pron"><span class="lbl">' + lbl + '</span>sentence ' + i + ' · /ˈsɛntəns ' + i + '/ · 边界样本生成标注</div>\n</div>');
 }
+// v2.42.2：答案词必须真实出现在 .sent-en 中（verify-plan 规则 5 溯源）。
+// 此前这段挖空是自造句，4/5 个答案在原文找不到——因为 perf-boundary 从没对边界样本
+// 跑过交付硬门禁，直到本次补上才暴露。现改为直接挖第 1 句的真实词。
 const boundaryCloze = {
   secLabel: '第 1 段 · 边界压测（100 句样本）',
-  text: 'This synthetic article carries one ______ sentences in total; every ______ block adds DOM nodes, and the template must stay responsive at this ______. Fill each blank first, then ______ the answers below; the sample exists to keep the ______ honest.',
-  answers: 'hundred / sent / scale / check / rendering',
+  text: 'Boundary sentence 1 ______ the template with a moderately long English ______ — item 1 of ______ 1 in this ______ article.',
+  answers: 'stress-tests / clause / segment / synthetic',
 };
+
+// ── v2.42.2 边界样本的第 15/17 节真实数据 ─────────────────────────────
+// 此前 boundary-100 只有 100 个 .sent，{{HOOK_CHAINS}} / {{PALACE_STOPS}} 仍是占位符：
+// perf-boundary 只查句数，测的是骨架而非真实长文方案（SKILL.md 说 §15/§17 全部体裁必备）。
+// 现按 SKILL.md「记忆宫殿层 · 句站对齐」的 M/base/rem 公式生成，并让 verify-plan 规则 3/4 可验。
+const PALACE_ROUTE = ['起床','卫生间','衣柜','厨房','餐桌','大门','电梯','小区门','公交站',
+  '地铁站','闸机','站台','车厢','公司大堂','办公楼电梯','工位','茶水间','会议室','食堂',
+  '下楼','超市','公园','回家路','沙发','床'];
+
+// M = min(25,n); base = floor(n/M); rem = n%M; 站 j 承载 base+(j<=rem?1:0) 句
+function palaceGroups(n){
+  const M = Math.min(25, n);
+  const base = Math.floor(n / M), rem = n % M;
+  const groups = [];
+  let cur = 1;
+  for(let j = 1; j <= M; j++){
+    const c = base + (j <= rem ? 1 : 0);
+    groups.push(Array.from({length: c}, (_, k) => cur + k));
+    cur += c;
+  }
+  return groups;
+}
+
+function boundaryHookChains(){
+  // 5 段 × 20 句：每条链 20 segs / 19 bridges / 20 anchors + 1 para-hook（满足 verify-plan 规则 4）
+  let html = '';
+  for(let seg = 1; seg <= 5; seg++){
+    const start = (seg - 1) * 20 + 1;
+    let line = '', anchors = '';
+    for(let i = start; i < start + 20; i++){
+      line += '<span class="seg">边界句' + i + '</span>';
+      if(i < start + 19) line += '<span class="bridge">→</span>';
+      anchors += '<span class="anchor">[Boundary sentence ' + i + ']</span>';
+    }
+    html += '<div class="hook-chain"><span class="para-hook">段 ' + seg + ' · 边界压测</span>'
+      + '<div class="chain-line">' + line + '</div>'
+      + '<div class="chain-anchors">' + anchors + '</div></div>\n';
+  }
+  return html;
+}
+
+function boundaryPalaceStops(){
+  return palaceGroups(100).map(function(g, j){
+    return '<div class="palace-stop" data-sents="' + g.join(',') + '">'
+      + '<span class="st-no">站 ' + (j + 1) + '</span>'
+      + '<span class="st-name">' + PALACE_ROUTE[j] + '</span>'
+      + '<div class="st-hook">' + g.map(i => '边界句' + i).join(' · ') + '</div>'
+      + '<span class="st-anchor">[Boundary sentence ' + g[0] + ']</span>'
+      + '</div>';
+  }).join('\n');
+}
 
 // ── 结构图内联 SVG（v2.35.1）────────────────────────────
 // 此前样本保留模板的 <img src="assets/{{topic}}-structure.svg"> 脚手架 → 破图 + 404。
@@ -113,7 +167,7 @@ function chainSvg(labels) {
   return s + '</svg>';
 }
 
-function build(title, subtitle, structureHint, sents, fillFirstN, outFile, cloze, structureLabels){
+function build(title, subtitle, structureHint, sents, fillFirstN, outFile, cloze, structureLabels, opts){
   let html = tpl;
   html = html.replace(/\{\{TITLE\}\}/g, title);
   html = html.replace(/<title>\{\{TITLE\}\}背诵方案<\/title>/, '<title>' + title + '背诵方案</title>');
@@ -142,6 +196,10 @@ function build(title, subtitle, structureHint, sents, fillFirstN, outFile, cloze
     html = html.replace('{{挖空后的段落原文，空用 ______ 表示}}', cloze.text);
     html = html.replace('{{答案词，斜杠分隔}}', cloze.answers);
   }
+
+  // v2.42.2：仅边界样本填 §15/§17 真实数据；其余样本按 v2.28.2 约定保留装饰性占位符
+  if (opts && opts.hookChains) html = html.replace('{{HOOK_CHAINS}}', () => opts.hookChains);
+  if (opts && opts.palaceStops) html = html.replace('{{PALACE_STOPS}}', () => opts.palaceStops);
 
   fs.writeFileSync(path.join(OUT_DIR, outFile), html, 'utf8');
   console.log('  ✅ ' + outFile + ' (' + (html.length / 1024).toFixed(1) + ' KB)');
@@ -177,7 +235,8 @@ build(
   100,
   'boundary-100-plan.html',
   boundaryCloze,
-  ['句 1–20', '句 21–40', '句 41–60', '句 61–80', '句 81–100']
+  ['句 1–20', '句 21–40', '句 41–60', '句 61–80', '句 81–100'],
+  { hookChains: boundaryHookChains(), palaceStops: boundaryPalaceStops() }
 );
 
 console.log('\n用法：npm run preview → 浏览器打开 http://localhost:4173/tests/samples/');

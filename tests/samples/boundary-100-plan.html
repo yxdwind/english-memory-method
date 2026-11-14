@@ -1,46 +1,8 @@
 <!DOCTYPE html>
 <!--
-  English Memory Method · 背诵方案模板（plan-template.html · v2.42.1 当前生效）
-  v2.38.0 组件新增：🧠 标准模式成为句级调度器——dueKeys 判到期、评「顺」由 srNext 排期毕业、
-  v2.39.0 组件新增：🧮 FSRS-5 调度一键切换（SM-2 默认不变；01b-fsrs 纯数学核心，与 ts-fsrs 等价）
-  v2.40.0 组件新增：🎤 段级费曼追问模式（三连深挖 → 自评 → 卡句点名入薄弱；需该段阶梯 L4+）
-  v2.41.0 组件新增：🔀 记忆库跨方案交错轻刷（链回忆轮转混排 A→B→C→A；结算按方案分组回链）
-  v2.42.0 产物配套：📊 生成质量评测（verify-plan --eval，4 条 E 规则 + 100 分制；evals/ 固化期望值）
-  到期句在 init/endRound/切模式三处自动回炉 weak、今日卡显示到期句数 + 一键快刷；
-  「🎯 连顺 N 轮」在标准模式禁用。轻量模式路径逐字不变（sr-scheduling.test.mjs 29 项护栏）。
-  v2.37.0 组件新增：今日任务卡「⏱ 今日顺序」条（复习优先于新学 + 多段交错提示，只加提示不重排段号）；
-  页脚版本戳随 package.json 同步（此前停留在 v2.30.0）。方法论侧新增对话陪练协议 / 复习调度硬规则 /
-  倦怠检测与换法阈值，详见 SKILL.md 同名章节。
-  v2.37.1：无模板行为改动；安装器补齐 library-template.html、陪练协议改静态/动态双档、
-  7 份 L2 平台适配文件同步、SM-2 标准档明确标注为可视化而非调度器。
-  用法：复制本文件为 <topic>-memorization-plan.html，按下方 <!-- ① ... --> 注释逐节替换内容。
-  所有样式已内联，不依赖外部资源；结构图引用相对路径 assets/<topic>-structure.svg。
-  v2.13.0 组件新增：今日任务排期（含 .ics 导出）、自测模式（遮译文/全遮）、复述阶梯追踪、
-  亲手改造留白（每段主线 / 宫殿画面）、?check=1 结构自检报告。
-  v2.14.0 组件新增：⚡ 薄弱句快刷（只显示薄弱句的短会话模式）、挖空交互化（______ 自动转输入框、
-  回车/失焦自动批改、错空直通薄弱清单）、今日任务直达锚点（去背诵 / 去自测 / 看薄弱）。
-  v2.15.0 组件新增：进度内容指纹（方案更新后检测并询问重置，防旧进度错位）、
-  宫殿 data-sents 句号标注（>25 句同站多物的红站联动与自检精确化）。
-  v2.16.0 组件新增：移动端自适应——表格横滚容器、今日任务卡窄屏堆叠、
-  复习/快刷/自测工具条吸顶（仅窄屏与激活态生效，桌面端零变化）。
-  v2.18.0 组件新增：首屏折叠（默认隐藏 h2 编号 ≥ 9 章节）+ 首次访问 on-boarding 5 步引导卡片。
-  v2.19.0 组件新增：🎙️ 影子跟读（MediaRecorder 录音 + 逐词自评，错词 ≥ 25% 自动入薄弱清单）。
-  v2.20.0 组件新增：🧠 SM-2 算法升级（Wozniak 1990）——每句维护 ef/interval/reps/due，仪表盘显示「下次复习」，
-  评卡时钩入 main IIFE 的 judge()/endRound()，自动与 Ebbinghaus 间隔取 max；轻量/标准模式切换。
-  v2.21.0 组件新增：💾 导出/📥 导入进度按钮（换浏览器/换电脑迁移用）——导出当前 localStorage 为 JSON（含 SM-2 / shadow / weak 全部字段），
-  导入做 fingerprint 失配确认；今日任务卡每段行加「📌 设为今天新学」按钮，倒推 start 日期让该段成为当天新学。
-  v2.22.0 组件新增：🛠 工程卫生大礼包——①.ics 时区修复（DTEND+DTSTAMP UTC+X-WR-TIMEZONE，避免跨时区/DST 偏移）②备份提醒（>30 天未打开弹 confirm 提示导出）③章节命名精简（去掉嵌套括号/版本号）④阶梯渐进引导（未完成 L1 时锁住 L2-L5）。
-  v2.23.0 组件新增：📊 内容质量大礼包——①按段统计（仪表盘加「段/句数/薄弱率/耗时」表，仅多段文章显示）②?check=1 加内容可疑项（译文长度比 + IPA 音标中文检测 + 连读覆盖率）③SKILL.md 加 Step 0 模式识别（短文/长文/演讲稿体裁判断与专属组件对照表）。
-  v2.24.0 组件新增：🎯 学习路径优化——①轻刷结算页加「一键回原方案补打卡」按钮（带 ?jump= 参数自动定位到缺句）②记忆库加状态筛选 chip（全部/有进度/薄弱最多/超 14 天未复习）③方案复习条加「★ 今天先做这个」按钮（智能判断薄弱/轮次/阶梯优先级后跳转）。
-  v2.25.0 组件新增：📊 评估优化——①「📝 段落测试」按钮（60 秒挖空挑战 + 自动批改给 0-100 分，写入 state.segTest.last）②毕业阈值配置「🎯 连顺 N 轮」（默认 3，点切换 2/3/4/5，state.streakToGoal）。
-  v2.26.0 组件新增：🧪 工程卫生——`bin/sync-fixtures.mjs` 把 `tests/samples/` 下真实生成方案同步到 `tests/fixtures/fixture-success.html`，fixture 现已反映"真实生成结果"而非手写字符串。CI 用 `npm run sync-fixtures -- --check` 检测漂移。
-  v2.27.0 组件新增：🌐 跨浏览器测试矩阵——`bin/check-browser-compat.mjs` 静态扫描模板用到的 43 个 Web API，对照 Chrome/Firefox/Safari/Edge 兼容性矩阵给出 ⚠/✅ 报告（`--strict` 模式有 ⚠ 时退出码 1）。配档 `docs/CROSS-BROWSER.md` 列 4 大浏览器差异 + 已知 bug 根因 + Playwright 集成样板。零运行时副作用。
-  v2.28.0 组件新增：🚀 端到端测试——`bin/e2e-flow.mjs` 在 jsdom 里完整跑 35 步用户流（冷启动 → 评卡 → 结束 → 导出 → 重置 → 导入 → 跨页面），揭示并修复 2 个 bug：① `endRound()` `state = loadState()` 覆盖本轮 mutations 导致 rounds/weak/mode 丢失（修复：loadState 后再 apply mutations）② `build-samples.mjs` 只命中 1 个 .sent 占位导致样本只有 1 句（修复：占位替换为 N 句 join）。配档 `docs/E2E.md` 列 35 步全链路 + 已知边界。
-  v2.28.1 组件修复：📊 按段统计表（多段文章仪表盘，renderDash 动态建表）包进 .emm-tblwrap 横滚容器——此前绕过了 v2.16「全部表格横滚」约定，窄屏溢出。
-  v2.29.0 组件新增：🚀 入门减负三件套——①首屏「3 步快背」极简入口卡（听读→钩子链→复述打卡，可跳转，其余章节折叠）②能力探测横幅（TTS/录音/存储不可用时显式告知+替代做法，替代静默降级）③🗂 Anki/CSV 导出（挖空卡+复述卡一键进 Anki）；🏛 记忆宫殿路线引导（首次使用自定义 25 站动线，localStorage 持久化、所有方案通用）；图例条补逻辑桥符号（⇒因果/↔转折/→递进/＋并列/:举例）；修复 v2.18 首屏折叠样式被误嵌套进 v2.16 移动端媒体查询（桌面端 on-boarding/折叠按钮此前无样式）。
-  v2.30.0 组件新增：🤖 发音自动评分——影子跟读面板新增「自动评分」：浏览器 SpeechRecognition 听用户朗读，转写与原句 LCS 逐词对齐后自动填 ✓/✗ 标注（可手动修正后保存），错词 ≥25% 入薄弱清单；能力横幅补「语音识别不可用」行（Chrome/Edge 支持，其余浏览器降级手动自评）。
-  v2.31.0 组件重构：源码拆分至 src/plan/（本文件为构建产物，改源码后 npm run build:template 重新生成）。
-  v2.32.0 组件新增：🔌 进度存储契约收敛——新增 00-store 块（第 1 个脚本块）：键派生与 load/loadRaw/save/patch 唯一实现，main/SR/shadow 的同名函数改为同签名薄委托（调用点零改动）。
+  English Memory Method · 背诵方案模板（plan-template.html · v2.42.2 当前生效）
+  用法：复制本文件为 topic-memorization-plan.html，按下方各节的 ①②③ 节注释提示逐节替换内容。
+  所有样式已内联，不依赖外部资源；结构图为内联 SVG。组件版本历史见仓库 CHANGELOG.md 与页脚版本戳。
 -->
 <html lang="zh-CN">
 <head>
@@ -811,9 +773,9 @@ body.emm-folded .emm-advanced{display:none!important;}
 <!-- ⑦ 挖空自测：每段一个 details，挖 2~5 个关键空，答案放 .answer -->
 <h2>11. 挖空自测（先自己填，再点开对答案）</h2>
 <p class="sec-label">第 1 段 · 边界压测（100 句样本）</p>
-<p style="font-size:15px;margin-top:10px;">This synthetic article carries one ______ sentences in total; every ______ block adds DOM nodes, and the template must stay responsive at this ______. Fill each blank first, then ______ the answers below; the sample exists to keep the ______ honest.</p>
+<p style="font-size:15px;margin-top:10px;">Boundary sentence 1 ______ the template with a moderately long English ______ — item 1 of ______ 1 in this ______ article.</p>
 <details class="answer-toggle"><summary>▶ 查看本段答案</summary>
-<div class="answer">答案：hundred / sent / scale / check / rendering</div>
+<div class="answer">答案：stress-tests / clause / segment / synthetic</div>
 </details>
 
 <!-- ⑧ 短语清单：8~15 条，三列表格：短语 | 中文释义 | 真实语料例句（新闻/TED 风格，搭配加粗，无翻译） -->
@@ -858,7 +820,12 @@ body.emm-folded .emm-advanced{display:none!important;}
 </ul>
 <h3 style="font-size:16px;margin:14px 0 6px;color:#92400e;">三层钩子链（v2.6.0 · 每段一条，逐句放行）</h3>
 <p style="font-size:13.5px;color:#6b7280;margin-bottom:10px;">用法：盖住原文 → 只看链 → 一钩一句往外说。段钩＝这段讲什么；句钩＝该句关键词；桥（⇒因果 / ↔转折 / →递进 / ＋并列 / :举例）解释下一钩为什么接得上；<span style="font-family:Consolas,monospace;color:#1d4ed8;">[方括号]</span>是原句英文锚词——卡壳看锚词，锚词带出原句。卡在哪一钩，就回原文只重背那一句。</p>
-{{HOOK_CHAINS}}
+<div class="hook-chain"><span class="para-hook">段 1 · 边界压测</span><div class="chain-line"><span class="seg">边界句1</span><span class="bridge">→</span><span class="seg">边界句2</span><span class="bridge">→</span><span class="seg">边界句3</span><span class="bridge">→</span><span class="seg">边界句4</span><span class="bridge">→</span><span class="seg">边界句5</span><span class="bridge">→</span><span class="seg">边界句6</span><span class="bridge">→</span><span class="seg">边界句7</span><span class="bridge">→</span><span class="seg">边界句8</span><span class="bridge">→</span><span class="seg">边界句9</span><span class="bridge">→</span><span class="seg">边界句10</span><span class="bridge">→</span><span class="seg">边界句11</span><span class="bridge">→</span><span class="seg">边界句12</span><span class="bridge">→</span><span class="seg">边界句13</span><span class="bridge">→</span><span class="seg">边界句14</span><span class="bridge">→</span><span class="seg">边界句15</span><span class="bridge">→</span><span class="seg">边界句16</span><span class="bridge">→</span><span class="seg">边界句17</span><span class="bridge">→</span><span class="seg">边界句18</span><span class="bridge">→</span><span class="seg">边界句19</span><span class="bridge">→</span><span class="seg">边界句20</span></div><div class="chain-anchors"><span class="anchor">[Boundary sentence 1]</span><span class="anchor">[Boundary sentence 2]</span><span class="anchor">[Boundary sentence 3]</span><span class="anchor">[Boundary sentence 4]</span><span class="anchor">[Boundary sentence 5]</span><span class="anchor">[Boundary sentence 6]</span><span class="anchor">[Boundary sentence 7]</span><span class="anchor">[Boundary sentence 8]</span><span class="anchor">[Boundary sentence 9]</span><span class="anchor">[Boundary sentence 10]</span><span class="anchor">[Boundary sentence 11]</span><span class="anchor">[Boundary sentence 12]</span><span class="anchor">[Boundary sentence 13]</span><span class="anchor">[Boundary sentence 14]</span><span class="anchor">[Boundary sentence 15]</span><span class="anchor">[Boundary sentence 16]</span><span class="anchor">[Boundary sentence 17]</span><span class="anchor">[Boundary sentence 18]</span><span class="anchor">[Boundary sentence 19]</span><span class="anchor">[Boundary sentence 20]</span></div></div>
+<div class="hook-chain"><span class="para-hook">段 2 · 边界压测</span><div class="chain-line"><span class="seg">边界句21</span><span class="bridge">→</span><span class="seg">边界句22</span><span class="bridge">→</span><span class="seg">边界句23</span><span class="bridge">→</span><span class="seg">边界句24</span><span class="bridge">→</span><span class="seg">边界句25</span><span class="bridge">→</span><span class="seg">边界句26</span><span class="bridge">→</span><span class="seg">边界句27</span><span class="bridge">→</span><span class="seg">边界句28</span><span class="bridge">→</span><span class="seg">边界句29</span><span class="bridge">→</span><span class="seg">边界句30</span><span class="bridge">→</span><span class="seg">边界句31</span><span class="bridge">→</span><span class="seg">边界句32</span><span class="bridge">→</span><span class="seg">边界句33</span><span class="bridge">→</span><span class="seg">边界句34</span><span class="bridge">→</span><span class="seg">边界句35</span><span class="bridge">→</span><span class="seg">边界句36</span><span class="bridge">→</span><span class="seg">边界句37</span><span class="bridge">→</span><span class="seg">边界句38</span><span class="bridge">→</span><span class="seg">边界句39</span><span class="bridge">→</span><span class="seg">边界句40</span></div><div class="chain-anchors"><span class="anchor">[Boundary sentence 21]</span><span class="anchor">[Boundary sentence 22]</span><span class="anchor">[Boundary sentence 23]</span><span class="anchor">[Boundary sentence 24]</span><span class="anchor">[Boundary sentence 25]</span><span class="anchor">[Boundary sentence 26]</span><span class="anchor">[Boundary sentence 27]</span><span class="anchor">[Boundary sentence 28]</span><span class="anchor">[Boundary sentence 29]</span><span class="anchor">[Boundary sentence 30]</span><span class="anchor">[Boundary sentence 31]</span><span class="anchor">[Boundary sentence 32]</span><span class="anchor">[Boundary sentence 33]</span><span class="anchor">[Boundary sentence 34]</span><span class="anchor">[Boundary sentence 35]</span><span class="anchor">[Boundary sentence 36]</span><span class="anchor">[Boundary sentence 37]</span><span class="anchor">[Boundary sentence 38]</span><span class="anchor">[Boundary sentence 39]</span><span class="anchor">[Boundary sentence 40]</span></div></div>
+<div class="hook-chain"><span class="para-hook">段 3 · 边界压测</span><div class="chain-line"><span class="seg">边界句41</span><span class="bridge">→</span><span class="seg">边界句42</span><span class="bridge">→</span><span class="seg">边界句43</span><span class="bridge">→</span><span class="seg">边界句44</span><span class="bridge">→</span><span class="seg">边界句45</span><span class="bridge">→</span><span class="seg">边界句46</span><span class="bridge">→</span><span class="seg">边界句47</span><span class="bridge">→</span><span class="seg">边界句48</span><span class="bridge">→</span><span class="seg">边界句49</span><span class="bridge">→</span><span class="seg">边界句50</span><span class="bridge">→</span><span class="seg">边界句51</span><span class="bridge">→</span><span class="seg">边界句52</span><span class="bridge">→</span><span class="seg">边界句53</span><span class="bridge">→</span><span class="seg">边界句54</span><span class="bridge">→</span><span class="seg">边界句55</span><span class="bridge">→</span><span class="seg">边界句56</span><span class="bridge">→</span><span class="seg">边界句57</span><span class="bridge">→</span><span class="seg">边界句58</span><span class="bridge">→</span><span class="seg">边界句59</span><span class="bridge">→</span><span class="seg">边界句60</span></div><div class="chain-anchors"><span class="anchor">[Boundary sentence 41]</span><span class="anchor">[Boundary sentence 42]</span><span class="anchor">[Boundary sentence 43]</span><span class="anchor">[Boundary sentence 44]</span><span class="anchor">[Boundary sentence 45]</span><span class="anchor">[Boundary sentence 46]</span><span class="anchor">[Boundary sentence 47]</span><span class="anchor">[Boundary sentence 48]</span><span class="anchor">[Boundary sentence 49]</span><span class="anchor">[Boundary sentence 50]</span><span class="anchor">[Boundary sentence 51]</span><span class="anchor">[Boundary sentence 52]</span><span class="anchor">[Boundary sentence 53]</span><span class="anchor">[Boundary sentence 54]</span><span class="anchor">[Boundary sentence 55]</span><span class="anchor">[Boundary sentence 56]</span><span class="anchor">[Boundary sentence 57]</span><span class="anchor">[Boundary sentence 58]</span><span class="anchor">[Boundary sentence 59]</span><span class="anchor">[Boundary sentence 60]</span></div></div>
+<div class="hook-chain"><span class="para-hook">段 4 · 边界压测</span><div class="chain-line"><span class="seg">边界句61</span><span class="bridge">→</span><span class="seg">边界句62</span><span class="bridge">→</span><span class="seg">边界句63</span><span class="bridge">→</span><span class="seg">边界句64</span><span class="bridge">→</span><span class="seg">边界句65</span><span class="bridge">→</span><span class="seg">边界句66</span><span class="bridge">→</span><span class="seg">边界句67</span><span class="bridge">→</span><span class="seg">边界句68</span><span class="bridge">→</span><span class="seg">边界句69</span><span class="bridge">→</span><span class="seg">边界句70</span><span class="bridge">→</span><span class="seg">边界句71</span><span class="bridge">→</span><span class="seg">边界句72</span><span class="bridge">→</span><span class="seg">边界句73</span><span class="bridge">→</span><span class="seg">边界句74</span><span class="bridge">→</span><span class="seg">边界句75</span><span class="bridge">→</span><span class="seg">边界句76</span><span class="bridge">→</span><span class="seg">边界句77</span><span class="bridge">→</span><span class="seg">边界句78</span><span class="bridge">→</span><span class="seg">边界句79</span><span class="bridge">→</span><span class="seg">边界句80</span></div><div class="chain-anchors"><span class="anchor">[Boundary sentence 61]</span><span class="anchor">[Boundary sentence 62]</span><span class="anchor">[Boundary sentence 63]</span><span class="anchor">[Boundary sentence 64]</span><span class="anchor">[Boundary sentence 65]</span><span class="anchor">[Boundary sentence 66]</span><span class="anchor">[Boundary sentence 67]</span><span class="anchor">[Boundary sentence 68]</span><span class="anchor">[Boundary sentence 69]</span><span class="anchor">[Boundary sentence 70]</span><span class="anchor">[Boundary sentence 71]</span><span class="anchor">[Boundary sentence 72]</span><span class="anchor">[Boundary sentence 73]</span><span class="anchor">[Boundary sentence 74]</span><span class="anchor">[Boundary sentence 75]</span><span class="anchor">[Boundary sentence 76]</span><span class="anchor">[Boundary sentence 77]</span><span class="anchor">[Boundary sentence 78]</span><span class="anchor">[Boundary sentence 79]</span><span class="anchor">[Boundary sentence 80]</span></div></div>
+<div class="hook-chain"><span class="para-hook">段 5 · 边界压测</span><div class="chain-line"><span class="seg">边界句81</span><span class="bridge">→</span><span class="seg">边界句82</span><span class="bridge">→</span><span class="seg">边界句83</span><span class="bridge">→</span><span class="seg">边界句84</span><span class="bridge">→</span><span class="seg">边界句85</span><span class="bridge">→</span><span class="seg">边界句86</span><span class="bridge">→</span><span class="seg">边界句87</span><span class="bridge">→</span><span class="seg">边界句88</span><span class="bridge">→</span><span class="seg">边界句89</span><span class="bridge">→</span><span class="seg">边界句90</span><span class="bridge">→</span><span class="seg">边界句91</span><span class="bridge">→</span><span class="seg">边界句92</span><span class="bridge">→</span><span class="seg">边界句93</span><span class="bridge">→</span><span class="seg">边界句94</span><span class="bridge">→</span><span class="seg">边界句95</span><span class="bridge">→</span><span class="seg">边界句96</span><span class="bridge">→</span><span class="seg">边界句97</span><span class="bridge">→</span><span class="seg">边界句98</span><span class="bridge">→</span><span class="seg">边界句99</span><span class="bridge">→</span><span class="seg">边界句100</span></div><div class="chain-anchors"><span class="anchor">[Boundary sentence 81]</span><span class="anchor">[Boundary sentence 82]</span><span class="anchor">[Boundary sentence 83]</span><span class="anchor">[Boundary sentence 84]</span><span class="anchor">[Boundary sentence 85]</span><span class="anchor">[Boundary sentence 86]</span><span class="anchor">[Boundary sentence 87]</span><span class="anchor">[Boundary sentence 88]</span><span class="anchor">[Boundary sentence 89]</span><span class="anchor">[Boundary sentence 90]</span><span class="anchor">[Boundary sentence 91]</span><span class="anchor">[Boundary sentence 92]</span><span class="anchor">[Boundary sentence 93]</span><span class="anchor">[Boundary sentence 94]</span><span class="anchor">[Boundary sentence 95]</span><span class="anchor">[Boundary sentence 96]</span><span class="anchor">[Boundary sentence 97]</span><span class="anchor">[Boundary sentence 98]</span><span class="anchor">[Boundary sentence 99]</span><span class="anchor">[Boundary sentence 100]</span></div></div>
+
 </div>
 <div class="tip">💡 额外技巧：录音对比法 —— 录下自己的背诵回放对照原文；{{本篇专属建议}}。</div>
 
@@ -884,7 +851,31 @@ body.emm-folded .emm-advanced{display:none!important;}
 <p style="font-size:14px;color:#374151;margin-bottom:8px;">钩子链是<b>逻辑线索</b>，宫殿是<b>空间线索</b>——两条独立记忆线互为兜底。随机丢句时改走宫殿："走到哪儿"直接提示"该哪句"，<b>空的站点</b>会立刻暴露丢句位置。句钩与锚词直接来自第 15 节钩子链，无需另记内容。</p>
 <p style="font-size:13.5px;color:#6b7280;margin-bottom:6px;"><b>踩点脚本</b>：闭眼从站 1 走到末站，每站停下默念该站句钩与锚词，走完即复习一遍全文顺序。平时走逻辑线（钩子链），卡壳或复习时走空间线（宫殿）。</p>
 <div class="palace-route">
-{{PALACE_STOPS}}
+<div class="palace-stop" data-sents="1,2,3,4"><span class="st-no">站 1</span><span class="st-name">起床</span><div class="st-hook">边界句1 · 边界句2 · 边界句3 · 边界句4</div><span class="st-anchor">[Boundary sentence 1]</span></div>
+<div class="palace-stop" data-sents="5,6,7,8"><span class="st-no">站 2</span><span class="st-name">卫生间</span><div class="st-hook">边界句5 · 边界句6 · 边界句7 · 边界句8</div><span class="st-anchor">[Boundary sentence 5]</span></div>
+<div class="palace-stop" data-sents="9,10,11,12"><span class="st-no">站 3</span><span class="st-name">衣柜</span><div class="st-hook">边界句9 · 边界句10 · 边界句11 · 边界句12</div><span class="st-anchor">[Boundary sentence 9]</span></div>
+<div class="palace-stop" data-sents="13,14,15,16"><span class="st-no">站 4</span><span class="st-name">厨房</span><div class="st-hook">边界句13 · 边界句14 · 边界句15 · 边界句16</div><span class="st-anchor">[Boundary sentence 13]</span></div>
+<div class="palace-stop" data-sents="17,18,19,20"><span class="st-no">站 5</span><span class="st-name">餐桌</span><div class="st-hook">边界句17 · 边界句18 · 边界句19 · 边界句20</div><span class="st-anchor">[Boundary sentence 17]</span></div>
+<div class="palace-stop" data-sents="21,22,23,24"><span class="st-no">站 6</span><span class="st-name">大门</span><div class="st-hook">边界句21 · 边界句22 · 边界句23 · 边界句24</div><span class="st-anchor">[Boundary sentence 21]</span></div>
+<div class="palace-stop" data-sents="25,26,27,28"><span class="st-no">站 7</span><span class="st-name">电梯</span><div class="st-hook">边界句25 · 边界句26 · 边界句27 · 边界句28</div><span class="st-anchor">[Boundary sentence 25]</span></div>
+<div class="palace-stop" data-sents="29,30,31,32"><span class="st-no">站 8</span><span class="st-name">小区门</span><div class="st-hook">边界句29 · 边界句30 · 边界句31 · 边界句32</div><span class="st-anchor">[Boundary sentence 29]</span></div>
+<div class="palace-stop" data-sents="33,34,35,36"><span class="st-no">站 9</span><span class="st-name">公交站</span><div class="st-hook">边界句33 · 边界句34 · 边界句35 · 边界句36</div><span class="st-anchor">[Boundary sentence 33]</span></div>
+<div class="palace-stop" data-sents="37,38,39,40"><span class="st-no">站 10</span><span class="st-name">地铁站</span><div class="st-hook">边界句37 · 边界句38 · 边界句39 · 边界句40</div><span class="st-anchor">[Boundary sentence 37]</span></div>
+<div class="palace-stop" data-sents="41,42,43,44"><span class="st-no">站 11</span><span class="st-name">闸机</span><div class="st-hook">边界句41 · 边界句42 · 边界句43 · 边界句44</div><span class="st-anchor">[Boundary sentence 41]</span></div>
+<div class="palace-stop" data-sents="45,46,47,48"><span class="st-no">站 12</span><span class="st-name">站台</span><div class="st-hook">边界句45 · 边界句46 · 边界句47 · 边界句48</div><span class="st-anchor">[Boundary sentence 45]</span></div>
+<div class="palace-stop" data-sents="49,50,51,52"><span class="st-no">站 13</span><span class="st-name">车厢</span><div class="st-hook">边界句49 · 边界句50 · 边界句51 · 边界句52</div><span class="st-anchor">[Boundary sentence 49]</span></div>
+<div class="palace-stop" data-sents="53,54,55,56"><span class="st-no">站 14</span><span class="st-name">公司大堂</span><div class="st-hook">边界句53 · 边界句54 · 边界句55 · 边界句56</div><span class="st-anchor">[Boundary sentence 53]</span></div>
+<div class="palace-stop" data-sents="57,58,59,60"><span class="st-no">站 15</span><span class="st-name">办公楼电梯</span><div class="st-hook">边界句57 · 边界句58 · 边界句59 · 边界句60</div><span class="st-anchor">[Boundary sentence 57]</span></div>
+<div class="palace-stop" data-sents="61,62,63,64"><span class="st-no">站 16</span><span class="st-name">工位</span><div class="st-hook">边界句61 · 边界句62 · 边界句63 · 边界句64</div><span class="st-anchor">[Boundary sentence 61]</span></div>
+<div class="palace-stop" data-sents="65,66,67,68"><span class="st-no">站 17</span><span class="st-name">茶水间</span><div class="st-hook">边界句65 · 边界句66 · 边界句67 · 边界句68</div><span class="st-anchor">[Boundary sentence 65]</span></div>
+<div class="palace-stop" data-sents="69,70,71,72"><span class="st-no">站 18</span><span class="st-name">会议室</span><div class="st-hook">边界句69 · 边界句70 · 边界句71 · 边界句72</div><span class="st-anchor">[Boundary sentence 69]</span></div>
+<div class="palace-stop" data-sents="73,74,75,76"><span class="st-no">站 19</span><span class="st-name">食堂</span><div class="st-hook">边界句73 · 边界句74 · 边界句75 · 边界句76</div><span class="st-anchor">[Boundary sentence 73]</span></div>
+<div class="palace-stop" data-sents="77,78,79,80"><span class="st-no">站 20</span><span class="st-name">下楼</span><div class="st-hook">边界句77 · 边界句78 · 边界句79 · 边界句80</div><span class="st-anchor">[Boundary sentence 77]</span></div>
+<div class="palace-stop" data-sents="81,82,83,84"><span class="st-no">站 21</span><span class="st-name">超市</span><div class="st-hook">边界句81 · 边界句82 · 边界句83 · 边界句84</div><span class="st-anchor">[Boundary sentence 81]</span></div>
+<div class="palace-stop" data-sents="85,86,87,88"><span class="st-no">站 22</span><span class="st-name">公园</span><div class="st-hook">边界句85 · 边界句86 · 边界句87 · 边界句88</div><span class="st-anchor">[Boundary sentence 85]</span></div>
+<div class="palace-stop" data-sents="89,90,91,92"><span class="st-no">站 23</span><span class="st-name">回家路</span><div class="st-hook">边界句89 · 边界句90 · 边界句91 · 边界句92</div><span class="st-anchor">[Boundary sentence 89]</span></div>
+<div class="palace-stop" data-sents="93,94,95,96"><span class="st-no">站 24</span><span class="st-name">沙发</span><div class="st-hook">边界句93 · 边界句94 · 边界句95 · 边界句96</div><span class="st-anchor">[Boundary sentence 93]</span></div>
+<div class="palace-stop" data-sents="97,98,99,100"><span class="st-no">站 25</span><span class="st-name">床</span><div class="st-hook">边界句97 · 边界句98 · 边界句99 · 边界句100</div><span class="st-anchor">[Boundary sentence 97]</span></div>
 </div>
 </div>
 
@@ -3136,7 +3127,7 @@ window.EMMFSRS = (function(){
 (function(){
   "use strict";
   // 页脚版本戳唯一来源；与模板顶部注释保持一致（RELEASE-CHECKLIST：每份生成方案打开即见"我跑的是哪版"）
-  var EMM_VERSION = 'v2.42.1';
+  var EMM_VERSION = 'v2.42.2';
 
   // 1. 页脚版本戳
   try {

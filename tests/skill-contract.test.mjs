@@ -11,7 +11,7 @@
  *   d. 模板今日任务卡含「复习优先」顺序条；页脚版本戳与 package.json 对齐
  *   e. 根 SKILL.md ≡ skills/ 副本（与 version-check 双保险）
  *
- * 断言数：22（v2.38.0 计入总测试数 721）
+ * 断言数：28（v2.42.2 计入总测试数 851）
  * 跑：node tests/skill-contract.test.mjs
  */
 import fs from 'node:fs';
@@ -32,7 +32,7 @@ const copy = read('skills/english-memory-method/SKILL.md');
 const planTpl = read('assets/plan-template.html');
 const pkg = JSON.parse(read('package.json'));
 
-console.log('\n== v2.38.0 SKILL.md 契约 gate ==');
+console.log('\n== v2.42.2 SKILL.md 契约 gate ==');
 
 // A. description：Agent 每轮都要读的元数据，只写「何时用」不堆功能清单
 const desc = (/^description: (.+)$/m.exec(skill) || [])[1] || '';
@@ -72,6 +72,21 @@ ok(skill.includes('轻量模式行为逐字不变') && skill.includes('回归护
 const zhReadme = read('readme.md'), enReadme = read('readme.en.md');
 ok(zhReadme.includes('自动回炉') && enReadme.includes('auto-schedule'),
   '双语 readme 同步声明标准档自动调度到期句');
+
+// C3. v2.42.2：--eval 质量门禁必须写进交付流程（防止「工具存在但生成流程 0 次引用」复发）
+ok(skill.includes('第 0.5 步 · 质量评测') && skill.includes('verify-plan.mjs <方案.html> --eval'),
+  'SKILL.md 交付流程含第 0.5 步 `verify-plan --eval` 必跑项');
+ok(skill.includes('E1 钩子具体性') && skill.includes('E2 译文长度比') && skill.includes('E3 连读标注覆盖') && skill.includes('E4 IPA 音标规范'),
+  '四条 E 规则口径写进 SKILL.md');
+ok(skill.includes('退出码恒 0') && skill.includes('不阻断交付') && skill.includes('E4 为 fail 级'),
+  'advisory 语义 + E4 fail 必须修复的规则明确');
+ok(skill.includes('evals/') && skill.includes('tests/evals.test.mjs'), '指向固定样本与口径锁测试');
+
+// C4. v2.42.2：FSRS 信源表表述校准（消除与 v2.39 vendor FSRS-5 核心的矛盾）
+ok(skill.includes('v2.42.2 校准') && skill.includes('默认 19 参数 W') && skill.includes('个性化参数优化'),
+  '明确区分「默认参数核心」与「per-user 拟合」两层');
+ok(skill.split('本地单文件场景数据不足').length - 1 === 1,
+  '旧表述「本地单文件场景数据不足」仅允许在 v2.42.2 校准引注中出现 1 次（不再独立出现）');
 
 // D. 代码层：复习优先提示 + 版本戳同步
 ok(planTpl.includes('emm-order') && planTpl.includes('今日顺序') && planTpl.includes('先复习到期段'),

@@ -81,7 +81,23 @@ ok(/⇒/.test(template) && /↔/.test(template) && /→/.test(template), '图例
   try { jumps.forEach(b => b.click()); } catch (e) { threw = true; }
   ok(!threw, '跳转按钮点击不抛错（scrollIntoView 在 jsdom 缺省时被守卫）');
   const ft = doc.querySelector('footer');
-  ok(!!ft && /v2\.42\.1/.test(ft.textContent), '页脚自动渲染版本戳 v2.42.1（v2.37 起随 package.json 同步，消除 v2.30.0 陈旧漂移）');
+  ok(!!ft && /v2\.42\.2/.test(ft.textContent), '页脚自动渲染版本戳 v2.42.2（v2.37 起随 package.json 同步，消除 v2.30.0 陈旧漂移）');
+  // v2.42.2 回归护栏：头部使用注释曾因内嵌 <!-- ① ... --> 提前闭合，孤儿版本史渲染到页面顶部
+  // jsdom 不实现 innerText（undefined），用 textContent 兜底；只取 body 直属文本节点，
+  // 避免把 <script>/<style> 里的字串误判成正文。
+  const ghostText = (function(){
+    if (doc.body.innerText) return doc.body.innerText;
+    let s = '';
+    const walker = doc.createTreeWalker(doc.body, 4 /* NodeFilter.SHOW_TEXT */);
+    while (walker.nextNode()) {
+      const p = walker.currentNode.parentNode;
+      if (p && /^(SCRIPT|STYLE)$/.test(p.nodeName)) continue;
+      s += walker.currentNode.nodeValue;
+    }
+    return s;
+  })();
+  ok(!ghostText.includes('注释逐节替换内容'), '页面正文不渲染头部使用注释（孤儿文本回归护栏）');
+  ok(!ghostText.includes('组件新增'), '页面正文不渲染版本史（版本史只归 CHANGELOG）');
 }
 
 // ── B. 能力横幅：缺录音 → 出现 + 可关闭 + 持久化 ──

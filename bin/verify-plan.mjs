@@ -287,6 +287,8 @@ function rule3_palaceAlignment(html) {
   }
   const badNos = stops.filter((s, i) => s.noNumber !== i + 1);
   if (badNos.length) items.push({ ok: false, msg: `${badNos.length} 个站点站号不连续（期望 1..${stops.length}）`, detail: badNos.slice(0, 5) });
+  // v2.42.2：默认动线 25 站；>25 句应按 SKILL.md M/base/rem 公式「同站多物」而非新增站点
+  if (stops.length > 25) items.push({ ok: false, msg: `站点数 ${stops.length} > 25（默认动线上限；请把多句并入同站 data-sents）` });
   const withData = stops.filter(s => s.dataSents);
   if (withData.length === stops.length) {
     const seen = new Set();

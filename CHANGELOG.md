@@ -4,6 +4,16 @@
 > `SKILL.md` 正文已于 v2.28.2 后"剥离变更日志"——只保留行为规则,版本噪音迁出至此,以减少生成上下文占用。
 > 章节编号以 `assets/plan-template.html` 的 h2 顺序为唯一真相源(记忆钩子=15 / 复述技巧包=16 / 记忆宫殿=17)。
 
+## [2.42.2] (模板头部幽灵文本修复 + 交付门禁/站点公式收口 · 2026-11-14)
+- **根因**：头部「用法」说明行内嵌了字面注释示例 `<!-- ① ... -->`——HTML 注释不允许嵌套，解析器在第一个 `-->` 提前闭合，其后「用法细则 + v2.13~v2.32 全部版本史 + 结尾 -->」约 2.9 KB 裸露为正文文本，被 foster-parenting 渲染到每个生成方案/样本/Pages 页面顶部。该行自 v2.18（安装器发布）引入，潜伏至今；git log -S 确认非并行会话引入。
+- **修复**：plan 与 library 模板头部分别收敛为规范注释（版本史指向 CHANGELOG.md，禁止注释内出现注释箭头序列）；qa-v229 新增 2 项回归护栏（正文不渲染使用注释/版本史）。
+- **FSRS 信源表校准**（并行会话成果一并入库）：SKILL.md 信源表 v2.42.2 校准注——区分「算法核心（01b-fsrs.js 默认 19 参数 W，零历史数据可用）」与「个性化参数优化（需 1000+ 条 review，本 skill 不做）」两层，消除「本地单文件场景数据不足」旧表述的误读；skill-contract C4 断言同步（旧表述仅允许在引注中出现 1 次）。
+- **#1 `--eval` 写进交付流程（并行会话成果一并入库）**：v2.42.0 加了 `verify-plan --eval` 质量门禁，但 `SKILL.md` 里 `--eval` 出现 0 次——与 v2.29.1 修过的「工具早已存在、生成流程 0 次引用」同类。SKILL.md「内容校验」新增**第 0.5 步 · 质量评测**：交付前必跑、4 条 E 规则口径表、advisory（退出码恒 0 不阻断）、**E4 fail 级必须修正后重跑**、质量分与 warn/fail 项必须写进交付说明、无 node 环境用 `?check=1` 替代；skill-contract 加 4 项断言防止再次漂移。
+- **#3 100 句宫殿站点公式（并行会话成果一并入库）**：SKILL.md「记忆宫殿层 · 句站对齐」此前只写「>25 句同站多物挂 2 句」，100 句无法落地。现定义 `M=min(25,n)` / `base=floor(n/M)` / `rem=n mod M` / `站 j 承载 base+(j≤rem?1:0) 句`，把旧的「挂 2 句」收为 26~50 句的特例；n=100 → 25 站各 4 句。`build-samples.mjs` 按公式为 boundary-100 生成真实 `{{HOOK_CHAINS}}`(5 链/100 句钩/95 桥/100 锚点)与 `{{PALACE_STOPS}}`(25 站带 `data-sents`)；`verify-plan.mjs` 规则 3 新增「站数 ≤25」校验；`perf-boundary.test.mjs` 加 12 项结构断言（独立重算公式比对 + 真实跑六条硬门禁）。
+- **#3 顺带抓到并修复存量 bug**：boundary-100 的挖空答案是自造句，4/5 个答案在 `.sent-en` 中找不到（`verify-plan` 规则 5 溯源失败）——此前 perf-boundary 从没对该样本跑过交付硬门禁。改为直接挖第 1 句真实词（`stress-tests / clause / segment / synthetic`），六条硬规则现已全绿。
+- **#1 顺带修复并行护栏崩溃**：qa-v229 新增的孤儿文本回归护栏用了 jsdom 不实现的 `doc.body.innerText`（`undefined.includes` 抛 TypeError，npm test 在第 18 套件中断）。改为 `textContent` TreeWalker 兜底并跳过 `<script>/<style>` 文本，保留原断言意图、断言数不变。
+- **测试**：总测试数 **851**（+20，31 套件；qa-v229 +2、skill-contract +6、perf-boundary +12）。
+
 ## [2.42.1] (FSRS 切换持久化修复 · 2026-11-11)
 - **真机演示抓到的 bug**：🧮 切到 FSRS 后，任意 main 侧 `save(state)`（如阶梯点击）会用内存快照全量覆写进度，抹掉 02-sr patch 写入的 `srAlgo`/转换后的 `sr`。
 - **修复**：① `fresh()` 常驻 `srAlgo:'sm2'` 字段；② 02-sr 的 `switchAlgo` 改经 `window.__emmAlgoSync(algo, srObj)` 钩子同步主内存并走主 save 全量写（无 main 环境退回 patch）。真机复验：切换 → 阶梯保存 → 重载，FSRS 模式完整幸存。

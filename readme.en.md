@@ -7,7 +7,7 @@
 Paste any English article, and it produces a complete memorization plan (**15 sections** regular · **16** speech incl. skeleton · **17** longform incl. segment dashboard; self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.42.1-blue)
+![Version](https://img.shields.io/badge/version-2.42.2-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-15-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -43,7 +43,7 @@ sentence-by-sentence linking marks, hooks welded into question chains, a retelli
 | 📅 | **Today card** | Per-segment Ebbinghaus computes today's work; "set as today's new" reshuffles |
 | 🌐 | **Online samples** | Try before installing: real generated plans on GitHub Pages — check-in / dictation / shadowing, just open |
 | 🗣 | **Chat drill protocol** | One question at a time, reveal only after you answer, three-level honest grading; debrief names your weakest sentence + next due date |
-| 🧪 | **831 automated tests** | Smoke + runtime + 35-step E2E + browser matrix + perf boundary + optional real-browser suite + SKILL.md/installer/platform-drift/SM-2/FSRS scheduling/Feynman mode/interleaved drill/quality-eval contracts, one `npm test` |
+| 🧪 | **851 automated tests** | Smoke + runtime + 35-step E2E + browser matrix + perf boundary + optional real-browser suite + SKILL.md/installer/platform-drift/SM-2/FSRS scheduling/Feynman mode/interleaved drill/quality-eval/head-comment contracts, one `npm test` |
 | 🚦 | **Delivery gate** | `node bin/verify-plan.mjs` runs six hard rules before delivery — non-zero exit blocks it |
 | 🔒 | **Collapsed self-tests** | Fill the blanks first; answers hide behind "▶ 查看本段答案" toggles, auto-hidden when printing |
 | 🖥 | **16+ platforms, one command** | Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi / MiniMax… |
@@ -232,6 +232,8 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 
 **v2.42.1**: 🔧 FSRS toggle persistence fix — a main-side save(state) full-overwrite wiped the srAlgo/converted-sr that 02-sr patched into the store (caught during the live demo); the toggle now syncs main memory via a __emmAlgoSync hook before the full write; qa-v239 gains a regression guard. Total tests **831**.
 
+**v2.42.2**: 🧹 template head ghost-text fix — the usage comment embedded a literal `<!-- ① ... -->` example, closing the comment early and rendering ~2.9 KB of orphaned v2.13–v2.32 version history at the top of every generated page (latent since v2.18); head comments consolidated to a canonical form + qa-v229 regression guard. Same release also lands: 📋 **`--eval` into the delivery flow** (SKILL.md Step 0.5 quality gate — 4 E-rules + 100-point score, advisory/non-blocking, E4 fail must be fixed; the tool existed but the generation flow never referenced it), 🧠 **FSRS source-table calibration** (default 19-parameter core vs. per-user optimization needing 1000+ reviews), 🏛 **100-sentence palace station formula** (`M=min(25,n)` / `base` / `rem` even distribution; n=100 → 25 stations × 4 sentences; the boundary sample now carries real hook chains and `data-sents`, perf-boundary gains 12 structure asserts and runs the six hard rules for real, and a pre-existing untraceable cloze-answer bug was fixed along the way). Total tests **851**.
+
 **Installer fix & executable-chain cleanup** (v2.37.1)
 
 **v2.37.1**: 🔧 fixed a real bug — all three installers omitted `assets/library-template.html`, so "build my memory library" always failed for one-command / npx / offline-bundle installs (the release zip did contain it, but tests only checked the zip, never the installed directory); `bin/install.mjs` now uses a single file manifest, plus an 8-assertion contract test that actually runs the installer. 🗣 the chat-drill due-first chain was unexecutable (the host agent cannot read browser `localStorage`); it is now a **static default** (zero-dependency, works on L1/L2/L3) plus an **optional dynamic tier** triggered when the user pastes exported progress JSON, with a new 7th "capability honesty" rule. 🔄 all 7 L2 platform adapters now carry the drill protocol and review-discipline rules, guarded by a new drift gate. 🧠 SM-2 "standard" is explicitly labeled a **visualization mode, not a scheduler** (graduation still follows the light-mode streak rule). Also aligned the stale library-template header version (stuck since v2.30.0). Total tests **691**.
@@ -404,7 +406,7 @@ Progress is saved in the browser `localStorage`: **it is isolated per browser an
 - Install sources default to `raw.githubusercontent.com` and jsDelivr; if your network is unreliable, use a reachable mirror or an offline package.
 
 ### Output quality depends on the host model
-Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 831 tests cover the **template and runtime**, not the quality of any specific model's generated content.
+Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 851 tests cover the **template and runtime**, not the quality of any specific model's generated content.
 
 ### Who this is NOT for
 - Absolute beginners who want a 5-minute quick-memorize flow (this method is methodology-heavy with a higher onboarding cost).
