@@ -153,6 +153,10 @@ function chainSvg(labels) {
   const w = 760, h = 96, bw = 168;
   const gap = (w - n * bw) / (n + 1);
   let s = '<svg role="img" aria-label="背诵地图" viewBox="0 0 ' + w + ' ' + h + '" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto">';
+  // v2.43.0 a11y：屏幕阅读器需要可朗读的图名与结构说明（SKILL.md 结构图规范硬性要求）
+  s += '<title>《' + labels[0] + '》等 ' + n + ' 段链式背诵地图</title>'
+    + '<desc>全文按 ' + n + ' 个段落自左向右串联，依次为：' + labels.join(' → ')
+    + '。先背总链再进入各段，卡片内是逐句钩子链。</desc>';
   for (let i = 0; i < n; i++) {
     const x = gap + i * (bw + gap);
     s += '<rect x="' + x + '" y="24" width="' + bw + '" height="48" rx="10" fill="#eef3ff" stroke="#4a6fa5" stroke-width="1.5"/>';

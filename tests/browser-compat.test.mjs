@@ -56,8 +56,8 @@ let output = '';
   ok(/兼容性报告/.test(output) || /compatibility/i.test(output), '输出含兼容性报告表头');
 }
 
-// D. 5 个已知 ⚠ API 都在矩阵
-const warned = ['speechSynthesis', 'MediaRecorder', 'getUserMedia', 'confirm', 'alert', 'SpeechRecognition'];
+// D. 已知 ⚠ API 都在矩阵（v2.43 起含 fetch：file:// → loopback 的 CORS 限制）
+const warned = ['speechSynthesis', 'MediaRecorder', 'getUserMedia', 'confirm', 'alert', 'SpeechRecognition', 'fetch'];
 warned.forEach(api => ok(output.includes(api), `矩阵含 ${api}`));
 
 // E. 已知全 ✅ API 也在矩阵（注意：脚本仅展示模板中实际用到的 API，故只选模板里出现的）
@@ -67,7 +67,7 @@ safe.forEach(api => ok(output.includes(api), `矩阵含 ${api}`));
 // F. 警告计数
 {
   const m = output.match(/⚠ 有 (\d+) 个 API/);
-  ok(m && Number(m[1]) === 6, `警告数 = 6（actual ${m ? m[1] : '未匹配'}）`);
+  ok(m && Number(m[1]) === 7, `警告数 = 7（actual ${m ? m[1] : '未匹配'}）`);
 }
 
 // G. --strict 模式：有 ⚠ 时退出码 1

@@ -31,9 +31,11 @@ SM-2 是 1987 年算法；FSRS-5（open-spaced-repetition/ts-fsrs，MIT）用难
 /learn 9c：同一会话内混排多个主题比分块练习更牢（Rohrer & Taylor 2007）。记忆库「今日全局排期」已跨方案，但轻刷仍按方案分块。
 **落地**：今日任务加「🔀 交错模式」开关——把多方案当日到期句混排成一场快刷，结算页按方案分组回写。
 
-### 4. AnkiConnect 直推（可选增强）★★
+### 4. AnkiConnect 直推（可选增强）★★ ✅ 已落地（v2.43.0）
 academic-vocabulary-anki 的核心体验：卡不需要手动导 CSV。探测 `localhost:8765`（AnkiConnect），在线时一键直推挖空/复述卡并带回导入回执；探测失败自动回退现有 CSV 路径。只碰本机 loopback，不破坏离线架构。
-**落地**：Anki 导出面板加「直推」按钮 + 探测逻辑；回执写 progress.log。
+**落地**：复习条新增「📡 直推 Anki」按钮 → `deckNames` 探测（1.5s 超时）→ `createDeck` → `addNotes`（`allowDuplicate=false`）；CSV 与直推共用 `collectAnkiCards()` 避免漂移；回执写 `state.log['anki:<date>']`（本机进度，随 💾 导出一起带走）。**注意**：`file://` 页面 Origin 为 `null`，AnkiConnect 默认 CORS 常拒绝，诊断弹窗会列出插件号 / `webCorsOriginList` / 端口三种原因并**自动回退 CSV**——离线可用性不受影响。
+
+> Top5 至此 5/5 全部落地：FSRS(v2.39.0) / Feynman(v2.40.0) / interleaving(v2.41.0) / evals(v2.42.0) / AnkiConnect(v2.43.0)。
 
 ### 5. 生成质量 evals 集 ★★（工程对齐）
 academic-vocabulary-anki 有 evals/（语言生成样例 + 评测用例）。我们的 verify-plan 六硬规则管「结构完整性」，不管「钩子链/译文好不好」。

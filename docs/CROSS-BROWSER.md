@@ -60,6 +60,12 @@
 
 ## 2. 已知 bug 与根因
 
+### 2.0 "📡 直推 Anki 提示无法连接"（v2.43.0 新增能力，非缺陷）
+- **症状**：点击「📡 直推 Anki」弹出诊断，随后自动下载 CSV。
+- **根因**：`file://` 页面发起跨域请求时 `Origin: null`，而 AnkiConnect 默认 `webCorsOriginList` 不含 `null`；此外 Anki 未启动 / 未装插件（2055492159）/ 端口非 8765 也会失败。`fetch` 在各浏览器都支持，但**从 file:// 到 loopback 的 CORS 取决于 AnkiConnect 配置**。
+- **缓解**：✅ 探测阶段 1.5s 超时 + 全链路 `catch`，失败时弹窗列出三种原因并**自动回退现有 CSV 导出**，不破坏离线架构。想启用直推：在 AnkiConnect 配置 `webCorsOriginList` 加入 `"null"`，或改用 `npm run preview` 以 `http://localhost:4173` 打开方案页。
+- **验证**：`tests/anki-connect.test.mjs`（17 项，含成功/重复卡/无 fetch/fetch 拒绝四条路径）。
+
 ### 2.1 "Firefox 录音按钮点了没反应"
 - **症状**：🎤 录音按钮失效，无 alert
 - **根因**：Firefox < 49 完全不支持 `MediaRecorder`，无对应 `navigator.mediaDevices`；Firefox ≥ 70 应该正常

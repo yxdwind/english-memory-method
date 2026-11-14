@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // english-memory-method · 自动内容校验（v2.17.0+）
-// 实现 SKILL.md §"内容校验（生成后强制执行）" 列出的 6 条硬规则
+// 实现 SKILL.md §"内容校验（生成后强制执行）" 列出的 7 条硬规则
 //
 // Usage:
 //     node bin/verify-plan.mjs <file.html> [--source <原文文本|文件>] [--no-color]
@@ -379,6 +379,35 @@ function rule5_clozeVerifiable(html) {
   };
 }
 
+// v2.43.0 规则 7：把 SKILL.md「记忆库校验第 5 条」的手写 node -e 命令变成机器门禁。
+// 根因：填充后的 memory-library.html 若在数据串里混入裸 `</script`，
+// HTML 解析器会提前闭合脚本、整页 JS 静默挂掉（书架空白），而 node --check 查不出来。
+// 关键判据：<script> 开标签数必须等于 </script 闭合数；记忆库额外要求恰好 2 次
+// （EMMProgressStore 注入块 + 主脚本）。转义写法 <\/script 不含 `</script` 序列，天然安全。
+function rule7_scriptTruncation(html, filePath) {
+  const isLibrary = /library/i.test(filePath || "");
+  const openCount = (html.match(/<script\b/gi) || []).length;
+  const closeCount = (html.match(/<\/script/gi) || []).length;
+  const items = [];
+  if (openCount === 0) {
+    return { id: 7, name: "脚本截断防护", status: "skip", msg: "无 <script> 块", items: [] };
+  }
+  if (closeCount !== openCount) {
+    items.push({ ok: false,
+      msg: `<script> 开标签 ${openCount} 个、</script 闭合 ${closeCount} 个——数据串里很可能混入未转义的 </script，HTML 解析器会提前闭合脚本` });
+  }
+  if (isLibrary && closeCount !== 2) {
+    items.push({ ok: false,
+      msg: `记忆库 </script 必须恰好 2 次（EMMProgressStore 注入块 + 主脚本），实际 ${closeCount} 次` });
+  }
+  return {
+    id: 7, name: "脚本截断防护",
+    status: items.length ? "fail" : "pass",
+    msg: `<script> ${openCount} / </script ${closeCount}${isLibrary ? "（记忆库期望 2）" : ""}`,
+    items,
+  };
+}
+
 function rule6_termAndPatternSourceability(html) {
   const terms = extractTermRows(html);
   const patterns = extractPatternRows(html);
@@ -515,6 +544,7 @@ function verifyFile(filePath, sourceText, opts = {}) {
     rule4_hookChainAlignment(html),
     rule5_clozeVerifiable(html),
     rule6_termAndPatternSourceability(html),
+    rule7_scriptTruncation(html, filePath),
   ];
   let hasAnyFail = false, hasAnyWarn = false;
   results.forEach(r => {
@@ -548,13 +578,14 @@ function printHelp() {
 
 退出码：0=全部通过；1=有 fail；2=参数错误
 
-覆盖的 6 条硬规则（来自 SKILL.md §"内容校验（生成后强制执行）"）：
+覆盖的 7 条硬规则（来自 SKILL.md §"内容校验（生成后强制执行）"）：
   1. 逐句完整性（error）── 句数相等、逐句逐字符一致
   2. 标注精度（warning）── 注解条数 / 连读-弱读-flap-击穿统计 / 音标可疑字符
   3. 宫殿对齐（error）── data-sents 覆盖齐全；站号连续；锚词在原句中可找到
   4. 钩子链对齐（error）── 句钩数==句数；逻辑桥数==句钩-1；锚点≥句钩
   5. 挖空可核对（error）── 2~5 空；空数==答案数；答案词真在原句中
   6. 词汇与金句溯源（error）── 术语词真在原文中；金句摘录前 12 字真在原文中
+  7. 脚本截断防护（error）── <script> 开闭合配平；记忆库 </script 恰好 2 次
 `);
 }
 function readSource(s) {
@@ -586,10 +617,10 @@ function main(argv) {
   if (argv.includes("--eval")) {
     console.log(paint("bold", "english-memory-method · 质量评测（--eval，4 条 E 规则，advisory）"));
     files.forEach(f => evalFile(f));
-    console.log(paint("dim", "（--eval 只输出发现与分数，不影响交付硬门禁；规则 1-6 请去掉 --eval 运行）"));
+    console.log(paint("dim", "（--eval 只输出发现与分数，不影响交付硬门禁；规则 1-7 请去掉 --eval 运行）"));
     return 0;
   }
-  console.log(paint("bold", "english-memory-method · 内容校验（6 条硬规则）"));
+  console.log(paint("bold", "english-memory-method · 内容校验（7 条硬规则）"));
   console.log(paint("dim", `目标: ${files.length} 个文件${sourceText ? "（含原文对比）" : "（未提供 --source，跳过规则 1 逐字符对比）"}`));
   let totalFail = 0, totalWarn = 0;
   files.forEach(f => {
@@ -599,7 +630,7 @@ function main(argv) {
   });
   console.log("");
   if (totalFail === 0 && totalWarn === 0) {
-    console.log(paint("green", `✓ 全部 ${files.length} 个文件通过 6 条硬规则`));
+    console.log(paint("green", `✓ 全部 ${files.length} 个文件通过 7 条硬规则`));
   } else {
     const summary = [];
     if (totalFail) summary.push(paint("red", `${totalFail} 个文件有 error 级失败`));

@@ -37,6 +37,7 @@ const MATRIX = {
   'Intl.DateTimeFormat':        { ch: { v: 24, s: '✅' }, ff: { v: 29, s: '✅' }, sf: { v: 10, s: '✅' }, ie: { v: 12, s: '✅' }, notes: '全部支持' },
   'localStorage':               { ch: { v: 4, s: '✅' }, ff: { v: 3.5, s: '✅' }, sf: { v: 4, s: '✅' }, ie: { v: 12, s: '✅' }, notes: 'file:// 协议配额：Chrome 5MB / Firefox 10MB / Edge 10MB；Safari ≤5MB；超量需 try/catch（已实现）' },
   'Promise':                     { ch: { v: 33, s: '✅' }, ff: { v: 29, s: '✅' }, sf: { v: 8, s: '✅' }, ie: { v: 12, s: '✅' }, notes: '' },
+  'fetch':                       { ch: { v: 42, s: '✅' }, ff: { v: 39, s: '✅' }, sf: { v: 10.1, s: '✅' }, ie: { v: 14, s: '⚠ file:// 页 Origin=null' }, notes: 'v2.43 AnkiConnect 直推用；仅访问 127.0.0.1:8765 loopback，CORS 被拒/超时自动回退 CSV 导出' },
   'scrollIntoView':              { ch: { v: 61, s: '✅ smooth' }, ff: { v: 36, s: '✅ smooth' }, sf: { v: 14, s: '✅ smooth' }, ie: { v: 79, s: '✅ smooth' }, notes: 'Safari < 14 接受 options 但 silent fallback' },
   'MutationObserver':           { ch: { v: 26, s: '✅' }, ff: { v: 14, s: '✅' }, sf: { v: 9.1, s: '✅' }, ie: { v: 12, s: '✅' }, notes: '' },
   'IntersectionObserver':       { ch: { v: 51, s: '✅' }, ff: { v: 55, s: '✅' }, sf: { v: 12.1, s: '⚠' }, ie: { v: 15, s: '✅' }, notes: '未在当前模板中使用' },

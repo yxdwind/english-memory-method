@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <!--
-  English Memory Method · 背诵方案模板（plan-template.html · v2.42.2 当前生效）
+  English Memory Method · 背诵方案模板（plan-template.html · v2.43.0 当前生效）
   用法：复制本文件为 topic-memorization-plan.html，按下方各节的 ①②③ 节注释提示逐节替换内容。
   所有样式已内联，不依赖外部资源；结构图为内联 SVG。组件版本历史见仓库 CHANGELOG.md 与页脚版本戳。
 -->
@@ -180,6 +180,19 @@ body.emm-folded .emm-advanced{display:none!important;}
 .emm-palace-editor{background:#fff;border:1px solid #8b5cf6;border-radius:12px;padding:14px 18px;margin:14px 0;font-size:13.5px;line-height:1.8;}
 .emm-palace-editor h3{margin:0 0 6px 0;font-size:15px;color:#5b21b6;}
 @media print{.emm-palace-onboard,.emm-palace-editor,.emm-palace-manage{display:none!important;}}
+/* v2.43.0 a11y：尊重系统「减少动态效果」偏好。
+   组件大量用 JS 内联 transition 做高亮闪烁/平滑滚动，故用 !important 覆盖内联样式。 */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+    scroll-behavior:auto!important;
+  }
+}
+/* 自测模式下 .sent 变为可键盘操作的按钮，给清晰的焦点轮廓 */
+.sent[role="button"]{cursor:pointer;}
+.sent[role="button"]:focus-visible{outline:3px solid #f59e0b;outline-offset:2px;}
 </style>
 </head>
 <body>
@@ -203,7 +216,7 @@ body.emm-folded .emm-advanced{display:none!important;}
 <!-- ③ 结构图：替换图片路径与说明文字 -->
 <h2>2. 文章结构图（背诵地图）</h2>
 <figure>
-  <svg role="img" aria-label="背诵地图" viewBox="0 0 760 96" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto"><rect x="-13.333333333333334" y="24" width="168" height="48" rx="10" fill="#eef3ff" stroke="#4a6fa5" stroke-width="1.5"/><text x="70.66666666666667" y="44" text-anchor="middle" font-size="13" fill="#1f2d3d">句 1–20</text><text x="70.66666666666667" y="62" text-anchor="middle" font-size="11" fill="#5a6b7f">段 1</text><line x1="158.66666666666666" y1="48" x2="137.33333333333331" y2="48" stroke="#4a6fa5" stroke-width="2" marker-end="url(#arr)"/><rect x="141.33333333333331" y="24" width="168" height="48" rx="10" fill="#eef3ff" stroke="#4a6fa5" stroke-width="1.5"/><text x="225.33333333333331" y="44" text-anchor="middle" font-size="13" fill="#1f2d3d">句 21–40</text><text x="225.33333333333331" y="62" text-anchor="middle" font-size="11" fill="#5a6b7f">段 2</text><line x1="313.3333333333333" y1="48" x2="292" y2="48" stroke="#4a6fa5" stroke-width="2" marker-end="url(#arr)"/><rect x="296" y="24" width="168" height="48" rx="10" fill="#eef3ff" stroke="#4a6fa5" stroke-width="1.5"/><text x="380" y="44" text-anchor="middle" font-size="13" fill="#1f2d3d">句 41–60</text><text x="380" y="62" text-anchor="middle" font-size="11" fill="#5a6b7f">段 3</text><line x1="468" y1="48" x2="446.6666666666667" y2="48" stroke="#4a6fa5" stroke-width="2" marker-end="url(#arr)"/><rect x="450.6666666666667" y="24" width="168" height="48" rx="10" fill="#eef3ff" stroke="#4a6fa5" stroke-width="1.5"/><text x="534.6666666666667" y="44" text-anchor="middle" font-size="13" fill="#1f2d3d">句 61–80</text><text x="534.6666666666667" y="62" text-anchor="middle" font-size="11" fill="#5a6b7f">段 4</text><line x1="622.6666666666667" y1="48" x2="601.3333333333334" y2="48" stroke="#4a6fa5" stroke-width="2" marker-end="url(#arr)"/><rect x="605.3333333333333" y="24" width="168" height="48" rx="10" fill="#eef3ff" stroke="#4a6fa5" stroke-width="1.5"/><text x="689.3333333333333" y="44" text-anchor="middle" font-size="13" fill="#1f2d3d">句 81–100</text><text x="689.3333333333333" y="62" text-anchor="middle" font-size="11" fill="#5a6b7f">段 5</text><defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#4a6fa5"/></marker></defs></svg>
+  <svg role="img" aria-label="背诵地图" viewBox="0 0 760 96" xmlns="http://www.w3.org/2000/svg" style="max-width:100%;height:auto"><title>《句 1–20》等 5 段链式背诵地图</title><desc>全文按 5 个段落自左向右串联，依次为：句 1–20 → 句 21–40 → 句 41–60 → 句 61–80 → 句 81–100。先背总链再进入各段，卡片内是逐句钩子链。</desc><rect x="-13.333333333333334" y="24" width="168" height="48" rx="10" fill="#eef3ff" stroke="#4a6fa5" stroke-width="1.5"/><text x="70.66666666666667" y="44" text-anchor="middle" font-size="13" fill="#1f2d3d">句 1–20</text><text x="70.66666666666667" y="62" text-anchor="middle" font-size="11" fill="#5a6b7f">段 1</text><line x1="158.66666666666666" y1="48" x2="137.33333333333331" y2="48" stroke="#4a6fa5" stroke-width="2" marker-end="url(#arr)"/><rect x="141.33333333333331" y="24" width="168" height="48" rx="10" fill="#eef3ff" stroke="#4a6fa5" stroke-width="1.5"/><text x="225.33333333333331" y="44" text-anchor="middle" font-size="13" fill="#1f2d3d">句 21–40</text><text x="225.33333333333331" y="62" text-anchor="middle" font-size="11" fill="#5a6b7f">段 2</text><line x1="313.3333333333333" y1="48" x2="292" y2="48" stroke="#4a6fa5" stroke-width="2" marker-end="url(#arr)"/><rect x="296" y="24" width="168" height="48" rx="10" fill="#eef3ff" stroke="#4a6fa5" stroke-width="1.5"/><text x="380" y="44" text-anchor="middle" font-size="13" fill="#1f2d3d">句 41–60</text><text x="380" y="62" text-anchor="middle" font-size="11" fill="#5a6b7f">段 3</text><line x1="468" y1="48" x2="446.6666666666667" y2="48" stroke="#4a6fa5" stroke-width="2" marker-end="url(#arr)"/><rect x="450.6666666666667" y="24" width="168" height="48" rx="10" fill="#eef3ff" stroke="#4a6fa5" stroke-width="1.5"/><text x="534.6666666666667" y="44" text-anchor="middle" font-size="13" fill="#1f2d3d">句 61–80</text><text x="534.6666666666667" y="62" text-anchor="middle" font-size="11" fill="#5a6b7f">段 4</text><line x1="622.6666666666667" y1="48" x2="601.3333333333334" y2="48" stroke="#4a6fa5" stroke-width="2" marker-end="url(#arr)"/><rect x="605.3333333333333" y="24" width="168" height="48" rx="10" fill="#eef3ff" stroke="#4a6fa5" stroke-width="1.5"/><text x="689.3333333333333" y="44" text-anchor="middle" font-size="13" fill="#1f2d3d">句 81–100</text><text x="689.3333333333333" y="62" text-anchor="middle" font-size="11" fill="#5a6b7f">段 5</text><defs><marker id="arr" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#4a6fa5"/></marker></defs></svg>
   <figcaption>确定性生成的 100 句合成文章：验证模板在大句数下的渲染与体积上限（性能边界守护样本，tests/perf-boundary.test.mjs 消费）</figcaption>
 </figure>
 
@@ -1185,6 +1198,7 @@ window.EMMFSRS = (function(){
       + '<span class="rv-stat rv-count"></span>'
       + '<button type="button" class="rv-btn rv-export" title="导出当前进度为 JSON 文件（换浏览器 / 换电脑迁移用）">💾 导出</button>'
       + '<button type="button" class="rv-btn rv-anki" title="导出挖空卡 + 复述卡为 CSV（Anki / Excel 可直接导入）">🗂 Anki</button>'
+      + '<button type="button" class="rv-btn rv-anki-push" title="探测本机 AnkiConnect（127.0.0.1:8765）并直接推送卡片；未运行/CORS 未放行时自动回退 CSV">📡 直推 Anki</button>'
       + '<button type="button" class="rv-btn rv-import" title="从 JSON 文件恢复进度">📥 导入</button>'
       + '<input type="file" class="rv-file-input" accept="application/json,.json" style="display:none;">'
       + '<button type="button" class="rv-btn rv-danger rv-reset">重置进度</button>';
@@ -1228,6 +1242,7 @@ window.EMMFSRS = (function(){
     bar.querySelector('.rv-export').addEventListener('click', exportProgress);
     // v2.29.0：Anki 导出按钮接线
     if(bar.querySelector('.rv-anki')) bar.querySelector('.rv-anki').addEventListener('click', exportAnki);
+    if(bar.querySelector('.rv-anki-push')) bar.querySelector('.rv-anki-push').addEventListener('click', pushAnki);
     bar.querySelector('.rv-import').addEventListener('click', function(){
       bar.querySelector('.rv-file-input').click();
     });
@@ -1501,7 +1516,8 @@ window.EMMFSRS = (function(){
     if(/[\t"\n\r]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"';
     return s;
   }
-  function exportAnki(){
+  // v2.43.0：CSV 导出与 AnkiConnect 直推共用同一份卡片来源，避免两条路径漂移
+  function collectAnkiCards(){
     var cards = [];
     // ① 复述卡：中文提示 → 英文原句
     document.querySelectorAll('.sent').forEach(function(node){
@@ -1528,8 +1544,16 @@ window.EMMFSRS = (function(){
       var ans = ansDiv.textContent.replace(/^答案：?/, '').trim();
       if(ctx && ans) cards.push([ctx, ans]);
     });
+    return cards;
+  }
+  function ankiDeckName(){
+    var h1 = document.querySelector('h1') ? document.querySelector('h1').textContent.trim() : (document.title || 'plan');
+    return '英语背诵::' + h1.slice(0, 30);
+  }
+  function exportAnki(){
+    var cards = collectAnkiCards();
     if(!cards.length){ alert('没有可导出的卡片（本篇似乎还没有逐句区或挖空内容）。'); return; }
-    var lines = ['#separator:Tab', '#html:false', '#notetype:Basic', '#columns:Front\tBack', '#deck:英语背诵::' + ((document.querySelector('h1') ? document.querySelector('h1').textContent.trim() : (document.title || 'plan')).slice(0, 30))];
+    var lines = ['#separator:Tab', '#html:false', '#notetype:Basic', '#columns:Front\tBack', '#deck:' + ankiDeckName()];
     cards.forEach(function(c){ lines.push(csvCell(c[0]) + '\t' + csvCell(c[1])); });
     var blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
     var url = URL.createObjectURL(blob);
@@ -1541,6 +1565,71 @@ window.EMMFSRS = (function(){
     document.body.appendChild(a); a.click(); document.body.removeChild(a);
     setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
     alert('已导出 ' + cards.length + ' 张卡片：' + a.download + '\n\nAnki 导入：文件 → 导入 → 选择此 CSV（分隔符已设为 Tab，映射第 1 列=Front、第 2 列=Back）。');
+  }
+
+  /* ===== v2.43.0 EMM_ANKICONNECT_V243: 可选直推（探测失败自动回退 CSV）=====
+     只访问本机 loopback 127.0.0.1:8765，不破坏零依赖 / 离线架构。
+     file:// 页面的 Origin 为 null，AnkiConnect 默认 CORS 常拒绝 → 明确列出原因并回退 CSV。 */
+  var ANKI_URL = 'http://127.0.0.1:8765';
+  function ankiCall(action, params){
+    return fetch(ANKI_URL, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ action: action, version: 6, params: params || {} })
+    }).then(function(r){ return r.json(); }).then(function(j){
+      if(j && j.error) throw new Error(j.error);
+      return j && j.result;
+    });
+  }
+  function ankiProbe(){
+    if(typeof fetch !== 'function') return Promise.reject(new Error('fetch 不可用'));
+    // 用 Promise.race 式超时，不引入 AbortController（保持兼容矩阵最小）
+    return new Promise(function(resolve, reject){
+      var settled = false;
+      var timer = setTimeout(function(){ if(!settled){ settled = true; reject(new Error('连接超时')); } }, 1500);
+      ankiCall('deckNames').then(function(decks){
+        if(settled) return; settled = true; clearTimeout(timer);
+        if(Array.isArray(decks)) resolve(decks); else reject(new Error('AnkiConnect 响应异常'));
+      }, function(e){ if(!settled){ settled = true; clearTimeout(timer); reject(e); } });
+    });
+  }
+  function pushAnki(){
+    var cards = collectAnkiCards();
+    if(!cards.length){ alert('没有可推送的卡片（本篇似乎还没有逐句区或挖空内容）。'); return; }
+    var btn = document.querySelector('.rv-anki-push');
+    var restore = function(){ if(btn){ btn.disabled = false; btn.textContent = '📡 直推 Anki'; } };
+    if(btn){ btn.disabled = true; btn.textContent = '⏳ 探测中…'; }
+    var deck = ankiDeckName();
+    ankiProbe().then(function(){
+      return ankiCall('createDeck', { deck: deck });
+    }).then(function(){
+      var notes = cards.map(function(c){
+        return { deckName: deck, modelName: 'Basic',
+                 fields: { Front: c[0], Back: c[1] },
+                 options: { allowDuplicate: false, duplicateScope: 'deck' },
+                 tags: ['english-memory-method'] };
+      });
+      return ankiCall('addNotes', { notes: notes }).then(function(ids){
+        return { ids: Array.isArray(ids) ? ids : [], total: notes.length };
+      });
+    }).then(function(res){
+      var added = res.ids.filter(function(x){ return x !== null; }).length;
+      var dups = res.total - added;
+      state.log = state.log || {};
+      state.log['anki:' + todayKey()] = JSON.stringify({ deck: deck, total: res.total, added: added, duplicates: dups });
+      save(state);
+      restore();
+      alert('✅ 已直推到 Anki：' + added + ' 张新增'
+        + (dups ? '，' + dups + ' 张重复被跳过（allowDuplicate=false）' : '')
+        + '。\n牌组：' + deck + '\n回执已写入本机进度。');
+    }, function(err){
+      restore();
+      alert('⚠️ 无法连接 AnkiConnect（' + (err && err.message ? err.message : '未知错误') + '）。\n\n'
+        + '常见原因：\n① Anki 未启动或未安装 AnkiConnect 插件（2055492159）；\n'
+        + '② 插件未放行跨域：file:// 页面 Origin 为 null，需在 AnkiConnect 配置的 webCorsOriginList 加入 "null"；\n'
+        + '③ 端口不是 8765。\n\n已自动回退到 CSV 导出，导入步骤不变。');
+      exportAnki();  // 探测失败 → 现有 CSV 路径，零回归
+    });
   }
   function importProgress(ev){
     var file = ev.target.files && ev.target.files[0];
@@ -1999,12 +2088,34 @@ window.EMMFSRS = (function(){
       b.textContent = '🙈 自测：' + ['关', '遮译文', '全遮'][state.quiz || 0];
       b.title = '遮住译文与注解复述（防假流利），点句子临时揭开核对；全遮同时隐藏行内标注样式';
     }
+    // v2.43.0 a11y：只在自测开启时才把 .sent 暴露为按钮，避免常态下多出 N 个无用的 tab 停靠点
+    sentences.forEach(function(s, i){
+      if(state.quiz){
+        s.node.setAttribute('role', 'button');
+        s.node.setAttribute('tabindex', '0');
+        s.node.setAttribute('aria-label', '第 ' + (i + 1) + ' 句：按 Enter 或空格临时揭开译文核对');
+      } else {
+        s.node.removeAttribute('role');
+        s.node.removeAttribute('tabindex');
+        s.node.removeAttribute('aria-label');
+        // 不清 .revealed：v2.13 既有契约是「关闭自测后点句保持原状」，
+        // 且自测关闭时译文本就可见，该 class 无视觉影响。
+      }
+    });
   }
   function wireReveal(){
     sentences.forEach(function(s){
       s.node.addEventListener('click', function(e){
         if(!state.quiz) return;
         if(e.target.closest('button, input, a, .rv-judge, .rv-dict')) return;
+        s.node.classList.toggle('revealed');
+      });
+      // v2.43.0 a11y：Enter / 空格等价于点击；e.target 必须是 .sent 本身，
+      // 让内部评卡按钮、听写输入框、挖空输入框继续自己处理按键。
+      s.node.addEventListener('keydown', function(e){
+        if(!state.quiz || e.target !== s.node) return;
+        if(e.key !== 'Enter' && e.key !== ' ' && e.key !== 'Spacebar') return;
+        e.preventDefault();
         s.node.classList.toggle('revealed');
       });
     });
@@ -2224,14 +2335,14 @@ window.EMMFSRS = (function(){
       if(!s.el) return;
       var div = document.createElement('div');
       div.className = 'wb-line';
-      div.innerHTML = '✍️ 我的一句话主线（亲手写，记忆翻倍）：<span class="wb-input" contenteditable="true" data-k="m' + i + '"></span>';
+      div.innerHTML = '✍️ 我的一句话主线（亲手写，记忆翻倍）：<span class="wb-input" contenteditable="true" role="textbox" aria-label="第 ' + (i + 1) + ' 段：亲手写一句话主线" data-k="m' + i + '"></span>';
       s.el.parentNode.insertBefore(div, s.el.nextSibling);
     });
     var stops = document.querySelectorAll('.palace-stop');
     Array.prototype.forEach.call(stops, function(st, i){
       var div = document.createElement('div');
       div.className = 'wb-line';
-      div.innerHTML = '🎨 我的画面：<span class="wb-input" contenteditable="true" data-k="p' + i + '"></span>';
+      div.innerHTML = '🎨 我的画面：<span class="wb-input" contenteditable="true" role="textbox" aria-label="记忆宫殿站 ' + (i + 1) + '：亲手写的画面" data-k="p' + i + '"></span>';
       st.appendChild(div);
     });
     var timer = null;
@@ -3127,7 +3238,7 @@ window.EMMFSRS = (function(){
 (function(){
   "use strict";
   // 页脚版本戳唯一来源；与模板顶部注释保持一致（RELEASE-CHECKLIST：每份生成方案打开即见"我跑的是哪版"）
-  var EMM_VERSION = 'v2.42.2';
+  var EMM_VERSION = 'v2.43.0';
 
   // 1. 页脚版本戳
   try {

@@ -8,7 +8,7 @@
  *   d. jsdom 全量渲染（按序 eval 全部脚本块）：DOM 中 100 句齐全
  *   e. 渲染 + 脚本求值总耗时宽松阈值（拦 O(n²) 级病态；jsdom 非真实浏览器，只做量级守护）
  *   f. v2.42.2 结构完整性：§15 钩子链 / §17 宫殿站点真实存在，且按 SKILL.md M/base/rem
- *      公式均匀分摊 100 句；verify-plan 六条硬规则对该样本退出码 0
+ *      公式均匀分摊 100 句；verify-plan 七条硬规则对该样本退出码 0
  *
  * 跑：node tests/perf-boundary.test.mjs
  */
@@ -94,7 +94,7 @@ try {
   vOut = execFileSync(process.execPath,
     [path.join(ROOT, 'bin', 'verify-plan.mjs'), SAMPLE, '--no-color'], { encoding: 'utf8' });
 } catch (e) { vCode = e.status ?? 1; vOut = (e.stdout || '') + (e.stderr || ''); }
-ok(vCode === 0, `verify-plan 对 100 句样本六条硬规则退出码 0（实际 ${vCode}）`);
+ok(vCode === 0, `verify-plan 对 100 句样本七条硬规则退出码 0（实际 ${vCode}）`);
 const lineOf = id => (vOut.split('\n').find(l => l.includes(id)) || '');
 ok(/✅/.test(lineOf('规则 3 宫殿对齐')), '规则 3 宫殿对齐为 ✅（非 skip / fail）');
 ok(/✅/.test(lineOf('规则 4 钩子链对齐')), '规则 4 钩子链对齐为 ✅（非 skip / fail）');

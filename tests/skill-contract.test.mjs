@@ -88,6 +88,13 @@ ok(skill.includes('v2.42.2 校准') && skill.includes('默认 19 参数 W') && s
 ok(skill.split('本地单文件场景数据不足').length - 1 === 1,
   '旧表述「本地单文件场景数据不足」仅允许在 v2.42.2 校准引注中出现 1 次（不再独立出现）');
 
+// C5. v2.43.0：脚本截断硬校验 / a11y 规范 / AnkiConnect 双通道
+ok(skill.includes('规则 7') && skill.includes('脚本截断'), 'SKILL.md 声明第 7 条硬规则已机器化');
+ok(/结构图规范/.test(skill) && skill.includes('<title>') && skill.includes('<desc>'),
+  '结构图规范含 SVG title/desc 可访问性要求');
+ok(skill.includes('AnkiConnect') && skill.includes('自动回退 CSV') && skill.includes('collectAnkiCards'),
+  'Anki 双通道 + 共用卡片来源 + 失败回退已写入 SKILL.md');
+
 // D. 代码层：复习优先提示 + 版本戳同步
 ok(planTpl.includes('emm-order') && planTpl.includes('今日顺序') && planTpl.includes('先复习到期段'),
   '模板今日任务卡含「⏱ 今日顺序」复习优先条');

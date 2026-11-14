@@ -7,7 +7,7 @@
 Paste any English article, and it produces a complete memorization plan (**15 sections** regular · **16** speech incl. skeleton · **17** longform incl. segment dashboard; self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.42.2-blue)
+![Version](https://img.shields.io/badge/version-2.43.0-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-15-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -43,8 +43,9 @@ sentence-by-sentence linking marks, hooks welded into question chains, a retelli
 | 📅 | **Today card** | Per-segment Ebbinghaus computes today's work; "set as today's new" reshuffles |
 | 🌐 | **Online samples** | Try before installing: real generated plans on GitHub Pages — check-in / dictation / shadowing, just open |
 | 🗣 | **Chat drill protocol** | One question at a time, reveal only after you answer, three-level honest grading; debrief names your weakest sentence + next due date |
-| 🧪 | **851 automated tests** | Smoke + runtime + 35-step E2E + browser matrix + perf boundary + optional real-browser suite + SKILL.md/installer/platform-drift/SM-2/FSRS scheduling/Feynman mode/interleaved drill/quality-eval/head-comment contracts, one `npm test` |
-| 🚦 | **Delivery gate** | `node bin/verify-plan.mjs` runs six hard rules before delivery — non-zero exit blocks it |
+| 📡 | **AnkiConnect push** | Probes local port 8765 and pushes cloze/retell cards directly, skips duplicates and logs a receipt; falls back to CSV automatically when offline or CORS-blocked |
+| 🧪 | **900 automated tests** | Smoke + runtime + 35-step E2E + browser matrix + perf boundary + optional real-browser suite + SKILL.md/installer/platform-drift/SM-2/FSRS scheduling/Feynman mode/interleaved drill/quality-eval/head-comment contracts, one `npm test` |
+| 🚦 | **Delivery gate** | `node bin/verify-plan.mjs` runs seven hard rules before delivery (fidelity / palace / hook chains / cloze / sourcing / script truncation) — non-zero exit blocks it |
 | 🔒 | **Collapsed self-tests** | Fill the blanks first; answers hide behind "▶ 查看本段答案" toggles, auto-hidden when printing |
 | 🖥 | **16+ platforms, one command** | Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi / MiniMax… |
 | 📄 | **Self-contained single file** | Each plan is one HTML: inline SVG, collapsible, print-friendly, zero external dependencies |
@@ -217,6 +218,10 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 > Newest first; earliest versions in the collapsed section at the bottom.
 
 > Full version history (including historical bug fixes and CI self-check anchors `EMM_*`) has been moved to [CHANGELOG.md](CHANGELOG.md).
+
+**Delivery gate / accessibility / Anki push** (v2.43.0)
+
+**v2.43.0**: 🛡 the `</script` truncation check becomes **hard rule #7** — it previously existed only as a hand-written `node -e` snippet in SKILL.md and was never implemented in `verify-plan`; now script open/close tags are balanced and library files must have exactly 2 closings. ♿ **a11y quartet**: `prefers-reduced-motion`, keyboard-operable sentences in self-test mode (Enter/Space), `role=textbox`+`aria-label` on editable blanks, and SVG `<title>/<desc>` on structure maps. 📡 **AnkiConnect push** (the last of the benchmark Top 5, now 5/5): probes local port 8765, pushes cards directly, skips duplicates, logs a receipt, and falls back to CSV automatically on CORS rejection or timeout. `dist/` release bundle regenerated (was stuck at v2.31.0). Total tests **900**.
 
 **SM-2 actually drives scheduling** (v2.38.0)
 
@@ -401,12 +406,14 @@ Progress is saved in the browser `localStorage`: **it is isolated per browser an
 
 **Chat drill cannot read local progress**: the conversation is isolated from the browser page, so the AI **cannot read `localStorage`** — by default it quizzes from the plan file's content. Only when you paste the 💾-exported JSON or a weak-sentence list into the chat does it switch to due-first ordering. 🧠 standard SM-2 scheduling runs **inside that HTML page only** (synced on open / end-of-round / switching to standard); it does not cross browsers or devices and does not push to your system calendar — use 💾/📥 JSON export/import for that.
 
+**📡 Anki push needs local CORS opt-in**: a `file://` page sends `Origin: null` to `127.0.0.1:8765`, which AnkiConnect's default `webCorsOriginList` usually rejects — add `"null"` there, or open plans via `npm run preview` at `http://localhost:4173`. If probing fails (Anki not running / plugin 2055492159 missing / wrong port / timeout), a diagnostic appears and it **automatically falls back to CSV export**; offline use is unaffected.
+
 ### Install & network
 - One-line install executes a remote script (`irm | iex` / `curl | bash`). In security-sensitive environments, **download and review the script first**, or use `npx` / the plugin marketplace.
 - Install sources default to `raw.githubusercontent.com` and jsDelivr; if your network is unreliable, use a reachable mirror or an offline package.
 
 ### Output quality depends on the host model
-Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 851 tests cover the **template and runtime**, not the quality of any specific model's generated content.
+Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 900 tests cover the **template and runtime**, not the quality of any specific model's generated content.
 
 ### Who this is NOT for
 - Absolute beginners who want a 5-minute quick-memorize flow (this method is methodology-heavy with a higher onboarding cost).

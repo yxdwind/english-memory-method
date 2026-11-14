@@ -169,3 +169,16 @@ body.emm-folded .emm-advanced{display:none!important;}
 .emm-palace-editor{background:#fff;border:1px solid #8b5cf6;border-radius:12px;padding:14px 18px;margin:14px 0;font-size:13.5px;line-height:1.8;}
 .emm-palace-editor h3{margin:0 0 6px 0;font-size:15px;color:#5b21b6;}
 @media print{.emm-palace-onboard,.emm-palace-editor,.emm-palace-manage{display:none!important;}}
+/* v2.43.0 a11y：尊重系统「减少动态效果」偏好。
+   组件大量用 JS 内联 transition 做高亮闪烁/平滑滚动，故用 !important 覆盖内联样式。 */
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{
+    animation-duration:.01ms!important;
+    animation-iteration-count:1!important;
+    transition-duration:.01ms!important;
+    scroll-behavior:auto!important;
+  }
+}
+/* 自测模式下 .sent 变为可键盘操作的按钮，给清晰的焦点轮廓 */
+.sent[role="button"]{cursor:pointer;}
+.sent[role="button"]:focus-visible{outline:3px solid #f59e0b;outline-offset:2px;}

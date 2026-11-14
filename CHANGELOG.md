@@ -4,6 +4,14 @@
 > `SKILL.md` 正文已于 v2.28.2 后"剥离变更日志"——只保留行为规则,版本噪音迁出至此,以减少生成上下文占用。
 > 章节编号以 `assets/plan-template.html` 的 h2 顺序为唯一真相源(记忆钩子=15 / 复述技巧包=16 / 记忆宫殿=17)。
 
+## [2.43.0] (脚本截断硬校验 + a11y + AnkiConnect 直推 · 2026-11-14)
+- **A · `</script` 生成端硬校验机器化（规则 7）**：SKILL.md「记忆库校验第 5 条」从 v2.28.1 起就硬性要求填充后的 `memory-library.html` 里 `</script` 恰好 2 次，但一直只给了一条手写 `node -e` 命令，`verify-plan.mjs` 完全没实现——数据串里混入裸 `</script` 会让 HTML 解析器提前闭合脚本、整页 JS 静默挂掉（书架空白），而 `node --check` 查不出来。新增 **规则 7 脚本截断防护**：校验 `<script>` 开闭合配平，对 library 文件额外强制「恰好 2 次」；转义写法 `<\/script` 不误报。CLI help / 启动横幅 / 成功文案由 6 条改为 7 条，SKILL.md 内容校验与记忆库校验两处标注「已机器化」。新增 `tests/script-truncation.test.mjs`（13 项，含注入裸 `</script`、多一个脚本块、转义写法三类样本）。
+- **B · a11y 基础四件套**（`ANALYSIS.md §2.3.5` 评 4/10 后一直未动）：① `prefers-reduced-motion: reduce` 媒体查询用 `!important` 覆盖组件大量 JS 内联 `transition`；② 自测模式下 `.sent` 才暴露 `role=button/tabindex/aria-label` 并支持 **Enter / 空格**键盘揭开（常态下不制造多余 tab 停靠点），关闭自测即移除语义；③ 亲手改造留白 `contenteditable` 补 `role="textbox"` + 互不重复的 `aria-label`；④ 结构图 SVG 硬性要求 `role="img"` + `<title>` + `<desc>`，`bin/build-samples.mjs` 的 `chainSvg()` 作为参考实现，3 个样例内联 SVG 全部补齐。新增 `tests/a11y.test.mjs`（15 项）。
+- **C · AnkiConnect 可选直推**（`docs/SIMILAR-SKILLS.md` Top5 最后一项，至此 **5/5 全部落地**）：复习条新增「📡 直推 Anki」，探测本机 `127.0.0.1:8765` → `deckNames` → `createDeck` → `addNotes`（`allowDuplicate=false` 跳过重复），回执写 `state.log['anki:<日期>']`。**CSV 与直推共用 `collectAnkiCards()`**，避免两条路径漂移。探测失败 / CORS 被拒 / 1.5s 超时一律弹诊断（插件 2055492159、`webCorsOriginList` 需含 `"null"`、端口）并**自动回退现有 CSV 导出**，离线架构零破坏；`fetch` 登记进跨浏览器矩阵（警告数 6→7），`docs/CROSS-BROWSER.md` 新增 §2.0。新增 `tests/anki-connect.test.mjs`（17 项，含成功/重复卡/无 fetch/fetch 拒绝四条路径）。
+- **D · 重发 dist 发布包**：`dist/` 里一直是 `v2.31.0` 的 zip 与 Nov 2 的 SHA256SUMS（落后 12 个版本），`npm run build:release` 产出 v2.43.0 zip + 双层校验和。
+- **文档**：双语 readme 功能表 / 已知局限 / 版本历史、`docs/SIMILAR-SKILLS.md` #4、`docs/CROSS-BROWSER.md`、SKILL.md 组件能力清单同步；`tests/skill-contract.test.mjs` 加 3 项契约断言锁住新规范。
+- **测试**：总测试数 **900**（+49，34 套件；新 3 套件 45 项 + skill-contract 3 + browser-compat 1）。
+
 ## [2.42.2] (模板头部幽灵文本修复 + 交付门禁/站点公式收口 · 2026-11-14)
 - **根因**：头部「用法」说明行内嵌了字面注释示例 `<!-- ① ... -->`——HTML 注释不允许嵌套，解析器在第一个 `-->` 提前闭合，其后「用法细则 + v2.13~v2.32 全部版本史 + 结尾 -->」约 2.9 KB 裸露为正文文本，被 foster-parenting 渲染到每个生成方案/样本/Pages 页面顶部。该行自 v2.18（安装器发布）引入，潜伏至今；git log -S 确认非并行会话引入。
 - **修复**：plan 与 library 模板头部分别收敛为规范注释（版本史指向 CHANGELOG.md，禁止注释内出现注释箭头序列）；qa-v229 新增 2 项回归护栏（正文不渲染使用注释/版本史）。
