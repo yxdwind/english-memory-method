@@ -185,6 +185,7 @@ function checkCopyIdentity() {
     ["assets/plan-template.html", "skills/english-memory-method/assets/plan-template.html"],
     ["assets/library-template.html", "skills/english-memory-method/assets/library-template.html"],
     ["SKILL.md", "skills/english-memory-method/SKILL.md"],
+    ["REFERENCE.md", "skills/english-memory-method/REFERENCE.md"],
   ];
   const out = [];
   for (const [main, copy] of PAIRS) {

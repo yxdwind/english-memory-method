@@ -4,6 +4,18 @@
 > `SKILL.md` 正文已于 v2.28.2 后"剥离变更日志"——只保留行为规则,版本噪音迁出至此,以减少生成上下文占用。
 > 章节编号以 `assets/plan-template.html` 的 h2 顺序为唯一真相源(记忆钩子=15 / 复述技巧包=16 / 记忆宫殿=17)。
 
+## [2.44.0] (生成效应联动 + 渐进披露 + 实证采集工具 · 2026-11-14)
+- **#1 留白 ↔ 阶梯升级联动(闭环 `ANALYSIS.md §2.1.3`「用户不改留白怎么办」)**:升到 **L2 及以上**时,若该段「一句话主线」还没亲手写,组件弹一次带 Slamecka & Graf (1978) 出处的强提醒——**取消 = 不升级并滚动聚焦到该段留白输入框,确定 = 仍可升级**(逃生口,不把不愿填的用户锁死)。L1 起步 / 降级 / 点当前级别 / 已填留白四种情况不打扰。顺带给 `contenteditable` 留白补 `tabindex="0"`,让 `focus()` 在真实浏览器里生效。
+  - **设计取舍**:用 `confirm` 软阻断而非硬阻断。既有 8 处阶梯点击用例的 `confirm` 默认返回 true,零回归;真实用户拿到强提醒 + 选择权。`tests/wb-gate.test.mjs`(16 项)覆盖取消/确定/已填/起步/降级/现场填写六条路径。
+- **#2 渐进披露拆分(闭环信源表里自认的「暂无 `REFERENCE.md` 拆分层」待办)**:新增 `REFERENCE.md`(根 + `skills/` 双副本,60 行),把 3 个纯参考章节——「同类 skill 借鉴与信源」「记忆力友好包」「主要参考出处」——从生成路径移出;`SKILL.md` 515 → 483 行,顶部新增「参考层(按需加载)」导航表,逐项写明触发条件。**执行规则(命名规范/结构图规范/内容校验七条硬规则/记忆库/陪练协议/调度规则)一律不外迁**,避免模型生成时缺约束。
+  - **全链路同步**(不能只搬文件):3 个安装器 `FILES` 加 `REFERENCE.md`、`build-release.mjs` 白名单、`release-build.test.mjs` 产物断言、`version-check.mjs` 副本一致性对、`skill-contract.test.mjs` 信源断言改读参考层 + 新增「SKILL.md ≤ 500 行」防膨胀门禁。`tests/progressive-disclosure.test.mjs`(15 项)**实跑安装器**确认 4 个文件都落地。
+  - 诚实说明:净减仅 18 行(导航占 14 行),本次主要价值是**建立参考层架构先例**与分发链路,后续可继续外迁低频内容。
+- **#3 实证研究采集工具(推进 `docs/RESEARCH.md §12`)**:新增 `research/session.html`——自包含单文件、零外链、**不联网**(无 fetch/XHR/WebSocket)、数据只写本机 localStorage、按 `data_schema` 组装嵌套对象、导出 `<Pxx>-emm-research.json`、隐私声明禁止自由文本写可识别信息。新增 `bin/research-validate.mjs`——零依赖 draft-07 子集校验(必填/类型/范围/枚举/格式/items)+ `--csv` 扁平导出 + `--anon` 匿名化(剔除 transcript),退出码 1 阻断进入统计。
+  - **校验器两次按真实数据校准**:① `total_pct` 与 `score_per_sentence` 在协议 §5 是**两个独立指标**(示例里就差 5 分),初版误加的「一致性硬约束」降级为复核提示、不阻断;② 对照组把不适用的 `exploratory` 指标写成 `null`,校验器对**非必填字段的 null** 按「未采集」跳过,必填字段为 null 仍报错。`tests/research-collector.test.mjs`(30 项)覆盖页面离线性质、jsdom 存/取/导出、7 类负向数据、CSV/匿名化。
+  - **状态边界**:工具链就绪 ≠ 有实证数据。RESEARCH.md §12 明确 4 项组织性待办(IRB / 材料 / 后端 / 启动)仍未完成,「缺乏实证」短板尚未消除。
+- **文档 / 发布**:双语 readme 功能表与版本历史、`docs/RESEARCH.md` §12、`docs/CROSS-BROWSER.md` 同步;`research/` 加入离线发布包目录白名单。
+- **测试**：总测试数 **971**（+71，37 套件；新增 3 套件 61 项，其余 10 项为契约门禁与安装/发布链路断言扩展）。
+
 ## [2.43.0] (脚本截断硬校验 + a11y + AnkiConnect 直推 · 2026-11-14)
 - **A · `</script` 生成端硬校验机器化（规则 7）**：SKILL.md「记忆库校验第 5 条」从 v2.28.1 起就硬性要求填充后的 `memory-library.html` 里 `</script` 恰好 2 次，但一直只给了一条手写 `node -e` 命令，`verify-plan.mjs` 完全没实现——数据串里混入裸 `</script` 会让 HTML 解析器提前闭合脚本、整页 JS 静默挂掉（书架空白），而 `node --check` 查不出来。新增 **规则 7 脚本截断防护**：校验 `<script>` 开闭合配平，对 library 文件额外强制「恰好 2 次」；转义写法 `<\/script` 不误报。CLI help / 启动横幅 / 成功文案由 6 条改为 7 条，SKILL.md 内容校验与记忆库校验两处标注「已机器化」。新增 `tests/script-truncation.test.mjs`（13 项，含注入裸 `</script`、多一个脚本块、转义写法三类样本）。
 - **B · a11y 基础四件套**（`ANALYSIS.md §2.3.5` 评 4/10 后一直未动）：① `prefers-reduced-motion: reduce` 媒体查询用 `!important` 覆盖组件大量 JS 内联 `transition`；② 自测模式下 `.sent` 才暴露 `role=button/tabindex/aria-label` 并支持 **Enter / 空格**键盘揭开（常态下不制造多余 tab 停靠点），关闭自测即移除语义；③ 亲手改造留白 `contenteditable` 补 `role="textbox"` + 互不重复的 `aria-label`；④ 结构图 SVG 硬性要求 `role="img"` + `<title>` + `<desc>`，`bin/build-samples.mjs` 的 `chainSvg()` 作为参考实现，3 个样例内联 SVG 全部补齐。新增 `tests/a11y.test.mjs`（15 项）。

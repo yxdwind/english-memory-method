@@ -308,11 +308,17 @@ D7  D7 测试（默写 + 主观 + 重测速度）
 ## 12. 状态与待办
 
 - [x] 实验设计草案 v0.1（2026-10-01）
+- [x] 受试者采集页 `research/session.html` 完成（v2.44.0）——自包含单文件、不联网、localStorage 本机保存、按 `data_schema` 组装、导出 JSON；隐私声明禁止在自由文本里写可识别信息
+- [x] 数据校验门禁 `bin/research-validate.mjs` 完成（v2.44.0）——draft-07 子集校验（必填/类型/范围/枚举/格式/items）+ `total_pct` 与逐句评分跨字段一致性 + `--csv` 扁平导出 + `--anon` 匿名化（剔除 transcript）；`tests/research-collector.test.mjs` 守护
 - [ ] 招募合作研究者 + IRB 审批
 - [ ] 材料选定（具体哪 200 词文本 + 谁翻译）
-- [ ] 受试者用模板 `research-template.html` 完成
-- [ ] 数据采集后端（加密 + 导出）
+- [ ] 数据采集后端（加密 + 导出）——当前为纯本机方案，多中心/跨设备需要服务端，与 §7 数据留存策略一并评估
 - [ ] 启动日期敲定
+
+> **v2.44.0 状态说明**：工具链已就绪，但**仍无受试者数据**，「缺乏实证」这一短板尚未消除——采集与统计能力不等于研究结论。上面 4 项组织性待办（伦理、材料、后端、启动）不依赖代码，需研究者推进。
+>
+> 使用顺序：`research/session.html`（录入）→ 导出 `<Pxx>-emm-research.json` →
+> `node bin/research-validate.mjs <文件> --csv out.csv --anon anon.json` → 统计。
 
 ---
 

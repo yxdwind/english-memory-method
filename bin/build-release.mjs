@@ -84,10 +84,10 @@ export function runGate(pkg, root = PKG_ROOT) {
 
 // ── 发布文件白名单（目录递归，确定性排序） ────────────────────────────────
 const BUNDLE_FILES = [
-  "SKILL.md", "README.md", "readme.en.md", "CHANGELOG.md", "RELEASE-CHECKLIST.md",
+  "SKILL.md", "REFERENCE.md", "README.md", "readme.en.md", "CHANGELOG.md", "RELEASE-CHECKLIST.md",
   "ANALYSIS.md", "license", "package.json", "install.sh", "install.ps1",
 ];
-const BUNDLE_DIRS = ["bin", "assets", "skills", "platforms", "docs", ".claude-plugin"];
+const BUNDLE_DIRS = ["bin", "assets", "skills", "platforms", "docs", "research", ".claude-plugin"];
 // 明确排除（开发/CI 专用，不进离线包）
 const EXCLUDE = [/^\.DS_Store$/, /^node_modules$/, /\.log$/, /^dist$/];
 

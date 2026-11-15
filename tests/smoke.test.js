@@ -141,6 +141,10 @@ async function run(name, withSegments, query) {
   ok(lv3locked.disabled === true, '未定级时 L3 锁定（v2.22 渐进引导）');
   const lv1 = card.querySelector('.emm-lv[data-seg="0"][data-lv="1"]');
   ok(lv1.disabled === false, 'L1 默认可用');
+  // v2.44.0：生成效应联动——主流程先亲手写该段主线，再升阶梯（已填留白不触发强提醒）。
+  // 「取消 / 跳过」两条分支由 tests/wb-gate.test.mjs 专门覆盖。
+  const wb0 = doc.querySelector('.wb-input[data-k="m0"]');
+  if (wb0) { wb0.textContent = '冒烟流程主线'; wb0.dispatchEvent(new w.Event('input', { bubbles: true })); }
   lv1.click();
   ok(!!card.querySelector('.emm-lv[data-seg="0"][data-lv="1"].emm-lv-on'), '点 L1 后点亮并落档');
   const lv3 = card.querySelector('.emm-lv[data-seg="0"][data-lv="3"]');

@@ -3,9 +3,23 @@ name: english-memory-method
 description: 把任意英文篇章（议论文/说明文/叙事文/演讲稿）拆成结构骨架、关键词链与三层钩子链，交付 SVG 结构图 + 自包含 HTML 背诵方案（逐句翻译/连读标注/挖空自测/复习打卡/听写/影子跟读/SM-2 调度 + FSRS-5 调度一键切换/记忆宫殿/费曼追问），并可把背过的方案汇总成个人记忆库。当用户给出英文文章并说「背诵方法 / 记忆技巧 / 帮我背 / 出背诵方案 / 和上面一样的记忆技巧」时使用；用户说「考我 / 陪我练 / 抽查 / 复述给你听」时进入对话陪练协议；用户说「生成记忆库 / 更新记忆库 / 汇总我的方案」时执行记忆库流程。翻译默认中文，可传参换语种；L2/L3 平台交 Markdown 精简版。
 ---
 
-# English Memory Method(英语篇章背诵法)v2.43.0
+# English Memory Method(英语篇章背诵法)v2.44.0
 
 帮助用户快速背熟英文篇章。核心流程:**拆骨架 → 串关键词并焊成链 → 链式复述(L1→L5 阶梯)→ 间隔复习**;最后交付结构图(SVG)+ HTML 背诵方案 + 挖空自测。回复语言与用户一致。
+
+## 参考层(按需加载 · v2.44.0 渐进披露)
+
+`SKILL.md` 只保留**生成方案时必须执行**的规则。下列低频内容已迁至同目录 `REFERENCE.md`,**仅在命中触发条件时读取**,不要每轮预加载:
+
+| 章节 | 何时读取 |
+|---|---|
+| 同类 skill 借鉴与信源(A/B/C 评级 + URL) | 核对方法论来源、被 review 问「这些规则哪来的」、或准备新增对标项时 |
+| 记忆力友好包 | 用户明确说「记性差 / 背不动 / 压力大」时,取减量与减压建议 |
+| 主要参考出处(一手论文) | 需要给出学术依据、写论文/报告引用时 |
+
+**仍留在 `SKILL.md`(执行规则,不可外迁)**:命名规范、结构图规范、逐句标注规范、内容校验七条硬规则、记忆库流程、对话陪练协议、复习调度硬规则。
+
+> 学术引用铁律:二手线索(评级 C、未核一手)不得写进交付给用户的学术依据表;正式引用以 `REFERENCE.md` 的一手论文为准。
 
 ## 核心理念(v2 新增)
 
@@ -167,7 +181,8 @@ description: 把任意英文篇章（议论文/说明文/叙事文/演讲稿）�
 - **自测模式**:复习打卡条新增「🙈 自测」三档循环(关→遮译文→全遮)。遮住全部中文翻译与连读注解,点句子临时揭开核对——把打卡从"看着原句评顺卡"变成"盖住→复述→揭开→评顺卡",消灭"认出式假流利";全遮档同时压平行内标注样式,原文变纯净文本。
 - **今日排期**:打卡条上方新增「📅 今日任务」卡。组件自动按 h2 标题 `4.N` 前缀识别段落单元(普通文章整篇=1 段,因此**长文段落单元标题必须用 h2 且以 `4.N` 开头**,否则排期退化为整篇一线);用户设开始日期(首次打开默认今天并持久化)与每天新学段数,按段艾宾浩斯(新学日→次日自测→第 3 天错句→第 7/15 天快背)自动算出"今天新学哪段、复习哪段",逐段勾选完成;一键导出 .ics 日历,把全部新学/复习事件写进系统日历做外部提醒。
 - **复述阶梯追踪**:今日任务卡内每段一行 L1~L5 按钮,点"当前能稳定复述到的级别"记档日期;升级前至少隔一轮复习(Step 3 硬规则)。
-- **亲手改造留白**:每段标题下「✍️ 我的一句话主线」、宫殿每站「🎨 我的画面」为可编辑留白(存 localStorage;打印时空白呈横线,可打印后手写)——把"生成效应必须用户亲手做"落进文件本身。学术依据:**Slamecka & Graf (1978) 的"生成效应"实验**——受试者自己生成的词比阅读的词回忆率高 25-35%,即使生成的内容更困难。引用见文末「主要参考出处」。
+- **亲手改造留白**:每段标题下「✍️ 我的一句话主线」、宫殿每站「🎨 我的画面」为可编辑留白(存 localStorage;打印时空白呈横线,可打印后手写)——把"生成效应必须用户亲手做"落进文件本身。学术依据:**Slamecka & Graf (1978) 的"生成效应"实验**——受试者自己生成的词比阅读的词回忆率高 25-35%,即使生成的内容更困难。引用见参考层 `REFERENCE.md`「主要参考出处」。
+  - **v2.44.0 生成效应联动(闭环 `ANALYSIS.md §2.1.3`「用户不改留白怎么办」)**:升到 **L2 及以上**时,若该段「一句话主线」还没亲手写,组件弹一次强提醒(带 Slamecka & Graf 出处);**取消 = 不升级并滚动聚焦到该段留白输入框,确定 = 仍可升级**(逃生口,不把不愿填的用户锁死)。L1 起步 / 降级 / 点当前级别 / 已填留白四种情况不打扰。生成方案时无需手写该组件,但交付说明里可提一句"升阶梯前最好先亲手写出每段主线"。
 - **结构自检**:用户打开 `plan.html?check=1` 即见自检报告(分段识别/宫殿站数与站号/句钩总数/逻辑桥/锚点覆盖/挖空空数 vs 答案数);
 **快刷与交互挖空**:复习闭环的两条短路径,组件内置:
 
@@ -238,7 +253,7 @@ description: 把任意英文篇章（议论文/说明文/叙事文/演讲稿）�
 
 ## 对话陪练协议(Chat Drill · v2.37.0)
 
-> 借鉴 `michalstrnadel/source-to-skill` 的 `skill-study` active-recall 协议(信源与评级见「同类 skill 借鉴与信源」)。
+> 借鉴 `michalstrnadel/source-to-skill` 的 `skill-study` active-recall 协议(信源与评级见参考层 `REFERENCE.md`)。
 > HTML 方案是「静态教具」,本节是「AI 在对话里怎么陪练」——两者互补,不重复。此前版本生成完文件就结束,缺的正是这一层**评估/反馈**。
 
 **触发**:用户说「考我 / 陪我练 / 抽查 / 提问 / 我说给你听 / 复述给你听 / quiz me / explain back」;或交付方案后用户回「开始」。未触发时不要自作主张开始提问。
@@ -317,37 +332,6 @@ description: 把任意英文篇章（议论文/说明文/叙事文/演讲稿）�
 3. 换个词/换个说法还成立吗?(能转述而非背字)
 
 三问由 AI 扮演「不懂的学生」追问,答不出即退回 L4;评分标准开始前公布、过程不改。L2/L3 环境用文字自问自答等价执行。
-
-## 同类 skill 借鉴与信源(v2.37.0)
-
-> 2026-11-09 读取 GitHub 同类 Agent Skill 源码后的横向对照。可信度评级:**A** = 已读取仓库内 SKILL.md 原文并逐条核对;**B** = 读取仓库 README 原文(经摘要提取);**C** = 仅搜索摘要 / 技能目录镜像,未核一手。
-
-| 仓库 / 文件 | 评级 | 可借鉴机制 | 本 skill 落地位置 | 不照搬的原因 |
-|---|---|---|---|---|
-| `michalstrnadel/source-to-skill` → `skills/skill-study/SKILL.md` | A | 一次一问 / 等答再揭 / 三档评分 / 原文唯一真相源 / due-first / 结算给最弱项+下次到期 / Leitner 1-3-7-14-30 | 「对话陪练协议」 | 它是**概念卡**级;段落背诵必须保句序,不能把句子打散成独立卡 |
-| `kaixiad/RetainCraft` → `SKILL.md` | A | 倦怠检测 / 评分纪律 / 逐级升级+连续 2 次达标 / L5 费曼检验 / 效果量表 | 「倦怠检测与换法阈值」「L5 费曼检验」 | 它的 L1-L5 是**知识等级**,本 skill 的 L1-L5 是**脚手架拆除级别**,语义不同;它的 `optimize-params` 需 1000+ 条 review 才拟合**个性化权重**,这**不等于 FSRS 算法不可用**(见下方校准) |
-| `lyndonkl/claude` → `skills/memory-retrieval-learning/SKILL.md` | A | 交错 ABCABC / 20-40% 遗忘甜区 / 3 轮 <60% 换法 / 复习短于初学 / 质量 rubric | 「复习调度硬规则」「换法阈值」 | 只给通用学习计划,不生成逐句标注与结构图 |
-| `liknenS/language-learning-skills` → `skills/vocab-coach/SKILL.md` | A | Pick-don't-dump(5-15 项)/ 一条目一事 / 先展示后保存 / 1-4 档评分 / 无连接器时 CSV 兜底 | 专业词汇 5~12 个、短语 8~15 个的「择优」原则 | 服务**词汇**而非**篇章**;四档评分会破坏现有二档向后兼容(SM-2 q=4/2) |
-| `m98/fluent` → `README.md` | B | 复习优先于新学 / helper skill 按职责拆分 / 会话结果解析出下次重点 | 规则 1 | 拆成 12 个 skill + 6 个 DB,违背本 skill「单文件零依赖」承诺 |
-| `jeffreytse/grimoire-core` → `apply-spaced-repetition` | C | 扩展间隔 1-2-4-8-16-35-90 / 每日新卡 10-20 上限 / 反复卡住的卡重写成原子卡 | 规则 2 + 换法阈值 | raw SKILL.md 路径 404,仅据技能目录镜像;「原子卡」假设与段落顺序记忆冲突 |
-| `adamaiken89/learn-something` | C | FSRS-5 卡组 / 每模块 3-5 挖空 / predict-next / error-spotting | 仅作未来参考 | 仅搜索摘要;课程制与单篇交付形态不同 |
-| Anthropic / `write-better-skill` 系 | C | description 写「何时用」不堆功能 / body 渐进披露 / 每步可检查且穷尽的完成判据 | 本次 description 重写 | 本 skill 需保持单文件 + 21 平台直装,暂无 `REFERENCE.md` 拆分层(留作后续架构项) |
-
-> **v2.42.2 校准(消除历史表述矛盾)**:v2.37.0 写本表时,「FSRS-5 需 1000+ 条 review」被简写成「本地单文件场景数据不足」,容易读成"本 skill 不能用 FSRS";v2.39.0 已内置 FSRS-5 核心,该表述不再成立。准确区分是两层——
-> ① **算法核心**:`src/plan/scripts/01b-fsrs.js` 逐公式移植 ts-fsrs v6.0.0 FSRS-5,用**默认 19 参数 W**(7 组黄金值 ±1e-6 锁死),零历史数据即可算 D/S/R 与到期日,🧮 一键切换,默认仍 SM-2;
-> ② **个性化参数优化**(RetainCraft `optimize-params` / FSRS 社区经验):需 1000+ 条 review 才不会过拟合,**本 skill 不做**——单文件 localStorage 样本量不够,且每篇方案独立、跨篇不共享调度历史。
-> 因此「不做 per-user 拟合」是范围选择,不是能力缺失;若未来记忆库聚合出足量跨篇复习日志,才具备做②的前提。
-
-**读取 URL**:
-
-- https://github.com/michalstrnadel/source-to-skill/blob/main/skills/skill-study/SKILL.md
-- https://github.com/kaixiad/RetainCraft/blob/main/SKILL.md
-- https://github.com/lyndonkl/claude/blob/main/skills/memory-retrieval-learning/SKILL.md
-- https://github.com/liknenS/language-learning-skills/blob/main/skills/vocab-coach/SKILL.md
-- https://github.com/m98/fluent/blob/main/README.md
-- https://www.skillsdirectory.com/skills/jeffreytse-apply-spaced-repetition (镜像,评级 C)
-
-**二手学术线索(评级 C,未核一手,不得写进交付给用户的学术依据表)**:Donoghue & Hattie (2021) 效果量(间隔 d=0.85 / 主动回忆 d=0.74 / 交错 d=0.47,转引自 RetainCraft 方法论表)、Bjork desirable difficulties(转引自 memory-retrieval-learning Guardrails)。按 `ANALYSIS.md` §4 的信源原则,核到一手论文前本 skill 的正式引用仍以「主要参考出处」5 篇一手论文为准。
 
 ## 平台能力分级与 Markdown 精简版(L2/L3 兜底)
 
@@ -491,25 +475,8 @@ node -e 'const fs=require("fs");const h=fs.readFileSync(process.argv[1],"utf8");
    **v2.43.0 起此条已并入交付硬门禁**:`node bin/verify-plan.mjs memory-library.html` 的规则 7 自动执行同一判据(并额外校验 `<script>` 开标签配平),退出码非 0 即阻断交付;上方命令保留作无 node 环境之外的快速人工复核。
 6. 用户打开 `memory-library.html?check=1` 可见数据体检报告(每篇 key/file/链句数/挖空配对逐项 ✅/⚠)。
 
-## 记忆力友好包(面向记忆弱的学习者)
-
-- **减量**:先只背主线 70%--每个意群只锁 1 个核心词,修饰语靠语法和逻辑推。先粗后细,比一次全背更牢。
-- **画面化**:每个钩子变成 1 秒画面,越具体越荒诞越好--图像记忆是人类的母语。
-- **自己编**:用户自己写的问题清单/自己编的电影画面,记忆强度约翻倍(生成效应)--AI 给的方案只是示例,改造动作必须用户亲手做。方案内「✍️ 我的一句话主线」「🎨 我的画面」留白(v2.13.0)就是为此准备的,交付时明确督促用户亲手填写。
-- **减压阀**:背不动时停 60 秒做别的再回来;漏一天不清零,第二天接着来;忘掉 20~40% 是正常甜区(见「复习调度硬规则」规则 5)。触发「累了 / 连卡 3 句 / 连续 2 轮降分」时按「倦怠检测与换法阈值」降档,不要硬扛。
-
 ## 命名规范
 
 - 文件名:`<topic>-memorization-plan.html`、`assets/<topic>-structure.svg`;topic 用文章主题英文(如 success / learning / jogging / greetings)。记忆库固定命名 `memory-library.html`,与方案同目录。
 - HTML 交付链接文字用中文用途名(如"背诵方案(含挖空自测)")。
 - 技能目录名如需通过 skill-creator 校验器,须为小写连字符格式(如 `english-memory-method`),不能含下划线。
-
-## 主要参考出处
-
-按章节归口,核心一手出处(完整列表见 `ANALYSIS.md` §4):
-
-- **生成效应(留白设计的依据)**:Slamecka, N. J., & Graf, P. (1978). The generation effect: Delineation of a phenomenon. *Journal of Experimental Psychology: Human Learning and Memory*, 4(6), 592–604. DOI: 10.1037/0278-7393.4.6.592
-- **间隔重复 / 艾宾浩斯**:Cepeda, N. J., et al. (2006). Distributed practice in verbal recall tasks: A review and quantitative synthesis. *Psychological Bulletin*, 132(3), 354–380.
-- **SM-2 算法**:Wozniak, P. A. (1990). Optimization of repetition spacing in the practice of learning. *Acta Neurobiologiae Experimentalis*, 50, 303–313.
-- **测试效应 / 主动回忆**:Roediger, H. L., & Karpicke, J. D. (2006). Test-enhanced learning. *Psychological Science*, 17(3), 249–255.
-- **记忆宫殿 / Method of Loci**:McCabe, J. A. (2015). Location, location, location! *Teaching of Psychology*, 42(2).

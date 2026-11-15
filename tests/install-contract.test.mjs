@@ -7,8 +7,8 @@
  * 的内容，管不到「安装后目录」，所以这个 bug 在 670 项测试全绿时依然存活。
  *
  * 检查：
- *   a. 三个安装器的文件清单都含 3 项且含 library-template.html
- *   b. 真正执行 `node bin/install.mjs --target <临时目录>`，断言 3 个文件落地且逐字一致
+ *   a. 三个安装器的文件清单都含 4 项且含 library-template.html
+ *   b. 真正执行 `node bin/install.mjs --target <临时目录>`，断言 4 个文件落地且逐字一致
  *
  * 跑：node tests/install-contract.test.mjs
  */
@@ -27,7 +27,7 @@ function ok(cond, label) {
   else      { failed++; console.log('  ❌ ' + label); }
 }
 
-const REQUIRED = ['SKILL.md', 'assets/plan-template.html', 'assets/library-template.html'];
+const REQUIRED = ['SKILL.md', 'REFERENCE.md', 'assets/plan-template.html', 'assets/library-template.html'];
 
 console.log('\n== v2.37.1 安装器契约 gate ==');
 
@@ -39,11 +39,11 @@ console.log('\n== v2.37.1 安装器契约 gate ==');
   const psLine = (/\$Files\s*=\s*@\(([^)]*)\)/.exec(ps1) || [])[1] || '';
   const shLine = (/^FILES=\(([^)]*)\)/m.exec(sh) || [])[1] || '';
   const mjsBlock = (/const FILES = \[([\s\S]*?)\];/.exec(mjs) || [])[1] || '';
-  ok(REQUIRED.every(f => psLine.includes(f)), 'install.ps1 $Files 含全部 3 个文件');
-  ok(REQUIRED.every(f => shLine.includes(f)), 'install.sh FILES 含全部 3 个文件');
-  ok(REQUIRED.every(f => mjsBlock.includes(f)), 'bin/install.mjs FILES 含全部 3 个文件');
+  ok(REQUIRED.every(f => psLine.includes(f)), 'install.ps1 $Files 含全部 4 个文件');
+  ok(REQUIRED.every(f => shLine.includes(f)), 'install.sh FILES 含全部 4 个文件');
+  ok(REQUIRED.every(f => mjsBlock.includes(f)), 'bin/install.mjs FILES 含全部 4 个文件');
   const counts = [psLine, shLine, mjsBlock].map(s => (s.match(/\.html|\.md/g) || []).length);
-  ok(counts.every(n => n === 3), `三份清单都恰好 3 项（${counts.join('/')}）`);
+  ok(counts.every(n => n === 4), `三份清单都恰好 4 项（${counts.join('/')}）`);
 }
 
 // B. 实跑 npm bin 安装器到临时目录，检查产物

@@ -11,7 +11,7 @@
  *   d. 模板今日任务卡含「复习优先」顺序条；页脚版本戳与 package.json 对齐
  *   e. 根 SKILL.md ≡ skills/ 副本（与 version-check 双保险）
  *
- * 断言数：28（v2.42.2 计入总测试数 851）
+ * 断言数：38（v2.44.0 计入总测试数 971）
  * 跑：node tests/skill-contract.test.mjs
  */
 import fs from 'node:fs';
@@ -29,10 +29,12 @@ function ok(cond, label) {
 
 const skill = read('SKILL.md');
 const copy = read('skills/english-memory-method/SKILL.md');
+const ref = read('REFERENCE.md');
+const refCopy = read('skills/english-memory-method/REFERENCE.md');
 const planTpl = read('assets/plan-template.html');
 const pkg = JSON.parse(read('package.json'));
 
-console.log('\n== v2.42.2 SKILL.md 契约 gate ==');
+console.log('\n== v2.44.0 SKILL.md 契约 gate ==');
 
 // A. description：Agent 每轮都要读的元数据，只写「何时用」不堆功能清单
 const desc = (/^description: (.+)$/m.exec(skill) || [])[1] || '';
@@ -43,8 +45,9 @@ const triggers = ['背诵方法', '记忆技巧', '帮我背', '出背诵方案'
 ok(triggers.every(t => desc.includes(t)), `description 触发语齐全（${triggers.length} 个）`);
 
 // B. 四个新章节
-const sections = ['## 对话陪练协议', '## 复习调度硬规则', '## 倦怠检测与换法阈值', '## 同类 skill 借鉴与信源'];
-ok(sections.every(s => skill.includes(s)), '四个新增章节齐全（陪练 / 调度 / 倦怠 / 信源）');
+const sections = ['## 对话陪练协议', '## 复习调度硬规则', '## 倦怠检测与换法阈值'];
+ok(sections.every(s => skill.includes(s)), '三个执行章节齐全（陪练 / 调度 / 倦怠）');
+ok(ref.includes('## 同类 skill 借鉴与信源'), '信源表已迁至 REFERENCE.md 参考层');
 const drill = ['一次一问', '等答再揭', '三档诚实评分', '原文唯一真相源', '结算三要素', 'due-first'];
 ok(drill.every(s => skill.includes(s)), '对话陪练硬规则 + due-first 齐全');
 ok(skill.includes('不写也读不到 localStorage') && skill.includes('回原方案补打卡'), '陪练不落盘、与 HTML 方案分工明确');
@@ -59,10 +62,10 @@ ok(skill.includes('连续 3 句') && skill.includes('连续 2 轮') && skill.inc
 ok(skill.includes('L5 费曼检验') && skill.includes('费曼三问'), 'L5 费曼检验替代「说够 90 秒」');
 
 // C. 信源与学术严谨性
-const urls = (skill.match(/https:\/\/github\.com\/[^\s)]+/g) || []);
+const urls = (ref.match(/https:\/\/github\.com\/[^\s)]+/g) || []);
 ok(urls.length >= 5, `信源表列出可核对的 GitHub URL（${urls.length} 个）`);
-ok(skill.includes('**A** =') && skill.includes('**B** =') && skill.includes('**C** ='), '信源含 A/B/C 可信度评级定义');
-ok(skill.includes('未核一手,不得写进交付给用户的学术依据表'), '二手学术线索明确标注禁用范围');
+ok(ref.includes('**A** =') && ref.includes('**B** =') && ref.includes('**C** ='), '信源含 A/B/C 可信度评级定义');
+ok(ref.includes('未核一手,不得写进交付给用户的学术依据表'), '二手学术线索明确标注禁用范围');
 
 // C2. SM-2 标准模式语义（v2.38.0 起真正驱动调度，取代 v2.37.1 的「仅可视化」）
 ok(skill.includes('句级调度器') && skill.includes('由 SM-2 `due` 驱动'),
@@ -83,9 +86,9 @@ ok(skill.includes('退出码恒 0') && skill.includes('不阻断交付') && skil
 ok(skill.includes('evals/') && skill.includes('tests/evals.test.mjs'), '指向固定样本与口径锁测试');
 
 // C4. v2.42.2：FSRS 信源表表述校准（消除与 v2.39 vendor FSRS-5 核心的矛盾）
-ok(skill.includes('v2.42.2 校准') && skill.includes('默认 19 参数 W') && skill.includes('个性化参数优化'),
+ok(ref.includes('v2.42.2 校准') && ref.includes('默认 19 参数 W') && ref.includes('个性化参数优化'),
   '明确区分「默认参数核心」与「per-user 拟合」两层');
-ok(skill.split('本地单文件场景数据不足').length - 1 === 1,
+ok(ref.split('本地单文件场景数据不足').length - 1 === 1,
   '旧表述「本地单文件场景数据不足」仅允许在 v2.42.2 校准引注中出现 1 次（不再独立出现）');
 
 // C5. v2.43.0：脚本截断硬校验 / a11y 规范 / AnkiConnect 双通道
@@ -94,6 +97,15 @@ ok(/结构图规范/.test(skill) && skill.includes('<title>') && skill.includes(
   '结构图规范含 SVG title/desc 可访问性要求');
 ok(skill.includes('AnkiConnect') && skill.includes('自动回退 CSV') && skill.includes('collectAnkiCards'),
   'Anki 双通道 + 共用卡片来源 + 失败回退已写入 SKILL.md');
+
+// C6. v2.44.0 渐进披露：参考层已拆出且有长度门禁
+ok(skill.includes('## 参考层(按需加载') && skill.includes('REFERENCE.md'), 'SKILL.md 含按需加载导航');
+ok(['同类 skill 借鉴与信源','记忆力友好包','主要参考出处'].every(x => ref.includes('## '+x)),
+  'REFERENCE.md 收齐 3 个纯参考章节');
+ok(!skill.includes('## 主要参考出处') && !skill.includes('## 记忆力友好包'), '参考章节不再留在 SKILL.md 正文');
+ok(skill.includes('## 命名规范') && skill.includes('## 内容校验'), '执行规则（命名/校验）仍留在 SKILL.md');
+ok(skill.split('\n').length <= 500, `SKILL.md 行数 ≤ 500 防再膨胀（实际 ${skill.split('\n').length}）`);
+ok(ref.replace(/\r\n/g,'\n') === refCopy.replace(/\r\n/g,'\n'), 'REFERENCE.md 根 ≡ skills/ 副本');
 
 // D. 代码层：复习优先提示 + 版本戳同步
 ok(planTpl.includes('emm-order') && planTpl.includes('今日顺序') && planTpl.includes('先复习到期段'),

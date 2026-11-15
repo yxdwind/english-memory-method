@@ -7,7 +7,7 @@
 Paste any English article, and it produces a complete memorization plan (**15 sections** regular · **16** speech incl. skeleton · **17** longform incl. segment dashboard; self-contained HTML):
 sentence-by-sentence linking marks, hooks welded into question chains, a retelling ladder, terminology tables, collapsed self-tests — all in one file.
 
-![Version](https://img.shields.io/badge/version-2.43.0-blue)
+![Version](https://img.shields.io/badge/version-2.44.0-blue)
 ![Platforms](https://img.shields.io/badge/platforms-16+-teal)
 ![Skill Sections](https://img.shields.io/badge/skill_sections-15-orange)
 ![License](https://img.shields.io/badge/license-MIT-green)
@@ -44,7 +44,9 @@ sentence-by-sentence linking marks, hooks welded into question chains, a retelli
 | 🌐 | **Online samples** | Try before installing: real generated plans on GitHub Pages — check-in / dictation / shadowing, just open |
 | 🗣 | **Chat drill protocol** | One question at a time, reveal only after you answer, three-level honest grading; debrief names your weakest sentence + next due date |
 | 📡 | **AnkiConnect push** | Probes local port 8765 and pushes cloze/retell cards directly, skips duplicates and logs a receipt; falls back to CSV automatically when offline or CORS-blocked |
-| 🧪 | **900 automated tests** | Smoke + runtime + 35-step E2E + browser matrix + perf boundary + optional real-browser suite + SKILL.md/installer/platform-drift/SM-2/FSRS scheduling/Feynman mode/interleaved drill/quality-eval/head-comment contracts, one `npm test` |
+| 📚 | **Progressive disclosure** | `SKILL.md` keeps execution rules only; sources / papers / memory-friendly pack load on demand from `REFERENCE.md`, shipped by installers and the offline bundle |
+| 🔬 | **Research collection** | `research/session.html` offline intake + `bin/research-validate.mjs` schema gate / CSV / anonymization; tooling ready, data pending recruitment |
+| 🧪 | **971 automated tests** | Smoke + runtime + 35-step E2E + browser matrix + perf boundary + optional real-browser suite + SKILL.md/installer/platform-drift/SM-2/FSRS scheduling/Feynman mode/interleaved drill/quality-eval/head-comment contracts, one `npm test` |
 | 🚦 | **Delivery gate** | `node bin/verify-plan.mjs` runs seven hard rules before delivery (fidelity / palace / hook chains / cloze / sourcing / script truncation) — non-zero exit blocks it |
 | 🔒 | **Collapsed self-tests** | Fill the blanks first; answers hide behind "▶ 查看本段答案" toggles, auto-hidden when printing |
 | 🖥 | **16+ platforms, one command** | Claude Code / Codex / Trae / Lingma / Comate / CodeBuddy / WorkBuddy / Kimi / MiniMax… |
@@ -218,6 +220,10 @@ Full matrix (21 platforms × install methods): **[platforms/README.md](platforms
 > Newest first; earliest versions in the collapsed section at the bottom.
 
 > Full version history (including historical bug fixes and CI self-check anchors `EMM_*`) has been moved to [CHANGELOG.md](CHANGELOG.md).
+
+**Generation effect / progressive disclosure / research tooling** (v2.44.0)
+
+**v2.44.0**: ✍️ **workbook ↔ ladder gate** — promoting to L2+ without hand-writing that segment's "one-line thread" raises a prompt citing Slamecka & Graf (1978); cancel focuses the blank, confirm skips (escape hatch), closing `ANALYSIS.md §2.1.3`. 📚 **progressive disclosure** — a new `REFERENCE.md` layer moves 3 reference-only sections out of the generation path (SKILL.md 515→483 lines) with an on-demand navigation table; installers, release bundle, copy-identity and contract gates all updated, plus a ≤500-line guard. 🔬 **research collection tooling** — `research/session.html` (self-contained, offline, localStorage, JSON export) + `bin/research-validate.mjs` (zero-dependency schema gate / CSV / anonymization); **tooling ready ≠ data collected** — IRB and recruitment remain open. Total tests **971**.
 
 **Delivery gate / accessibility / Anki push** (v2.43.0)
 
@@ -413,7 +419,7 @@ Progress is saved in the browser `localStorage`: **it is isolated per browser an
 - Install sources default to `raw.githubusercontent.com` and jsDelivr; if your network is unreliable, use a reachable mirror or an offline package.
 
 ### Output quality depends on the host model
-Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 900 tests cover the **template and runtime**, not the quality of any specific model's generated content.
+Plans are generated live by the host agent's model; quality scales with model capability. Weaker models or L2/L3 platforms produce thinner output. The 971 tests cover the **template and runtime**, not the quality of any specific model's generated content.
 
 ### Who this is NOT for
 - Absolute beginners who want a 5-minute quick-memorize flow (this method is methodology-heavy with a higher onboarding cost).

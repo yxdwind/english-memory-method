@@ -81,7 +81,7 @@ ok(/^[a-f0-9]{64}  english-memory-method-v\d+\.\d+\.\d+\.zip$/.test(sumsOuter), 
 const entries = readZip(zipBuf);
 const names = entries.map(e => e.name);
 const must = [
-  `${BUNDLE}/SKILL.md`, `${BUNDLE}/assets/plan-template.html`, `${BUNDLE}/assets/library-template.html`,
+  `${BUNDLE}/SKILL.md`, `${BUNDLE}/REFERENCE.md`, `${BUNDLE}/skills/english-memory-method/REFERENCE.md`, `${BUNDLE}/assets/plan-template.html`, `${BUNDLE}/assets/library-template.html`,
   `${BUNDLE}/install.sh`, `${BUNDLE}/install.ps1`, `${BUNDLE}/bin/build-release.mjs`,
   `${BUNDLE}/bin/version-check.mjs`, `${BUNDLE}/skills/english-memory-method/SKILL.md`,
   `${BUNDLE}/platforms/README.md`, `${BUNDLE}/docs/E2E.md`, `${BUNDLE}/.claude-plugin/plugin.json`,

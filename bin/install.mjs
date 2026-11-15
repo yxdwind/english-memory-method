@@ -37,6 +37,7 @@ const PLATFORMS = {
 // 新增模板时只需改这一处；tests/install-contract.test.mjs 会实跑本脚本校验产物齐全。
 const FILES = [
   "SKILL.md",
+  "REFERENCE.md",
   "assets/plan-template.html",
   "assets/library-template.html",
 ];

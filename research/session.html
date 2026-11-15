@@ -1,0 +1,241 @@
+<!DOCTYPE html>
+<!--
+  English Memory Method · 受试者数据采集页（research/session.html · v2.44.0）
+  配套 docs/RESEARCH.md（14 天 RCT 试点）与 tests/fixtures/research-protocol.json 的 data_schema。
+  自包含单文件、零外部依赖、不联网：数据只写本机 localStorage，导出后由研究者自行保管。
+  导出后请用 node bin/research-validate.mjs <file.json> 过一遍 schema 门禁再进入统计。
+-->
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>EMM 试点 · 受试者数据采集</title>
+<style>
+  :root{--bd:#d8dee9;--ac:#4a6fa5;--bg:#f7f9fc;--ok:#15803d;--bad:#b91c1c}
+  *{box-sizing:border-box}
+  body{font:15px/1.7 system-ui,'Microsoft YaHei',sans-serif;margin:0;padding:24px;background:var(--bg);color:#1f2d3d}
+  .wrap{max-width:860px;margin:0 auto}
+  h1{font-size:22px;margin:0 0 4px}
+  h2{font-size:17px;margin:26px 0 10px;padding-bottom:6px;border-bottom:2px solid var(--ac);color:#25436d}
+  .privacy{background:#fff7ed;border:1px solid #fdba74;border-left:4px solid #f97316;border-radius:10px;padding:12px 16px;margin:16px 0;font-size:13.5px}
+  .card{background:#fff;border:1px solid var(--bd);border-radius:12px;padding:16px 18px;margin-bottom:14px}
+  label{display:block;font-size:13px;color:#475569;margin:8px 0 3px;font-weight:600}
+  input[type=text],input[type=number],input[type=datetime-local],select,textarea{
+    width:100%;padding:7px 10px;border:1px solid var(--bd);border-radius:7px;font:inherit;font-size:14px;background:#fff}
+  textarea{min-height:90px;resize:vertical}
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:0 14px}
+  .chk{display:flex;align-items:center;gap:8px;margin:10px 0;font-weight:600}
+  .chk input{width:17px;height:17px}
+  .dayrow{display:grid;grid-template-columns:repeat(auto-fit,minmax(120px,1fr));gap:0 12px;
+    border:1px dashed var(--bd);border-radius:8px;padding:6px 12px;margin:8px 0}
+  .dayrow b{grid-column:1/-1;font-size:13px;color:#25436d}
+  .bar{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0}
+  button{background:var(--ac);color:#fff;border:0;border-radius:8px;padding:9px 16px;
+    font:inherit;font-size:14px;font-weight:600;cursor:pointer}
+  button.sec{background:#fff;color:var(--ac);border:1px solid var(--ac)}
+  button.warn{background:#fff;color:var(--bad);border:1px solid #fca5a5}
+  button:focus-visible{outline:3px solid #f59e0b;outline-offset:2px}
+  #status{margin:12px 0;font-size:14px;font-weight:600;min-height:22px}
+  .ok{color:var(--ok)} .bad{color:var(--bad)}
+  .hint{font-size:12.5px;color:#64748b;font-weight:400}
+  @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+  @media print{.bar,.privacy{display:none}}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>EMM 试点 · 受试者数据采集</h1>
+  <p class="hint">研究设计：docs/RESEARCH.md　·　数据口径：tests/fixtures/research-protocol.json（data_schema v0.1.0）</p>
+
+  <div class="privacy">
+    🔒 <b>隐私与离线声明</b>：本页<b>不联网、不上传、无外部资源</b>。填写内容只保存在本机浏览器 localStorage，
+    点击「导出 JSON」才会生成文件。请不要在自由文本框里写姓名、学号、联系方式等可识别信息；
+    受试者一律用编号 <code>P01…P20</code>。导出文件请按研究方案加密保管，并遵守研究方案 §数据留存 的期限。
+  </div>
+
+  <form id="f" autocomplete="off">
+    <h2>1. 受试者基本信息</h2>
+    <div class="card">
+      <div class="grid">
+        <div><label for="subject_id">受试者编号 * <span class="hint">P01–P20</span></label><input id="subject_id" name="subject_id" type="text" placeholder="P01" required></div>
+        <div><label for="group">分组 *</label><select id="group" name="group"><option value="experimental">实验组（本 skill）</option><option value="control">对照组（传统跟读）</option></select></div>
+        <div><label for="enrolled_at">入组时间 *</label><input id="enrolled_at" name="enrolled_at" type="datetime-local" required></div>
+      </div>
+      <label class="chk"><input id="consent_signed" name="consent_signed" type="checkbox" required> 已签署知情同意书（必填，未签不得入组）</label>
+    </div>
+
+    <h2>2. D0 基线</h2>
+    <div class="card">
+      <div class="grid">
+        <div><label for="english_score">英语水平分 <span class="hint">0–990</span></label><input id="english_score" name="baseline.english_score" type="number" min="0" max="990"></div>
+        <div><label for="english_test">考试类型</label><select id="english_test" name="baseline.english_test"><option value="">—</option><option>CET-6</option><option>IELTS</option><option>TEM-4</option></select></div>
+        <div><label for="v">VARK·视觉 <span class="hint">0–16</span></label><input id="v" name="baseline.vark.v" type="number" min="0" max="16"></div>
+        <div><label for="a">VARK·听觉</label><input id="a" name="baseline.vark.a" type="number" min="0" max="16"></div>
+        <div><label for="r">VARK·读写</label><input id="r" name="baseline.vark.r" type="number" min="0" max="16"></div>
+        <div><label for="k">VARK·动觉</label><input id="k" name="baseline.vark.k" type="number" min="0" max="16"></div>
+        <div><label for="phq9">PHQ-9 <span class="hint">0–27</span></label><input id="phq9" name="baseline.phq9" type="number" min="0" max="27"></div>
+        <div><label for="gad7">GAD-7 <span class="hint">0–21</span></label><input id="gad7" name="baseline.gad7" type="number" min="0" max="21"></div>
+      </div>
+    </div>
+
+    <h2>3. 训练期 D1–D3</h2>
+    <div class="card" id="training"></div>
+
+    <h2>4. D7 延迟回忆</h2>
+    <div class="card">
+      <label for="transcript">复述转写 <span class="hint">不要写可识别信息</span></label>
+      <textarea id="transcript" name="d7_recall.transcript" placeholder="逐句转写受试者的复述…"></textarea>
+      <div class="grid">
+        <div><label for="scores">逐句评分 <span class="hint">逗号分隔，每句 0–4</span></label><input id="scores" name="d7_recall.score_per_sentence" type="text" placeholder="4,4,3,4,4"></div>
+        <div><label for="total_pct">总正确率 % <span class="hint">0–100</span></label><input id="total_pct" name="d7_recall.total_pct" type="number" min="0" max="100" step="0.1"></div>
+        <div><label for="difficulty">主观难度 <span class="hint">1–5</span></label><input id="difficulty" name="subjective.difficulty" type="number" min="1" max="5"></div>
+        <div><label for="enjoyment">主观喜爱度 <span class="hint">1–5</span></label><input id="enjoyment" name="subjective.enjoyment" type="number" min="1" max="5"></div>
+        <div><label for="retest_speed_sec">复测用时（秒）</label><input id="retest_speed_sec" name="retest_speed_sec" type="number" min="0"></div>
+      </div>
+    </div>
+
+    <div class="bar">
+      <button type="button" id="save">💾 保存到本机</button>
+      <button type="button" id="export" class="sec">📤 导出 JSON</button>
+      <button type="button" id="load" class="sec">📥 载入本机记录</button>
+      <button type="button" id="clear" class="warn">清空本页</button>
+    </div>
+    <div id="status" role="status" aria-live="polite"></div>
+    <p class="hint">保存键：<code>emm-research:&lt;受试者编号&gt;</code>。导出后请运行
+      <code>node bin/research-validate.mjs &lt;导出文件.json&gt;</code> 过 schema 门禁。</p>
+  </form>
+</div>
+
+<script>
+(function(){
+  "use strict";
+  var $ = function(id){ return document.getElementById(id); };
+  var status = $('status');
+  function say(msg, good){ status.textContent = msg; status.className = good ? 'ok' : 'bad'; }
+  function num(v){ return v === '' || v === null || v === undefined ? undefined : Number(v); }
+  function setPath(o, p, v){
+    if(v === undefined || v === '') return;
+    var parts = p.split('.'), cur = o;
+    for(var i = 0; i < parts.length - 1; i++){
+      if(!cur[parts[i]] || typeof cur[parts[i]] !== 'object') cur[parts[i]] = {};
+      cur = cur[parts[i]];
+    }
+    cur[parts[parts.length - 1]] = v;
+  }
+
+  // 训练期 3 天：动态生成，字段命名 dayN_*
+  (function(){
+    var host = $('training'), html = '';
+    for(var d = 1; d <= 3; d++){
+      html += '<div class="dayrow"><b>Day ' + d + '</b>'
+        + '<div><label>学习分钟</label><input id="day' + d + '_minutes" type="number" min="0" max="600"></div>'
+        + '<div><label>薄弱句号 <span class="hint">逗号分隔</span></label><input id="day' + d + '_weak" type="text" placeholder="3,5"></div>'
+        + '<div><label class="chk"><input id="day' + d + '_shadow" type="checkbox"> 用了跟读</label></div>'
+        + '<div><label class="chk"><input id="day' + d + '_abandoned" type="checkbox"> 中途放弃</label></div>'
+        + '</div>';
+    }
+    host.innerHTML = html;
+  })();
+
+  function collect(){
+    var o = { subject_id: $('subject_id').value.trim(), group: $('group').value, consent_signed: $('consent_signed').checked };
+    var dt = $('enrolled_at').value;
+    if(dt) o.enrolled_at = dt.length === 16 ? dt + ':00Z' : dt;
+    var paths = {
+      'baseline.english_score': num($('english_score').value),
+      'baseline.english_test': $('english_test').value || undefined,
+      'baseline.vark.v': num($('v').value), 'baseline.vark.a': num($('a').value),
+      'baseline.vark.r': num($('r').value), 'baseline.vark.k': num($('k').value),
+      'baseline.phq9': num($('phq9').value), 'baseline.gad7': num($('gad7').value),
+      'd7_recall.transcript': $('transcript').value.trim() || undefined,
+      'd7_recall.total_pct': num($('total_pct').value),
+      'subjective.difficulty': num($('difficulty').value),
+      'subjective.enjoyment': num($('enjoyment').value),
+      'retest_speed_sec': num($('retest_speed_sec').value)
+    };
+    Object.keys(paths).forEach(function(p){ setPath(o, p, paths[p]); });
+    var sc = $('scores').value.split(',').map(function(x){ return x.trim(); }).filter(Boolean).map(Number);
+    if(sc.length){ if(!o.d7_recall) o.d7_recall = {}; o.d7_recall.score_per_sentence = sc; }
+    o.training_log = [];
+    for(var d = 1; d <= 3; d++){
+      var m = num($('day' + d + '_minutes').value);
+      var w = $('day' + d + '_weak').value.split(',').map(function(x){ return x.trim(); }).filter(Boolean).map(Number);
+      var sh = $('day' + d + '_shadow').checked, ab = $('day' + d + '_abandoned').checked;
+      if(m === undefined && !w.length && !sh && !ab) continue;
+      var e = { day: d, minutes: m === undefined ? 0 : m };
+      if(w.length) e.weak_sentences = w;
+      if(sh) e.shadow_used = true;
+      if(ab) e.abandoned = true;
+      o.training_log.push(e);
+    }
+    return o;
+  }
+
+  function check(o){
+    var errs = [];
+    if(!/^P[0-9]{2}$/.test(o.subject_id)) errs.push('受试者编号须为 P01–P20 格式');
+    if(!o.enrolled_at) errs.push('入组时间必填');
+    if(o.consent_signed !== true) errs.push('未签知情同意书不得入组');
+    var d7 = o.d7_recall || {};
+    if(d7.score_per_sentence && d7.score_per_sentence.some(function(x){ return !Number.isInteger(x) || x < 0 || x > 4; }))
+      errs.push('逐句评分须为 0–4 的整数');
+    if(d7.total_pct !== undefined && (d7.total_pct < 0 || d7.total_pct > 100)) errs.push('总正确率须在 0–100');
+    return errs;
+  }
+
+  function download(name, text){
+    var a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([text], { type: 'application/json;charset=utf-8' }));
+    a.download = name; document.body.appendChild(a); a.click(); document.body.removeChild(a);
+    setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+  }
+
+  $('save').addEventListener('click', function(){
+    var o = collect(), errs = check(o);
+    if(errs.length){ say('❌ ' + errs.join('；'), false); return; }
+    try {
+      localStorage.setItem('emm-research:' + o.subject_id, JSON.stringify(o));
+      say('✅ 已保存到本机：' + o.subject_id + '（不联网）', true);
+    } catch(e){ say('❌ 本机存储写入失败：' + e.message, false); }
+  });
+  $('export').addEventListener('click', function(){
+    var o = collect(), errs = check(o);
+    if(errs.length){ say('❌ ' + errs.join('；'), false); return; }
+    download(o.subject_id + '-emm-research.json', JSON.stringify(o, null, 2));
+    say('📤 已导出 ' + o.subject_id + '-emm-research.json，请接着跑 research-validate.mjs', true);
+  });
+  $('load').addEventListener('click', function(){
+    var id = $('subject_id').value.trim();
+    if(!/^P[0-9]{2}$/.test(id)){ say('❌ 先填受试者编号（P01–P20）再载入', false); return; }
+    var raw = localStorage.getItem('emm-research:' + id);
+    if(!raw){ say('❌ 本机没有 ' + id + ' 的记录', false); return; }
+    try {
+      var o = JSON.parse(raw);
+      $('group').value = o.group || 'experimental';
+      $('enrolled_at').value = (o.enrolled_at || '').slice(0, 16);
+      $('consent_signed').checked = !!o.consent_signed;
+      var b = o.baseline || {}, v = b.vark || {}, d7 = o.d7_recall || {}, sj = o.subjective || {};
+      var put = function(id, val){ if(val !== undefined) $(id).value = val; };
+      put('english_score', b.english_score); put('english_test', b.english_test);
+      put('v', v.v); put('a', v.a); put('r', v.r); put('k', v.k);
+      put('phq9', b.phq9); put('gad7', b.gad7);
+      put('transcript', d7.transcript); put('scores', (d7.score_per_sentence || []).join(','));
+      put('total_pct', d7.total_pct); put('difficulty', sj.difficulty);
+      put('enjoyment', sj.enjoyment); put('retest_speed_sec', o.retest_speed_sec);
+      (o.training_log || []).forEach(function(e){
+        if(!$('day' + e.day + '_minutes')) return;
+        put('day' + e.day + '_minutes', e.minutes);
+        put('day' + e.day + '_weak', (e.weak_sentences || []).join(','));
+        $('day' + e.day + '_shadow').checked = !!e.shadow_used;
+        $('day' + e.day + '_abandoned').checked = !!e.abandoned;
+      });
+      say('✅ 已载入本机记录：' + id, true);
+    } catch(e){ say('❌ 记录损坏：' + e.message, false); }
+  });
+  $('clear').addEventListener('click', function(){
+    $('f').reset(); say('本页已清空（本机已保存的记录不受影响）', true);
+  });
+})();
+</script>
+</body>
+</html>
